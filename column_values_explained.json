@@ -1,0 +1,99 @@
+[
+  {
+    "table": "reglementeleve",
+    "columns": [
+      {
+        "name": "ModeReglement",
+        "description": "Indique la méthode de paiement utilisée.",
+        "values": {
+          "1": "Espèces",
+          "2": "Chèque"
+        }
+      },
+      {
+        "name": "RegInscri",
+        "description": "Indique si le règlement est lié à l'inscription.",
+        "values": {
+          "0": "Non",
+          "1": "Oui"
+        }
+      },
+      {
+        "name": "RegUniform",
+        "description": "Indique si le règlement est lié à l'uniforme.",
+        "values": {
+          "0": "Non",
+          "1": "Oui"
+        }
+      },
+      {
+        "name": "Remboursement",
+        "description": "Indique si le règlement est un remboursement.",
+        "values": {
+          "0": "Non",
+          "1": "Oui"
+        }
+      },
+      {
+        "name": "Annule",
+        "description": "Indique si le règlement est annulé.",
+        "values": {
+          "0": "Non",
+          "1": "Oui"
+        }
+      },
+      {
+        "name": "AnnulationAvecRemboursement",
+        "description": "Indique si l'annulation a été suivie d'un remboursement.",
+        "values": {
+          "0": "Non",
+          "1": "Oui"
+        }
+      },
+      {
+        "name": "ModeRemboursement",
+        "description": "Indique le mode utilisé pour le remboursement.",
+        "values": {
+          "1": "Espèces",
+          "2": "Chèque",
+          "3": "Virement"
+        }
+      }
+    ]
+  },
+  {
+    "table": "personne",
+    "columns": [
+      {
+        "name": "Localite",
+        "description": "Nom de la localité ou du lieu de résidence de la personne (quartier, ville ou village). Sert à identifier la zone géographique du domicile.",
+        "values": {
+          "1": "Centre-ville",
+          "2": "Banlieue",
+          "3": "Zone rurale",
+          "4": "Autre"
+        }
+      },
+      {
+        "name": "Civilite",
+        "description": "Civilité de la personne (titre utilisé dans les documents : Monsieur, Madame, etc.).",
+        "values": {
+          "1": "Monsieur",
+          "2": "Madame",
+          "3": "Mademoiselle"
+        }
+      },
+      {
+        "name": "Nationalite",
+        "description": "Nationalité de la personne (code pays).",
+        "values": {
+          "1": "Tunisienne",
+          "2": "Française",
+          "3": "Algérienne",
+          "4": "Marocaine",
+          "5": "Autre"
+        }
+      }
+    ]
+  }
+]

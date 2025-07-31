@@ -1,0 +1,6 @@
+{
+  "Donne moi le num\u00e9ro de t\u00e9l\u00e9phone de Abdelbasset Laataoui": {
+    "sql": "SELECT tel1\nFROM `personne`\nWHERE prenomar = 'Abdelbasset Laataoui';",
+    "response": "\u2139\ufe0f Aucune donn\u00e9e trouv\u00e9e."
+  }
+}

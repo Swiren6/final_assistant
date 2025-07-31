@@ -1,0 +1,62 @@
+[
+  {
+    "role": "parent",
+    "question": "Quel est l'emploi du temps de mon enfant cette semaine ?",
+    "expected_sql": "SELECT day, subject, start_time, end_time FROM timetable WHERE student_id = [ID] AND day BETWEEN '[LUNDI_DATE]' AND '[DIMANCHE_DATE]' ORDER BY day, start_time;"
+  },
+  {
+    "role": "parent",
+    "question": "Est-ce que mon enfant a mangé à la cantine aujourd'hui ?",
+    "expected_sql": "SELECT meal FROM canteen WHERE student_id = [ID] AND date = CURRENT_DATE();"
+  },
+  {
+    "role": "parent",
+    "question": "Combien de retards a-t-il eu ce mois-ci ?",
+    "expected_sql": "SELECT COUNT(*) FROM absences WHERE student_id = [ID] AND reason = 'retard' AND date BETWEEN '[DEBUT_MOIS]' AND '[FIN_MOIS]';"
+  },
+  {
+    "role": "parent",
+    "question": "Quels sont ses devoirs pour demain en mathématiques ?",
+    "expected_sql": "SELECT assignment FROM homework WHERE student_id = [ID] AND subject = 'mathématiques' AND due_date = '[DEMAIN_DATE]';"
+  },
+  {
+    "role": "parent",
+    "question": "Quelle est sa moyenne en sciences ce trimestre ?",
+    "expected_sql": "SELECT AVG(grade) FROM grades WHERE student_id = [ID] AND subject = 'sciences' AND period = 'trimestre_1';"
+  },
+  {
+    "role": "administration",
+    "question": "Quel est le nombre total d'élèves préinscrits cette année ?",
+    "expected_sql": "SELECT COUNT(*) FROM enrollments WHERE year = 2024 AND status = 'preinscrit';"
+  },
+  {
+    "role": "administration",
+    "question": "Liste des élèves non reinscrits par classe",
+    "expected_sql": "SELECT s.name, s.class FROM students s JOIN enrollments e ON s.id = e.student_id WHERE e.status = 'non_reinscrit' AND e.year = 2024 ORDER BY s.class;"
+  },
+  {
+    "role": "administration",
+    "question": "Quel est le taux de paiement des frais de cantine par mois ?",
+    "expected_sql": "SELECT MONTH(payment_date) AS month, (SUM(amount) / SUM(expected_amount)) * 100 AS payment_rate FROM canteen_payments WHERE YEAR(payment_date) = 2024 GROUP BY MONTH(payment_date);"
+  },
+  {
+    "role": "administration",
+    "question": "Quelle est la moyenne des notes en français pour la classe de 4ème B ?",
+    "expected_sql": "SELECT AVG(g.grade) FROM grades g JOIN students s ON g.student_id = s.id WHERE g.subject = 'français' AND s.class = '4B';"
+  },
+  {
+    "role": "administration",
+    "question": "Liste des parents dont les enfants ont plus de 3 absences non justifiées",
+    "expected_sql": "SELECT p.name, p.contact FROM parents p JOIN students s ON p.child_id = s.id JOIN (SELECT student_id, COUNT(*) as abs_count FROM absences WHERE justified = false GROUP BY student_id HAVING COUNT(*) > 3) a ON s.id = a.student_id;"
+  },
+  {
+    "role": "parent",
+    "question": "Quand a lieu le prochain conseil de classe ?",
+    "expected_sql": "SELECT date, time FROM events WHERE type = 'conseil_classe' AND date >= CURRENT_DATE() ORDER BY date LIMIT 1;"
+  },
+  {
+    "role": "administration",
+    "question": "Quels sont les élèves boursiers avec une moyenne supérieure à 14 ?",
+    "expected_sql": "SELECT s.name, s.class, AVG(g.grade) as average FROM students s JOIN grades g ON s.id = g.student_id WHERE s.scholarship = true GROUP BY s.id HAVING average > 14;"
+  }
+]

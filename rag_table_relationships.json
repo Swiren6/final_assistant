@@ -1,0 +1,185 @@
+{
+  "absence": [
+    "inscriptioneleve"
+  ],
+  "actionfonctionalitepriv": [
+    "fonctionaliteprivelge"
+  ],
+  "avertissement": [
+    "inscriptioneleve"
+  ],
+  "banque": [
+    "localite",
+    "personne"
+  ],
+  "banquebordereaudetails": [
+    "banquebordereau",
+    "reglementeleve"
+  ],
+  "banqueversement": [
+    "banquebordereau"
+  ],
+  "blame": [
+    "inscriptioneleve"
+  ],
+  "caisse": [
+    "utilisateur"
+  ],
+  "caisse_log": [
+    "personne",
+    "utilisateur"
+  ],
+  "caissedetails": [
+    "banqueversement",
+    "caisse",
+    "cantineparjour",
+    "paiementdetailscourete",
+    "personne",
+    "reglementeleve",
+    "utilisateur"
+  ],
+  "cantineparjour": [
+    "utilisateur"
+  ],
+  "cantineparjourenseignant": [
+    "utilisateur"
+  ],
+  "classe": [
+    "etablissement",
+    "niveau"
+  ],
+  "delegation": [
+    "gouvernorat"
+  ],
+  "disponibiliteenseignant": [
+    "enseingant",
+    "jour"
+  ],
+  "dre": [
+    "gouvernorat"
+  ],
+  "eleve": [
+    "personne"
+  ],
+  "enseigantmatiere": [
+    "anneescolaire",
+    "matiere",
+    "personne"
+  ],
+  "enseingant": [
+    "diplome",
+    "modalitepaiement",
+    "personne",
+    "qualite",
+    "situationfamilliale"
+  ],
+  "etablissement": [
+    "dre",
+    "gouvernorat",
+    "typeetablissement"
+  ],
+  "fichierpreinscriptionpreinscription": [
+    "preinscriptionpreinscription"
+  ],
+  "fonctionaliteprivelge": [
+    "rubrique"
+  ],
+  "inscriptioneleve": [
+    "anneescolaire",
+    "personne"
+  ],
+  "jourfr": [
+    "anneescolaire"
+  ],
+  "modalitetranche": [
+    "anneescolaire",
+    "modalite"
+  ],
+  "paiement": [
+    "inscriptioneleve",
+    "paiementmotif"
+  ],
+  "paiementdetailscourete": [
+    "paiementcourete"
+  ],
+  "paiementextra": [
+    "anneescolaire",
+    "classe",
+    "inscriptioneleve",
+    "modalite",
+    "paiementmotif",
+    "personne"
+  ],
+  "paiementextradetails": [
+    "paiementextra"
+  ],
+  "parent": [
+    "personne"
+  ],
+  "parenteleve": [
+    "eleve",
+    "parent"
+  ],
+  "personne": [
+    "civilite",
+    "localite",
+    "nationalite"
+  ],
+  "personnepreinscription": [
+    "civilite",
+    "localite"
+  ],
+  "preinscription": [
+    "eleve",
+    "niveau",
+    "personne",
+    "section"
+  ],
+  "preinscriptionpreinscription": [
+    "elevepreinscription",
+    "niveau",
+    "personnepreinscription",
+    "section"
+  ],
+  "reglementeleve": [
+    "modereglement",
+    "paiement",
+    "paiementextradetails",
+    "personne",
+    "uniformcommande",
+    "utilisateur"
+  ],
+  "reglementeleve_echeancier": [
+    "modereglement",
+    "paiementextradetails",
+    "personne",
+    "uniformcommande",
+    "utilisateur"
+  ],
+  "renseignementmedicaux": [
+    "eleve",
+    "personne"
+  ],
+  "section": [
+    "niveau"
+  ],
+  "surveillant": [
+    "diplome",
+    "modalitepaiement",
+    "personne",
+    "qualite",
+    "situationfamilliale"
+  ],
+  "uniformcommandedetails": [
+    "uniformcommande",
+    "uniformcouleur",
+    "uniformmodel",
+    "uniformtaille"
+  ],
+  "uniformmodel": [
+    "uniformgenre"
+  ],
+  "utilisateur": [
+    "grade"
+  ]
+}

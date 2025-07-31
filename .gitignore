@@ -4,13 +4,13 @@
 .packages
 .pub-cache/
 .pub/
-/build/
-/android/
-/ios/
-/web/
-/linux/
-/windows/
-/macos/
+build/
+android/
+ios/
+web/
+linux/
+windows/
+macos/
 
 # Fichiers de configuration locaux
 .flutter-plugins
@@ -18,15 +18,6 @@
 .fvm/
 .flutter/
 .settings/
-*.swp
-*.swo
-
-# Fichiers IDE (VS Code, Android Studio)
-.vscode/
-.idea/
-*.iml
-*.lock
-*.log
 
 # Fichiers spécifiques à Flutter
 Generated.xcconfig
@@ -45,31 +36,33 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Cache et fichiers de dépendances
+# Cache et packaging
 .pytest_cache/
 *.egg-info/
 *.egg
 dist/
-build/
 
-# Fichiers de configuration et logs
-*.log
+# Données et modèles locaux
+chroma_db/
+models/
+
+# Configs / bases locales
 *.sqlite
 *.db
 *.env
-.env.local
-.env.development
-.env.test
-.env.production
+.env.*
 
-# Fichiers spécifiques à Flask
-instance/
-.webassets-cache
-
-# Fichiers de déploiement
-*.DS_Store
+# === IDE / OS / Logs ===
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+*.lock
+*.log
+.DS_Store
 Thumbs.db
 
-# Fichiers de coverage
+# === Coverage ===
 .coverage
 htmlcov/

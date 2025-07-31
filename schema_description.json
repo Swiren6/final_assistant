@@ -1,0 +1,966 @@
+[
+  {
+    "table": "absence",
+    "description": "La table 'absence' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Date (date), Vu (tinyint unsigned), SeanceDebut (int unsigned), SeanceFin (int unsigned), Enseignant (int unsigned), Matiere (int unsigned), Classe (int unsigned), Etat (int unsigned), anneeSco (int unsigned), Motif (varchar(45)), Groupe (int unsigned), Semaine (int unsigned), Justifier (int unsigned), Jour (int unsigned), SD (varchar(45)), SF (varchar(45)), IdGlobalAbs (int unsigned), nomprenom (varchar(45)), datesaisie (datetime)."
+  },
+  {
+    "table": "actionfonctionalitepriv",
+    "description": "La table 'actionfonctionalitepriv' contient les colonnes suivantes : id (int unsigned), idFonctionalite (int unsigned), libelleAction (varchar(45)), htmlId (varchar(45)), htmlNom (varchar(45))."
+  },
+  {
+    "table": "actualite1",
+    "description": "La table 'actualite1' contient les colonnes suivantes : id (int unsigned), titre (varchar(45)), descriptionCourte (varchar(300)), descriptionLong (varchar(255)), date (varchar(45)), heure (varchar(45)), image (varchar(255)), actif (varchar(45))."
+  },
+  {
+    "table": "actualites",
+    "description": "La table 'actualites' contient les colonnes suivantes : id (int), image (varchar(255)), titre (varchar(255)), description (varchar(1000))."
+  },
+  {
+    "table": "anneescolaire",
+    "description": "La table 'anneescolaire' contient les colonnes suivantes : id (int unsigned), AnneeScolaire (varchar(100)), Actif (int unsigned), AnneeScolaireAr (varchar(45)), AnneePreinscription (int unsigned), Annee (varchar(45)), actifmobile (tinyint(1))."
+  },
+  {
+    "table": "avertissement",
+    "description": "La table 'avertissement' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Object (varchar(45)), Description (varchar(200)), Enseignant (int unsigned), Date (datetime), Matiere (int unsigned), Vu (tinyint unsigned)."
+  },
+  {
+    "table": "banque",
+    "description": "La table 'banque' contient les colonnes suivantes : id (int unsigned), codeBanque (varchar(200)), codeSwift (varchar(200)), nomBanque (varchar(200)), adresseBanque (varchar(200)), idLocalite (int unsigned), idPersonne (int), tel1 (varchar(45)), tel2 (varchar(45)), fax (varchar(45)), mail (varchar(45)), site (varchar(45))."
+  },
+  {
+    "table": "banquebordereau",
+    "description": "La table 'banquebordereau' contient les colonnes suivantes : id (int unsigned), Numero (varchar(145)), Date (datetime)."
+  },
+  {
+    "table": "banquebordereaudetails",
+    "description": "La table 'banquebordereaudetails' contient les colonnes suivantes : id (int unsigned), BanqueBordereau (int unsigned), Reglement (int unsigned)."
+  },
+  {
+    "table": "banqueversement",
+    "description": "La table 'banqueversement' contient les colonnes suivantes : id (int unsigned), DateVersement (datetime), ModeReglement (int unsigned), Montant (double(10,2)), Bordereau (int unsigned), Utilisateur (int unsigned)."
+  },
+  {
+    "table": "blame",
+    "description": "La table 'blame' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Object (varchar(45)), Description (varchar(200)), Enseignant (int unsigned), Date (datetime), Matiere (int unsigned), Vu (tinyint unsigned), Classe (int unsigned), anneeSco (int unsigned)."
+  },
+  {
+    "table": "caisse",
+    "description": "La table 'caisse' contient les colonnes suivantes : id (int unsigned), Date_ouverture (datetime), Date_fermeture (datetime), montant_ouverture (double(10,3)), montant_fermeture (double(10,3)), Utilisateur (int unsigned)."
+  },
+  {
+    "table": "caisse_log",
+    "description": "La table 'caisse_log' contient les colonnes suivantes : id (int unsigned), Caisse (int), idCaisseDetails (int unsigned), date (datetime), EncienMontant (double(10,3)), NouveauMontant (double(10,3)), EncienModeReglement (int unsigned), NouveauModeReglement (int unsigned), EncieNumCheque (varchar(45)), NouveauNumCheque (varchar(45)), Personne (int), Utilisateur (int unsigned), Motif (varchar(200))."
+  },
+  {
+    "table": "caissedetails",
+    "description": "La table 'caissedetails' contient les colonnes suivantes : id (int unsigned), Caisse (int unsigned), date (datetime), Montant (double(10,3)), ModeReglement (int unsigned), NumCheque (varchar(45)), Reglement (int unsigned), Personne (int), Utilisateur (int unsigned), Motif (varchar(200)), Banque (int unsigned), Observation (varchar(200)), NumFactureAssocie (varchar(200)), Montant_Sortie (double(10,3)), IdVersement (int unsigned), CantineParJour (int unsigned), CourEteId (int unsigned)."
+  },
+  {
+    "table": "caissemotif",
+    "description": "La table 'caissemotif' contient les colonnes suivantes : id (int unsigned), Motif (varchar(250)), Type (varchar(250))."
+  },
+  {
+    "table": "cantine",
+    "description": "La table 'cantine' contient les colonnes suivantes : id (int unsigned), jour (varchar(45)), image (varchar(500))."
+  },
+  {
+    "table": "cantineparjour",
+    "description": "La table 'cantineparjour' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Date (datetime), MontantTTC (double(10,3)), MontantRestant (double(10,3)), DateDePaiement (datetime), Utilisateur (int unsigned), ModePaiement (int unsigned), EtatSolde (int unsigned)."
+  },
+  {
+    "table": "cantineparjourenseignant",
+    "description": "La table 'cantineparjourenseignant' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), Date (datetime), MontantTTC (double(10,3)), MontantRestant (double(10,3)), DateDePaiement (datetime), Utilisateur (int unsigned), ModePaiement (int unsigned)."
+  },
+  {
+    "table": "civilite",
+    "description": "La table 'civilite' contient les colonnes suivantes : idCivilite (int unsigned), libelleCiviliteFr (varchar(45)), libelleCiviliteAr (varchar(45))."
+  },
+  {
+    "table": "classe",
+    "description": "La table 'classe' contient les colonnes suivantes : id (int), ID_ANNEE_SCO (int), IDNIV (int), IDSECT (int), CODEETAB (int unsigned), CODECLASSEFR (char(45)), NOMCLASSEFR (char(45)), CODECLASSEAR (char(45)), NOMCLASSEAR (char(45)), ordre (int unsigned)."
+  },
+  {
+    "table": "codepostal",
+    "description": "La table 'codepostal' contient les colonnes suivantes : Gouvernorat (varchar(255)), Delegation (varchar(255)), Localite (varchar(255)), Codepostal (double)."
+  },
+  {
+    "table": "configaffichage",
+    "description": "La table 'configaffichage' contient les colonnes suivantes : id (int unsigned), libelle (varchar(45)), actif (int), msgmaintenance (varchar(1000))."
+  },
+  {
+    "table": "configmatiereclsstat",
+    "description": "La table 'configmatiereclsstat' contient les colonnes suivantes : id (int unsigned), idclasse (varchar(45)), idmatiere (varchar(45))."
+  },
+  {
+    "table": "configmatierenivstat",
+    "description": "La table 'configmatierenivstat' contient les colonnes suivantes : id (int unsigned), idniv (varchar(45)), idmatiere (varchar(45))."
+  },
+  {
+    "table": "configuration",
+    "description": "La table 'configuration' contient les colonnes suivantes : id (int unsigned), FraisInscription (double(10,3)), Remise1Frere (double(10,3)), Remise2Frere (double(10,3)), CaisseCentralisee (int unsigned)."
+  },
+  {
+    "table": "decision",
+    "description": "La table 'decision' contient les colonnes suivantes : id (int unsigned), libelleDecisionFr (varchar(45)), libelleDecisionAr (varchar(45))."
+  },
+  {
+    "table": "delegation",
+    "description": "La table 'delegation' contient les colonnes suivantes : id (int), CODEGOUV (int), LIBELLEDELEGATIONAR (varchar(45)), LIBELLEDELEGATIONFR (varchar(45))."
+  },
+  {
+    "table": "diplome",
+    "description": "La table 'diplome' contient les colonnes suivantes : id (int unsigned), libelleDiplomeFr (varchar(100)), libelleDiplomeAr (varchar(100))."
+  },
+  {
+    "table": "discipline",
+    "description": "La table 'discipline' contient les colonnes suivantes : id (int unsigned), nomDisciplineFr (varchar(45)), nomDisciplineAr (varchar(45))."
+  },
+  {
+    "table": "disponibiliteenseignant",
+    "description": "La table 'disponibiliteenseignant' contient les colonnes suivantes : id (int unsigned), idEnseignant (int unsigned), idJour (int unsigned), idsemaine (int unsigned), S1 (tinyint unsigned), S2 (tinyint unsigned), S3 (tinyint unsigned), S4 (tinyint unsigned), S5 (tinyint unsigned), S6 (tinyint unsigned), S7 (tinyint unsigned), S8 (tinyint unsigned), S9 (tinyint unsigned), S10 (tinyint unsigned), S11 (tinyint unsigned), S12 (tinyint unsigned), S13 (tinyint unsigned), S14 (tinyint unsigned), S15 (tinyint unsigned), S16 (tinyint unsigned), S17 (tinyint unsigned), S18 (tinyint unsigned), S19 (tinyint unsigned), S20 (tinyint unsigned)."
+  },
+  {
+    "table": "documentelevepreinscri",
+    "description": "La table 'documentelevepreinscri' contient les colonnes suivantes : id (int unsigned), EleveId (int unsigned), doc (varchar(45)), PreinscroptionId (int unsigned), AnneeSco (int unsigned), NomDoc (varchar(445))."
+  },
+  {
+    "table": "dossierscolaire",
+    "description": "La table 'dossierscolaire' contient les colonnes suivantes : id (int unsigned), nomprenom (varchar(45)), niveaus (varchar(100)), annee (varchar(45)), etablissement (varchar(45)), section (varchar(45)), matiere_option (varchar(45)), moyenne_general (varchar(45)), decisions (varchar(45)), ideleve (int), idNiveau (varchar(45)), etablissementdinscris (varchar(45)), etablissementdirige (varchar(45))."
+  },
+  {
+    "table": "dre",
+    "description": "La table 'dre' contient les colonnes suivantes : id (int), CODEGOUV (int), LIBELLEDREAR (char(45)), LIBELLEDREFR (char(45))."
+  },
+  {
+    "table": "eduattestation",
+    "description": "La table 'eduattestation' contient les colonnes suivantes : code (double), nom (varchar(100)), prenom (varchar(100)), attestation (varchar(100)), moyenne (double), classe (varchar(100)), sexe (varchar(100)), codeperiode (double), codeprix (double), codesexe (double)."
+  },
+  {
+    "table": "educlasse",
+    "description": "La table 'educlasse' contient les colonnes suivantes : codeclas (double), annescol (double), codenive (double), libeclasar (varchar(100)), libeclasfr (varchar(100)), nbrepart (double), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), datedownload (varchar(100))."
+  },
+  {
+    "table": "educycleens",
+    "description": "La table 'educycleens' contient les colonnes suivantes : codecycl (double), libecyclar (varchar(100)), libecyclfr (varchar(100)), codewei (double), codecyclsucc (varchar(100))."
+  },
+  {
+    "table": "edueleve",
+    "description": "La table 'edueleve' contient les colonnes suivantes : idenelev (double), cinelev (varchar(100)), prenelevar (varchar(100)), nomelevar (varchar(100)), nomelevfr (varchar(100)), prenelevfr (varchar(100)), datenaiselev (varchar(100)), lieunaiselev (varchar(100)), codesexe (double), codetypehand (double), nbrefrer (double), codenati (double), codeetatfami (double), codetyperesi (double), dateentretab (varchar(100)), codetypesort (double), codecaussort (double), numeneuv (varchar(100)), numeseribacc (varchar(100)), numebacc (varchar(100)), prenpere (varchar(100)), codeprofpere (double), niveinstpere (varchar(100)), codesituactipere (double), resipere (double), ruepere (varchar(100)), codepostpere (varchar(100)), villpere (varchar(100)), telepere (varchar(100)), mailpere (varchar(100)), nommere (varchar(100)), prenmere (varchar(100)), codeprofmere (double), niveinstmere (varchar(100)), codesituactimere (double), ruemere (varchar(100)), codepostmere (varchar(100)), villmere (varchar(100)), telemere (varchar(100)), mailmere (varchar(100)), nomtute (varchar(100)), prentute (varchar(100)), codeproftute (double), lienpare (varchar(100)), ruetute (varchar(100)), codeposttute (varchar(100)), villtute (varchar(100)), teletute (varchar(100)), anneredoprim (varchar(100)), anneredoseco (varchar(100)), datesortetab (varchar(100)), dateretrlivr (varchar(100)), nomrecelivr (varchar(100)), cinrecelivr (varchar(100)), datedelicert (varchar(100)), nomrececert (varchar(100)), cinrececert (varchar(100)), datedelidipl (varchar(100)), nomrecedipl (varchar(100)), cinrecedipl (varchar(100)), codeetabdest (varchar(100)), codeetab (double), idenelevanci (varchar(100)), codeetabante (double), codetypeentr (double), codegouvnais (double), etatinscexamnati (double), datetransfert (varchar(100)), etattransfert (varchar(100)), idenuniq (varchar(100)), codepermanent (varchar(100)), refeextr (varchar(100)), datedownload (varchar(100))."
+  },
+  {
+    "table": "eduinscription",
+    "description": "La table 'eduinscription' contient les colonnes suivantes : idenelev (double), annescol (double), codeclas (double), numeordr (double), pourbour (varchar(100)), codesituinte (varchar(100)), codeetabinte (varchar(100)), numeinte (varchar(100)), dispspor (varchar(100)), etatinsc (double), formmati1 (varchar(100)), formmati2 (varchar(100)), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), idenuniq (double), datedownload (varchar(100))."
+  },
+  {
+    "table": "edumatiere",
+    "description": "La table 'edumatiere' contient les colonnes suivantes : codemati (double), libematiar (varchar(100)), libematifr (varchar(100)), codedisc (double), codematisy (varchar(100)), codematbac (varchar(100)), codenatumati (double)."
+  },
+  {
+    "table": "edumoymati",
+    "description": "La table 'edumoymati' contient les colonnes suivantes : idenelev (double), codemati (double), codetypemati (double), codeperiexam (double), codenive (double), moyemati (varchar(500)), rangmati (double), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), nvmoy (varchar(45))."
+  },
+  {
+    "table": "edumoymaticopie",
+    "description": "La table 'edumoymaticopie' contient les colonnes suivantes : idenelev (double), codemati (double), codetypemati (double), codeperiexam (double), codenive (double), moyemati (varchar(500)), rangmati (double), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), nvmoy (varchar(45))."
+  },
+  {
+    "table": "edumoymatisave",
+    "description": "La table 'edumoymatisave' contient les colonnes suivantes : idenelev (double), codemati (double), codetypemati (double), codeperiexam (double), codenive (double), moyemati (varchar(45)), rangmati (double), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), nvmoy (varchar(45))."
+  },
+  {
+    "table": "eduniveau",
+    "description": "La table 'eduniveau' contient les colonnes suivantes : codenive (double), codesect (double), libenivear (varchar(100)), niveetud (double), nbrechoioptiobli (double), nbrechoioptiopti (double), niveorie (double), finetud (double)."
+  },
+  {
+    "table": "edunoteelev",
+    "description": "La table 'edunoteelev' contient les colonnes suivantes : codenive (double), codemati (double), codetypemati (double), codeperiexam (double), codetypeepre (double), numeepre (double), idenelev (double), noteepre (double), codeetab (double), datetransfert (varchar(100)), etattransfert (varchar(100)), datedownload (varchar(100))."
+  },
+  {
+    "table": "eduperiexam",
+    "description": "La table 'eduperiexam' contient les colonnes suivantes : codeperiexam (double), libeperiexamar (varchar(100)), libeperiexamfr (varchar(100)), coefperiexam (double), id (int unsigned)."
+  },
+  {
+    "table": "eduprix",
+    "description": "La table 'eduprix' contient les colonnes suivantes : codeprix (double), libeprixar (varchar(100)), libeprixfr (varchar(100))."
+  },
+  {
+    "table": "eduresultat",
+    "description": "La table 'eduresultat' contient les colonnes suivantes : idenelev (double), codeperiexam (double), moyeperiexam (double), rangperiexam (double), codedecicons (varchar(100)), codesectorie (varchar(100)), obsecons (varchar(100)), codeprix (varchar(100)), moyeexamnati (varchar(100)), codementexam (varchar(100)), codeetab (double), codecondassi (double), datetransfert (varchar(100)), etattransfert (varchar(100)), id (int unsigned)."
+  },
+  {
+    "table": "eduresultatcopie",
+    "description": "La table 'eduresultatcopie' contient les colonnes suivantes : idenelev (double), codeperiexam (double), moyeperiexam (double), rangperiexam (double), codedecicons (varchar(100)), codesectorie (varchar(100)), obsecons (varchar(100)), codeprix (varchar(100)), moyeexamnati (varchar(100)), codementexam (varchar(100)), codeetab (double), codecondassi (double), datetransfert (varchar(100)), etattransfert (varchar(100))."
+  },
+  {
+    "table": "eduresultatcopie11",
+    "description": "La table 'eduresultatcopie11' contient les colonnes suivantes : id (int unsigned), matiere (varchar(45)), moyenne (varchar(45)), codetrimestre (varchar(45)), Idpersonne (varchar(45))."
+  },
+  {
+    "table": "edusection",
+    "description": "La table 'edusection' contient les colonnes suivantes : codesect (double), codecycl (double), libesectar (varchar(100)), libesectfr (varchar(100)), codesectsy (varchar(100)), codesectbacc (varchar(100)), capasect (double), numesect (double), codefili (double)."
+  },
+  {
+    "table": "edutypeepre",
+    "description": "La table 'edutypeepre' contient les colonnes suivantes : codetypeepre (double), libetypeeprear (varchar(100)), libetypeeprefr (varchar(100)), abretypeeprear (varchar(100)), date_update (varchar(100))."
+  },
+  {
+    "table": "eleve",
+    "description": "La table eleve contient tous les élèves inscrits. Elle inclut les colonnes : id (int), DateNaissance (date), LieuNaissance (varchar(100)), IdPersonne (int), Solde (double(10,3)), photo (varchar(355)), IdEdusrv (varchar(355)), AutreLieuNaissance (varchar(45))."
+  },
+  {
+    "table": "eleve_archive",
+    "description": "La table 'eleve_archive' contient les colonnes suivantes : id (int), DateNaissance (date), LieuNaissance (varchar(100)), IdPersonne (int), Solde (double(10,3)), photo (varchar(355)), IdEdusrv (varchar(355))."
+  },
+  {
+    "table": "eleveinscri",
+    "description": "La table 'eleveinscri' contient les colonnes suivantes : NomPrenomAr (varchar(201)), NomPrenomFr (varchar(201)), nomclassefr (char(45))."
+  },
+  {
+    "table": "eleveinscri2020",
+    "description": "La table 'eleveinscri2020' contient les colonnes suivantes : id (int unsigned), NomPrenomAr (varchar(201)), NomPrenomFr (varchar(201)), DateNaissance (date), nomclassefr (char(45))."
+  },
+  {
+    "table": "elevepreinscription",
+    "description": "La table 'elevepreinscription' contient les colonnes suivantes : id (int), DateNaissance (date), LieuNaissance (varchar(100)), IdPersonne (int), Solde (double(10,3)), photo (varchar(355)), IdEdusrv (varchar(20)), AutreLieuNaissance (varchar(45))."
+  },
+  {
+    "table": "elevepreinscriptionlog",
+    "description": "La table 'elevepreinscriptionlog' contient les colonnes suivantes : id (int unsigned), DateNaissance (date), LieuNaissance (varchar(100)), IdPersonne (int unsigned), Solde (double(10,3)), photo (varchar(355)), IdEdusrv (varchar(355)), AutreLieuNaissance (varchar(255))."
+  },
+  {
+    "table": "emploidutemps",
+    "description": "La table 'emploidutemps' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), Salle (int unsigned), Jour (int unsigned), Matiere (int unsigned), AnneeScolaire (int unsigned), Semaine (int unsigned), Classe (int unsigned), Groupe (varchar(45)), Remarque (varchar(45)), SeanceDebut (int unsigned), SeanceFin (int unsigned)."
+  },
+  {
+    "table": "emploidutemps_enligne",
+    "description": "La table 'emploidutemps_enligne' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), Salle (int unsigned), Jour (int unsigned), Matiere (int unsigned), AnneeScolaire (int unsigned), Semaine (int unsigned), Classe (int unsigned), Groupe (varchar(45)), Remarque (varchar(45)), SeanceDebut (int unsigned), SeanceFin (int unsigned)."
+  },
+  {
+    "table": "enseigantmatiere",
+    "description": "La table 'enseigantmatiere' contient les colonnes suivantes : id (int unsigned), idPersonne (int), idMatiere (int unsigned), anneeSco (int unsigned)."
+  },
+  {
+    "table": "enseignant_double",
+    "description": "La table 'enseignant_double' contient les colonnes suivantes : id (int unsigned), idcorrecte (int unsigned), idpersonnedb (int unsigned)."
+  },
+  {
+    "table": "enseignant_motif",
+    "description": "La table 'enseignant_motif' contient les colonnes suivantes : id (int unsigned), libelle (varchar(45))."
+  },
+  {
+    "table": "enseignant_paiement",
+    "description": "La table 'enseignant_paiement' contient les colonnes suivantes : id (int unsigned), date (varchar(45)), MontantTotal (varchar(45)), IdPersonne (varchar(45)), Nbrheures (varchar(45)), ModePaiement (varchar(45)), Anneescolaire (varchar(45)), mois (varchar(45)), seuilprof (int)."
+  },
+  {
+    "table": "enseignants_presence",
+    "description": "La table 'enseignants_presence' contient les colonnes suivantes : id (int unsigned), nomprenom (varchar(45)), jour (int), salle (varchar(45)), classe (varchar(45)), anneesco (int), debut (varchar(45)), fin (varchar(45)), etat (int), idpersonne (varchar(45)), Date (date), semaine (varchar(45)), cout (varchar(45)), nbrheures (decimal(10,2)), typeseance (varchar(45)), motif (varchar(45)), Idpaiementens (varchar(45)), seuilprof (int), numsemaine (varchar(45)), payer (int unsigned)."
+  },
+  {
+    "table": "enseingant",
+    "description": "La table 'enseingant' contient les colonnes suivantes : id (int unsigned), dateNaissance (date), lieuNaissance (varchar(45)), mail (varchar(100)), coutHoraire (int unsigned), idPersonne (int), IdSituation (int unsigned), IdDip (int unsigned), IdModPaiement (int unsigned), IdQualite (int unsigned), rib (varchar(45)), banque (varchar(45)), sexe (varchar(45)), dateDip (varchar(45)), seuilprof (int), disabled (int)."
+  },
+  {
+    "table": "etablissement",
+    "description": "La table 'etablissement' contient les colonnes suivantes : id (int unsigned), CODETYPEETAB (int), CODEDRE (int), CODEGOUV (int), CODEDELEGATION (int), LIBELLEETABAR (varchar(100)), LIBELLEETABFR (varchar(100)), ecole (varchar(45))."
+  },
+  {
+    "table": "extracasier",
+    "description": "La table 'extracasier' contient les colonnes suivantes : id (int unsigned), Nom (varchar(45))."
+  },
+  {
+    "table": "extraclub",
+    "description": "La table 'extraclub' contient les colonnes suivantes : id (int unsigned), Nom (varchar(105))."
+  },
+  {
+    "table": "extravaucher",
+    "description": "La table 'extravaucher' contient les colonnes suivantes : id (int unsigned), Nom (varchar(45))."
+  },
+  {
+    "table": "fichierpreinscriptionpreinscription",
+    "description": "La table 'fichierpreinscriptionpreinscription' contient les colonnes suivantes : id (int unsigned), releveNoteAnnuel (text), releveNoteTrimestre (text), srcName (varchar(45)), updatedAt (datetime), preinscription (int unsigned)."
+  },
+  {
+    "table": "fonctionaliteprivelge",
+    "description": "La table 'fonctionaliteprivelge' contient les colonnes suivantes : id (int unsigned), libelleFonctionalite (varchar(45)), htmlId (varchar(45)), htmlNom (varchar(45)), idRubrique (int unsigned)."
+  },
+  {
+    "table": "getallelevefordescipline",
+    "description": "La table 'getallelevefordescipline' contient les colonnes suivantes : IdEleve (int), IdEdusrv (varchar(355)), id (int unsigned), Annuler (tinyint unsigned), Classe (int unsigned), NomPrenomAr (varchar(201)), NomPrenomFr (varchar(201)), DateNaissance (date), nomclassefr (char(45)), anneescolaire (varchar(100)), idAnneSco (int unsigned)."
+  },
+  {
+    "table": "geteleveinscrisansreglement",
+    "description": "La table 'geteleveinscrisansreglement' contient les colonnes suivantes : id (int unsigned), Eleve (int unsigned), Classe (int unsigned), Date (date), AnneeScolaire (int unsigned), Personne (int), Modalite (int unsigned), TTC_Scolaire (double(10,3)), Restant_Scolaire (double(10,3)), Solde (double(10,3)), TypeInscri (varchar(45))."
+  },
+  {
+    "table": "gouvernorat",
+    "description": "La table 'gouvernorat' contient les colonnes suivantes : id (int), LIBELLEGOUVAR (char(45)), LIBELLEGOUVFR (char(45))."
+  },
+  {
+    "table": "grade",
+    "description": "La table 'grade' contient les colonnes suivantes : id (int unsigned), libelleGrade (varchar(45))."
+  },
+  {
+    "table": "groupe",
+    "description": "La table 'groupe' contient les colonnes suivantes : id (int unsigned), libelleGroupe (varchar(45))."
+  },
+  {
+    "table": "groupecourete",
+    "description": "La table 'groupecourete' contient les colonnes suivantes : id (int unsigned), IdAnneeSco (int unsigned), IdSectionCourEte (int unsigned), IdEnseignant (int unsigned), Montant (varchar(200)), NbrHeurs (int unsigned), IdMatiere (int unsigned), NomGroupeEte (varchar(45))."
+  },
+  {
+    "table": "grouperepartition",
+    "description": "La table 'grouperepartition' contient les colonnes suivantes : id (int unsigned), IdInscription (int unsigned), IdGroupe (int unsigned), IdAnneeScolaire (int unsigned), IdTrimstre (int unsigned), IdClasse (int), IdPersonne (int)."
+  },
+  {
+    "table": "homeworkclasse",
+    "description": "La table 'homeworkclasse' contient les colonnes suivantes : id (int unsigned), idhomework (int unsigned), idclasse (int unsigned)."
+  },
+  {
+    "table": "homeworks",
+    "description": "La table 'homeworks' contient les colonnes suivantes : id (int unsigned), titre (varchar(500)), description (varchar(1000)), date (varchar(100)), datelimite (varchar(100)), etat (tinyint(1)), idclasse (int unsigned), idenseignant (int unsigned), idpersonne (int unsigned), compterendu (tinyint(1))."
+  },
+  {
+    "table": "infosfornisseur",
+    "description": "La table 'infosfornisseur' contient les colonnes suivantes : id (int unsigned), Nomfornisseur (varchar(45)), rib (varchar(45)), banque (varchar(45)), agence (varchar(45)), adresseAr (varchar(45)), adresseFr (varchar(45))."
+  },
+  {
+    "table": "inscriptioneleve",
+    "description": "La table 'inscriptioneleve' contient les colonnes suivantes : id (int unsigned), Eleve (int unsigned), Classe (int unsigned), Date (date), AnneeScolaire (int unsigned), Personne (int), Modalite (int unsigned), TTC_Scolaire (double(10,3)), Restant_Scolaire (double(10,3)), Solde (double(10,3)), TypeInscri (varchar(45)), PreinscriptionId (int unsigned), Annuler (tinyint unsigned), DateAnnulation (varchar(450)), groupe (int unsigned)."
+  },
+  {
+    "table": "inscriptionelevecourete",
+    "description": "La table 'inscriptionelevecourete' contient les colonnes suivantes : id (int unsigned), IdAnneeSco (int unsigned), IdEtablissement (int unsigned), IdGroupeCourEte (int unsigned), NomPereFr (varchar(45)), NomMereFr (varchar(45)), PrenomPereFr (varchar(45)), PrenomMereFr (varchar(45)), CinPere (varchar(45)), CinMere (varchar(45)), TelMere (varchar(45)), TelPere (varchar(45)), TTC_CourEte (double(10,3)), Restant_CourEte (double(10,3)), DateCourEte (datetime), AnneeSco (int unsigned), Enseignant (varchar(45)), Section (varchar(45)), IdPersonne (int unsigned)."
+  },
+  {
+    "table": "jour",
+    "description": "La table 'jour' contient les colonnes suivantes : id (int unsigned), libelleJour (varchar(45)), libelleJourFr (varchar(45))."
+  },
+  {
+    "table": "jourfr",
+    "description": "La table 'jourfr' contient les colonnes suivantes : id (int unsigned), nomJourFr (varchar(45)), nomJourAr (varchar(45)), dateDebut (varchar(45)), dateFin (varchar(45)), idannee (int unsigned)."
+  },
+  {
+    "table": "justificationeleve",
+    "description": "La table 'justificationeleve' contient les colonnes suivantes : id (int unsigned), motif (varchar(45)), idinscription (varchar(45)), datedebut (varchar(45)), datefin (varchar(45)), id_classe (varchar(45)), date_creation (datetime)."
+  },
+  {
+    "table": "localite",
+    "description": "La table 'localite' contient les colonnes suivantes : IDLOCALITE (int unsigned), CODEDELEGATION (int), LIBELLELOCALITEFR (varchar(45)), LIBELLELOCALITEAR (varchar(45)), CODEPOSTAL (varchar(45))."
+  },
+  {
+    "table": "logsms",
+    "description": "La table 'logsms' contient les colonnes suivantes : id (int unsigned), idInscri (int unsigned), NomPrenomEleve (varchar(45)), date (varchar(100)), heure (varchar(45)), typesms (int unsigned), motifsms (varchar(200)), IdAbsence (int unsigned), IdRetard (int unsigned), IdBlame (int unsigned)."
+  },
+  {
+    "table": "matiere",
+    "description": "La table 'matiere' contient les colonnes suivantes : id (int unsigned), NomMatiereFr (varchar(100)), NomMatiereAr (varchar(100))."
+  },
+  {
+    "table": "matiereexamenbloque",
+    "description": "La table 'matiereexamenbloque' contient les colonnes suivantes : id (int unsigned), IdNiv (int unsigned), IdMat (int unsigned), IdSection (int unsigned)."
+  },
+  {
+    "table": "matieresection",
+    "description": "La table 'matieresection' contient les colonnes suivantes : id (int unsigned), IdSection (int unsigned), IdMatiere (int unsigned)."
+  },
+  {
+    "table": "menu_cantine",
+    "description": "La table 'menu_cantine' contient les colonnes suivantes : id (int unsigned), libellerepat (varchar(100)), idjour (varchar(45)), ordre (tinyint unsigned)."
+  },
+  {
+    "table": "menu_cantine_jour",
+    "description": "La table 'menu_cantine_jour' contient les colonnes suivantes : id (int), libelle (varchar(255))."
+  },
+  {
+    "table": "modalite",
+    "description": "La table 'modalite' contient les colonnes suivantes : id (int unsigned), NomModalite (varchar(45)), NbrTranche (int unsigned)."
+  },
+  {
+    "table": "modalitepaiement",
+    "description": "La table 'modalitepaiement' contient les colonnes suivantes : id (int unsigned), libelleModalite (varchar(100)), banque (varchar(45))."
+  },
+  {
+    "table": "modalitetranche",
+    "description": "La table 'modalitetranche' contient les colonnes suivantes : id (int unsigned), Modalite (int unsigned), NbrTranche (varchar(200)), MontantHTCollege (double(10,3)), MontantHTLycee (double(10,3)), TVA (double(10,3)), MtTVACollege (double(10,3)), MtTTCCollege (double(10,3)), MtTVALycee (double(10,3)), MtTTCLycee (double(10,3)), TauxRemise (double(10,3)), TotalRemiseCollege (double(10,3)), TotalRemiseLycee (double(10,3)), NetHTCollege (double(10,3)), NetHTLycee (double(10,3)), AnneeScolaire (int unsigned), TypePaiement (varchar(200)), ancienneAnnee (int)."
+  },
+  {
+    "table": "modereglement",
+    "description": "La table 'modereglement' contient les colonnes suivantes : id (int unsigned), Libelle (varchar(45))."
+  },
+  {
+    "table": "motifdoc",
+    "description": "La table 'motifdoc' contient les colonnes suivantes : id (int unsigned), libelleMotif (varchar(45)), AnneeSco (int unsigned)."
+  },
+  {
+    "table": "motifsms",
+    "description": "La table 'motifsms' contient les colonnes suivantes : id (int unsigned), motif (varchar(260)), type (varchar(45))."
+  },
+  {
+    "table": "motiftelechargement",
+    "description": "La table 'motiftelechargement' contient les colonnes suivantes : id (int), libelle (varchar(255)), type (varchar(255))."
+  },
+  {
+    "table": "nationalite",
+    "description": "La table 'nationalite' contient les colonnes suivantes : id (int unsigned), NationaliteFr (varchar(100)), NationaliteAr (varchar(100))."
+  },
+  {
+    "table": "naturematiere",
+    "description": "La table 'naturematiere' contient les colonnes suivantes : id (int unsigned), nomNatureMatiereFr (varchar(45)), nomNatureMatiereAr (varchar(45))."
+  },
+  {
+    "table": "niveau",
+    "description": "La table 'niveau' contient les colonnes suivantes : id (int), CODENIVFR (char(45)), NOMNIVFR (char(45)), CODENIVAR (char(45)), NOMNIVAR (char(45))."
+  },
+  {
+    "table": "noteeleveparmatiere",
+    "description": "La table 'noteeleveparmatiere' contient les colonnes suivantes : id (int unsigned), AnneeScolaire (varchar(45)), id_classe (varchar(45)), id_inscription (varchar(45)), id_matiere (varchar(45)), id_trimestre (varchar(45)), orale (varchar(45)), TP (varchar(45)), ExamenEcrit (varchar(45)), DS (varchar(45)), DC1 (varchar(45)), DC2 (varchar(45)), nomprenom (varchar(45)), Etat (varchar(45)), EtatTP (varchar(45)), EtatExamenEcrit (varchar(45)), EtatDC1 (varchar(45)), EtatDC2 (varchar(45)), EtatDS (varchar(45)), nomprenomAr (varchar(45))."
+  },
+  {
+    "table": "noteeleveview",
+    "description": "La table 'noteeleveview' contient les colonnes suivantes : id (int unsigned), nom_prenom (varchar(45)), classe_id (varchar(45)), trim1_moyenne (varchar(45)), trim1_rang (varchar(45)), trim2_moyenne (varchar(45)), trim2_rang (varchar(45)), annuelle_moyenne (varchar(45)), annuelle_rang (varchar(45)), eleve_id (int unsigned), AnneeScolaire (varchar(45))."
+  },
+  {
+    "table": "noteseleve",
+    "description": "La table 'noteseleve' contient les colonnes suivantes : id (int unsigned), nom_prenom (varchar(45)), classe_id (varchar(45)), trim1_moyenne (varchar(45)), trim1_rang (varchar(45)), trim2_moyenne (varchar(45)), trim2_rang (varchar(45)), annuelle_moyenne (varchar(45)), annuelle_rang (varchar(45)), eleve_id (int unsigned), AnneeScolaire (varchar(45))."
+  },
+  {
+    "table": "notificationcompagne",
+    "description": "La table 'notificationcompagne' contient les colonnes suivantes : id (int unsigned), DateEnvoi (datetime), message (varchar(450)), Type (varchar(45)), distinataire (varchar(45)), nbnotification (varchar(45))."
+  },
+  {
+    "table": "notifications",
+    "description": "La table 'notifications' contient les colonnes suivantes : id (int), date (datetime), motif (varchar(255)), idPersonne (int), titre (varchar(255)), message (longtext), vue (tinyint(1)), vueAdmin (tinyint(1))."
+  },
+  {
+    "table": "nvetatcantineparjourglobale",
+    "description": "La table 'nvetatcantineparjourglobale' contient les colonnes suivantes : id (int unsigned), Cantine Enseignant Par jour (varchar(28)), NomPrenom (varchar(201)), Date (date)."
+  },
+  {
+    "table": "paiement",
+    "description": "La table 'paiement' contient les colonnes suivantes : id (int unsigned), MotifPaiement (int unsigned), date (datetime), Tranche (varchar(100)), TotalHT (double(10,3)), TauxRemise (double(10,3)), TotalRemise (double(10,3)), NetHT (double(10,3)), TauxTVA (double(10,3)), TotalTVA (double(10,3)), TotalTTC (double(10,3)), Inscription (int unsigned), MontantRestant (double(10,3)), Annuler (tinyint unsigned), TotalNet (int unsigned)."
+  },
+  {
+    "table": "paiementcourete",
+    "description": "La table 'paiementcourete' contient les colonnes suivantes : id (int unsigned), IDInscriEte (int unsigned), MontantCourEte (int unsigned), MontantPaye (int unsigned), SoldeDu (int unsigned), Date (datetime)."
+  },
+  {
+    "table": "paiementdetailscourete",
+    "description": "La table 'paiementdetailscourete' contient les colonnes suivantes : id (int unsigned), IdInscri (int unsigned), IdPaiement (int unsigned), date (datetime), Montant (double(10,3)), ModePaiement (int unsigned), NumCheque (varchar(45)), Utulisateur (int unsigned), DateEcheance (datetime), annule (tinyint unsigned), Banque (int unsigned), Proprietaire (varchar(100)), IdPersonne (int unsigned)."
+  },
+  {
+    "table": "paiementextra",
+    "description": "La table 'paiementextra' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), TotalHT (double(10,3)), TauxRemise (double(10,3)), TotalRemise (double(10,3)), NetHT (double(10,3)), TauxTVA (double(10,3)), TotalTVA (double(10,3)), TotalTTC (double(10,3)), MontantRestant (double(10,3)), date (datetime), paiementmotif (int unsigned), Personne (int), AnneeScolaire (int unsigned), Classe (int), Modalite (int unsigned), ExtraClub (int unsigned), ExtraCasier (int unsigned), Extravauchers (int unsigned), Annuler (int unsigned)."
+  },
+  {
+    "table": "paiementextradetails",
+    "description": "La table 'paiementextradetails' contient les colonnes suivantes : id (int unsigned), PaiementExtras (int unsigned), TotalHT (double(10,3)), TauxRemise (double(10,3)), TotalRemise (double(10,3)), NetHT (double(10,3)), TauxTVA (double(10,3)), TotalTVA (double(10,3)), TotalTTC (double(10,3)), MontantRestant (double(10,3)), Motif (varchar(45)), Annuler (int unsigned), TotalNet (int unsigned)."
+  },
+  {
+    "table": "paiementmotif",
+    "description": "La table 'paiementmotif' contient les colonnes suivantes : id (int unsigned), Libelle (varchar(100)), Montant (double(10,3))."
+  },
+  {
+    "table": "parent",
+    "description": "La table 'parent' contient les colonnes suivantes : id (int unsigned), Personne (int), Profession (varchar(145)), Etablissement (varchar(145)), AdresseEtr (varchar(145)), PaysEtr (varchar(145)), VilleEtr (varchar(145)), CodePostalEtr (varchar(145)), ResideEtr (varchar(145)), Etranger (varchar(145)), codepostal (int unsigned), rib (varchar(45))."
+  },
+  {
+    "table": "parent_archive",
+    "description": "La table 'parent_archive' contient les colonnes suivantes : id (int unsigned), Personne (int), Profession (varchar(145)), Etablissement (varchar(145)), AdresseEtr (varchar(145)), PaysEtr (varchar(145)), VilleEtr (varchar(145)), CodePostalEtr (varchar(145)), ResideEtr (varchar(145)), Etranger (varchar(145)), codepostal (int unsigned)."
+  },
+  {
+    "table": "parent_ise",
+    "description": "La table 'parent_ise' contient les colonnes suivantes : idParent (int unsigned), Nom (varchar(45)), Prenom (varchar(45)), Nationalite (varchar(45)), CIN (varchar(45)), DateCIN (date), Profession (varchar(100)), Etablissement (varchar(100)), Adresse (varchar(100)), Ville (varchar(45)), ARNom (varchar(45)), ARPrenom (varchar(45)), ARNationalite (varchar(45)), ARProfession (varchar(100)), AREtablissement (varchar(100)), ARAdresse (varchar(100)), ARVille (varchar(45)), Tel1 (varchar(45)), Tel2 (varchar(45)), Tel3 (varchar(45)), Type (varchar(45)), Etranger (tinyint unsigned), CodePostal (varchar(45)), numstag (int)."
+  },
+  {
+    "table": "parenteleve",
+    "description": "La table 'parenteleve' contient les colonnes suivantes : id (int unsigned), Parent (int unsigned), Eleve (int), Type (varchar(45))."
+  },
+  {
+    "table": "parenteleve_archive",
+    "description": "La table 'parenteleve_archive' contient les colonnes suivantes : id (int unsigned), Parent (int unsigned), Eleve (int), Type (varchar(45))."
+  },
+  {
+    "table": "parenteleveannee4",
+    "description": "La table 'parenteleveannee4' contient les colonnes suivantes : eleve (int), nomprenomeleve (varchar(201)), parent (int unsigned), type (varchar(45)), personne (int), nomprenomparent (varchar(201)), nomprenomparentar (varchar(201)), cin (varchar(100)), tel1 (varchar(20)), nomclassefr (char(45))."
+  },
+  {
+    "table": "parentelevepreinscription",
+    "description": "La table 'parentelevepreinscription' contient les colonnes suivantes : id (int unsigned), Parent (int unsigned), Eleve (int), Type (varchar(45))."
+  },
+  {
+    "table": "parentpreinscription",
+    "description": "La table 'parentpreinscription' contient les colonnes suivantes : id (int unsigned), Personne (int), Profession (varchar(145)), Etablissement (varchar(145)), AdresseEtr (varchar(145)), PaysEtr (varchar(145)), VilleEtr (varchar(145)), CodePostalEtr (varchar(145)), ResideEtr (varchar(145)), Etranger (varchar(145)), codepostal (int unsigned), rib (varchar(45))."
+  },
+  {
+    "table": "pays",
+    "description": "La table 'pays' contient les colonnes suivantes : IDPAYS (int), NOMPAYS (char(45))."
+  },
+  {
+    "table": "pbiviewinscritscolaire",
+    "description": "La table 'pbiviewinscritscolaire' contient les colonnes suivantes : Nomeleve (varchar(100)), Prenomeleve (varchar(100)), libellelocalitefr (varchar(45)), LIBELLEDELEGATIONFR (varchar(45)), nomclassefr (char(45)), nomnivfr (char(45)), TypeInscri (varchar(45)), anneescolaire (varchar(100)), NomPere (varchar(201)), TelephonePere (varchar(20)), NomMere (varchar(201)), TelMere (varchar(20))."
+  },
+  {
+    "table": "periodeexamen",
+    "description": "La table 'periodeexamen' contient les colonnes suivantes : id (int unsigned), libellePeriodeExamenFr (varchar(45)), libellePeriodeExamenAr (varchar(45)), coefficientExamen (int)."
+  },
+  {
+    "table": "personne",
+    "description": "Table centrale des individus avec coordonnées complètes. Recherche multilingue (FR/AR) possible.",
+    "search_hints": {
+      "contacts": "Utiliser CONCAT(NomFr,' ',PrenomFr) ou variantes arabes + Tel1/Tel2/Tel3",
+      "name_variants": "Les noms peuvent être saisis en français (NomFr) ou arabe (NomAr)"
+    },
+    "columns": [
+      {"name": "id", "type": "INT", "description": "Identifiant unique"},
+      {"name": "NomFr", "type": "VARCHAR(100)", "description": "nom de la personne écrit en lettres latines"},
+      {"name": "PrenomFr", "type": "VARCHAR(100)", "description": "prénom de la personne en lettres latines"},
+      {"name": "NomAr", "type": "VARCHAR(100)", "description": "nom de la personne en lettres arabes"},
+      {"name": "PrenomAr", "type": "VARCHAR(100)", "description": "prénom de la personne lettres arabes"},
+      {"name": "Cin", "type": "VARCHAR(100)", "description": "numéro de la carte d'identité de la personne"},
+      {"name": "CinLiv", "type": "VARCHAR(100)", "description": "numéro de carte d'identité de la personne ayant récupéré un document scolaire (parent ou tuteur légal)"},
+      {"name": "AdresseFr", "type": "VARCHAR(100)", "description": "adresse de la personne en français"},
+      {"name": "AdresseAr", "type": "VARCHAR(100)", "description": "adresse de la personne en arabe"},
+      {"name": "Tel1", "type": "VARCHAR(20)", "description": "numéro principal de téléphone (tel1) de la personne, utilisé comme moyen de contact ou pour être joint facilement. Correspond généralement au numéro de portable ou fixe principal. Synonyme de 'numéro de téléphone' ou 'contact'."},
+      {"name": "Tel2", "type": "VARCHAR(20)", "description": "numéro de téléphone 2 de la personne"},
+      {"name": "Tel3", "type": "VARCHAR(20)", "description": "numéro de téléphone 3 de la personne"},
+      {"name": "Email", "type": "VARCHAR(100)", "description": "adresse mail de la personne"},
+      {"name": "Login", "type": "VARCHAR(100)", "description": "login de la personne"},
+      {"name": "Pwd", "type": "VARCHAR(100)", "description": "mot de passe de la personne"},
+      {"name": "Nationalite", "type": "int unsigned", "description": "nationalité de la personne"},
+      {"name": "Localite", "type": "int unsigned", "description": "Nom de la localité ou du lieu de résidence de la personne (quartier, ville ou village). Sert à identifier la zone géographique du domicile"},
+      {"name": "Civilite", "type": "int unsigned", "description": "Civilité de la personne (titre utilisé dans les documents : Monsieur, Madame, etc.)"}
+    ]
+  },
+  {
+    "table": "personne_archive",
+    "description": "La table 'personne_archive' contient les colonnes suivantes : id (int), NomFr (varchar(100)), PrenomFr (varchar(100)), NomAr (varchar(100)), PrenomAr (varchar(100)), Cin (varchar(100)), CinLiv (varchar(100)), AdresseFr (varchar(100)), AdresseAr (varchar(100)), Tel1 (varchar(20)), Tel2 (varchar(20)), Tel3 (varchar(20)), Email (varchar(100)), Login (varchar(100)), Pwd (varchar(100)), Nationalite (int unsigned), Localite (int unsigned), Civilite (int unsigned), codepostal (varchar(200)), SoldeCantineParJour (int unsigned), type (varchar(45)), nationaliteAutre (varchar(100)), localiteAutre (varchar(100))."
+  },
+  {
+    "table": "personnepreinscription",
+    "description": "La table 'personnepreinscription' contient les colonnes suivantes : id (int), NomFr (varchar(100)), PrenomFr (varchar(100)), NomAr (varchar(100)), PrenomAr (varchar(100)), Cin (varchar(100)), CinLiv (varchar(100)), AdresseFr (varchar(100)), AdresseAr (varchar(100)), Tel1 (varchar(20)), Tel2 (varchar(20)), Tel3 (varchar(20)), Email (varchar(100)), Login (varchar(100)), Pwd (varchar(100)), Nationalite (int unsigned), Localite (int unsigned), Civilite (int unsigned), codepostal (varchar(200)), SoldeCantineParJour (int unsigned), type (varchar(45)), nationaliteAutre (varchar(100)), localiteAutre (varchar(100))."
+  },
+  {
+    "table": "personnepreinscriptionlog",
+    "description": "La table 'personnepreinscriptionlog' contient les colonnes suivantes : id (int), NomFr (varchar(100)), PrenomFr (varchar(100)), NomAr (varchar(100)), PrenomAr (varchar(100)), Cin (varchar(100)), CinLiv (varchar(100)), AdresseFr (varchar(100)), AdresseAr (varchar(100)), Tel1 (varchar(20)), Tel2 (varchar(20)), Tel3 (varchar(20)), Email (varchar(100)), Login (varchar(100)), Pwd (varchar(100)), Nationalite (int unsigned), Localite (int unsigned), Civilite (int unsigned), codepostal (varchar(200)), SoldeCantineParJour (int unsigned), type (varchar(45)), nationaliteAutre (varchar(45)), localiteAutre (varchar(45))."
+  },
+  {
+    "table": "personnesupp",
+    "description": "La table 'personnesupp' contient les colonnes suivantes : id (int unsigned), personne (varchar(45))."
+  },
+  {
+    "table": "piecejoint",
+    "description": "La table 'piecejoint' contient les colonnes suivantes : id (int unsigned), idhomework (int unsigned), pdf (varchar(1000))."
+  },
+  {
+    "table": "preinscription",
+    "description": "La table 'preinscription' contient les colonnes suivantes : id (int unsigned), date (varchar(100)), Resultat (varchar(100)), Eleve (int), Etablissement (char(10)), NiveauPrecedent (int), SectionPrecedent (int), MoyennePrecedent (varchar(100)), MotifRefus (varchar(100)), Niveau (int), Section (int), Decision (varchar(100)), Personne (int), AnneeScolaire (int), NoteMath_precedente (double(10,3)), NoteFrancias_precedente (double(10,3)), NoteArabe_precedente (double(10,3)), NotePhysique_precedente (double(10,3)), NoteSvt_precedente (double(10,3)), Moyenne_Arithmetique (double(10,3)), NoteMath_precedente_2 (double(10,3)), NoteFrancias_precedente_2 (double(10,3)), NoteArabe_precedente_2 (double(10,3)), NotePhysique_precedente_2 (double(10,3)), NoteSvt_precedente_2 (double(10,3)), Moyenne_Arithmetique_2 (double(10,3)), MoyennePilote (double(10,3)), Moyenne_Arithmetique_General (double(10,3)), NoteAnglais_precedente_2 (double(10,3)), MoyenneGeneralAnneeDernier (double(10,3)), codepostal (int unsigned), representantLegal (varchar(45)), situationFamiliale (varchar(45)), DecisionFinal (int unsigned), etatTransfert (tinyint unsigned), dateTransfert (date), etatParent (tinyint unsigned), etablissement1 (varchar(45)), dateContact (varchar(45))."
+  },
+  {
+    "table": "preinscription_archive",
+    "description": "La table 'preinscription_archive' contient les colonnes suivantes : id (int unsigned), date (varchar(100)), Resultat (varchar(100)), Eleve (int), Etablissement (char(10)), NiveauPrecedent (int), SectionPrecedent (int), MoyennePrecedent (varchar(100)), MotifRefus (varchar(100)), Niveau (int), Section (int), Decision (varchar(100)), Personne (int), AnneeScolaire (int), NoteMath_precedente (double(10,3)), NoteFrancias_precedente (double(10,3)), NoteArabe_precedente (double(10,3)), NotePhysique_precedente (double(10,3)), NoteSvt_precedente (double(10,3)), Moyenne_Arithmetique (double(10,3)), NoteMath_precedente_2 (double(10,3)), NoteFrancias_precedente_2 (double(10,3)), NoteArabe_precedente_2 (double(10,3)), NotePhysique_precedente_2 (double(10,3)), NoteSvt_precedente_2 (double(10,3)), Moyenne_Arithmetique_2 (double(10,3)), MoyennePilote (double(10,3)), Moyenne_Arithmetique_General (double(10,3)), NoteAnglais_precedente_2 (double(10,3)), MoyenneGeneralAnneeDernier (double(10,3)), codepostal (int unsigned), representantLegal (varchar(45)), situationFamiliale (varchar(45)), DecisionFinal (int unsigned), etatTransfert (tinyint unsigned), dateTransfert (date), etatParent (tinyint unsigned), etablissement1 (varchar(45))."
+  },
+  {
+    "table": "preinscriptionlog",
+    "description": "La table 'preinscriptionlog' contient les colonnes suivantes : id (int unsigned), date (varchar(100)), Resultat (varchar(100)), Eleve (int), Etablissement (char(10)), NiveauPrecedent (int), SectionPrecedent (int), MoyennePrecedent (varchar(100)), MotifRefus (varchar(100)), Niveau (int), Section (int), Decision (varchar(100)), Personne (int), AnneeScolaire (int), NoteMath_precedente (double(10,3)), NoteFrancias_precedente (double(10,3)), NoteArabe_precedente (double(10,3)), NotePhysique_precedente (double(10,3)), NoteSvt_precedente (double(10,3)), Moyenne_Arithmetique (double(10,3)), NoteMath_precedente_2 (double(10,3)), NoteFrancias_precedente_2 (double(10,3)), NoteArabe_precedente_2 (double(10,3)), NotePhysique_precedente_2 (double(10,3)), NoteSvt_precedente_2 (double(10,3)), Moyenne_Arithmetique_2 (double(10,3)), MoyennePilote (double(10,3)), Moyenne_Arithmetique_General (double(10,3)), NoteAnglais_precedente_2 (double(10,3)), MoyenneGeneralAnneeDernier (double(10,3)), codepostal (int), representantLegal (varchar(45)), situationFamiliale (varchar(45)), DecisionFinal (int unsigned), etatTransfert (tinyint unsigned), dateTransfert (date), etatParent (tinyint unsigned), etablissement1 (varchar(45)), dateContact (varchar(45))."
+  },
+  {
+    "table": "preinscriptionpreinscription",
+    "description": "La table 'preinscriptionpreinscription' contient les colonnes suivantes : id (int unsigned), date (varchar(100)), Resultat (varchar(100)), Eleve (int), Etablissement (char(10)), NiveauPrecedent (int), SectionPrecedent (int), MoyennePrecedent (varchar(100)), MotifRefus (varchar(100)), Niveau (int), Section (int), Decision (varchar(100)), Personne (int), AnneeScolaire (int), NoteMath_precedente (double(10,3)), NoteFrancias_precedente (double(10,3)), NoteArabe_precedente (double(10,3)), NotePhysique_precedente (double(10,3)), NoteSvt_precedente (double(10,3)), Moyenne_Arithmetique (double(10,3)), NoteMath_precedente_2 (double(10,3)), NoteFrancias_precedente_2 (double(10,3)), NoteArabe_precedente_2 (double(10,3)), NotePhysique_precedente_2 (double(10,3)), NoteSvt_precedente_2 (double(10,3)), Moyenne_Arithmetique_2 (double(10,3)), MoyennePilote (double(10,3)), Moyenne_Arithmetique_General (double(10,3)), NoteAnglais_precedente_2 (double(10,3)), MoyenneGeneralAnneeDernier (double(10,3)), codepostal (int), representantLegal (varchar(45)), situationFamiliale (varchar(45)), DecisionFinal (int unsigned), etatTransfert (tinyint unsigned), dateTransfert (date), etatParent (tinyint unsigned), etablissement1 (varchar(45)), dateContact (varchar(45))."
+  },
+  {
+    "table": "privilege",
+    "description": "La table 'privilege' contient les colonnes suivantes : id (int unsigned), privilege (varchar(45))."
+  },
+  {
+    "table": "qualite",
+    "description": "La table 'qualite' contient les colonnes suivantes : id (int unsigned), qualiteFr (varchar(100)), qualiteAr (varchar(100))."
+  },
+  {
+    "table": "reclamation",
+    "description": "La table 'reclamation' contient les colonnes suivantes : id (int unsigned), objet (varchar(45)), msg (varchar(45)), date (varchar(45)), idpersonne (int unsigned), archiver (tinyint(1)), type (varchar(45))."
+  },
+  {
+    "table": "reglementeleve",
+    "description": "La table 'reglementeleve' contient les colonnes suivantes : id (int unsigned), Date (datetime), ModeReglement (int unsigned), NumCheque (varchar(45)), Proprietaire (varchar(200)), Montant (double(10,3)), IdInscription (int unsigned), IdExtra (int unsigned), IdUniformCommande (int unsigned), Personne (int), Utilisateur (int unsigned), DateEcheance (datetime), Banque (int unsigned), Observation (varchar(200)), RegInscri (tinyint unsigned), RegUniform (tinyint unsigned), TypeReglement (int unsigned), Remboursement (tinyint unsigned), Annule (tinyint unsigned), AnnulationAvecRemboursement (tinyint unsigned), ModeRemboursement (int unsigned), DateEchianceAnnulation (datetime), NumChequeAnnulation (varchar(45)), rib (varchar(45)), agence (varchar(45))."
+  },
+  {
+    "table": "reglementeleve_echeancier",
+    "description": "La table 'reglementeleve_echeancier' contient les paiements effectués par les élèves. Elle inclut colonnes suivantes : id (int unsigned), Date (datetime), ModeReglement (int unsigned), NumCheque (varchar(45)), Proprietaire (varchar(200)), Montant (double(10,3)), IdInscription (int unsigned), IdExtra (int unsigned), IdUniformCommande (int unsigned), Personne (int), Utilisateur (int unsigned), DateEcheance (datetime), Banque (int unsigned), Observation (varchar(200)), RegInscri (tinyint unsigned), RegUniform (tinyint unsigned), TypeReglement (int unsigned), isValide (tinyint unsigned), AnnulationAvecRemboursement (tinyint unsigned), Annule (tinyint unsigned), rib (varchar(45)), agence (varchar(45))."
+  },
+  {
+    "table": "reglementfornisseur",
+    "description": "La table 'reglementfornisseur' contient les colonnes suivantes : id (int unsigned), date (date), modereglement (int unsigned), Numcheque (varchar(45)), proprietaire (varchar(45)), Montant (double(10,3)), idfornisseur (int unsigned), Dateecheance (date), banque (int unsigned), rib (varchar(45)), agence (varchar(45)), nombenificiaire (varchar(45))."
+  },
+  {
+    "table": "renseignementmedicaux",
+    "description": "La table 'renseignementmedicaux' contient les colonnes suivantes : id (int unsigned), idPersonne (int), idEleve (int), TroubleVue (tinyint unsigned), PortLunette (tinyint unsigned), motifPortLunette (varchar(200)), VisionColeurPerturbe (tinyint unsigned), DateDernExamenOpht (datetime), NomOphtalmalogue (varchar(45)), AdrOphtalmalogue (varchar(45)), Asthme (tinyint unsigned), DescriAstheme (varchar(300)), Allergie (tinyint unsigned), DescriAlllergie (varchar(300)), IntolMedica (tinyint unsigned), DescriIntolMedica (varchar(300)), AutresAllergie (varchar(300)), Epilepsie (tinyint unsigned), TraitementEpilepsie (varchar(300)), Handicap (tinyint unsigned), DescriHandicap (varchar(300)), MaladieChronique (tinyint unsigned), DescriMaladieChro (varchar(300)), TroublesAudi (tinyint unsigned), DescriTroublesAudi (varchar(300)), AutresTroubles (varchar(300)), TraitementTrouble (tinyint unsigned), DescriTraitementTrouble (varchar(300)), InterventionChiru (tinyint unsigned), DescriInterventionChiru (varchar(300)), BeneficieReduc (tinyint unsigned), DescriBeneficieReduc (varchar(300)), ActEnfant (tinyint unsigned)."
+  },
+  {
+    "table": "repartitionexamen",
+    "description": "La table 'repartitionexamen' contient les colonnes suivantes : id (int unsigned), idClasse (int), idMatiere (int unsigned), idSalle (int unsigned), idAnneescolaire (int unsigned), idSurveillant (int unsigned), idTrimestre (int unsigned), heureDeb (varchar(45)), heureFin (varchar(45)), duree (int unsigned), periodejour (varchar(45)), date (date), groupe (int unsigned), TypeExamen (int unsigned), idSurveillant2 (int unsigned), semaine (varchar(45))."
+  },
+  {
+    "table": "repartitionexamencopie",
+    "description": "La table 'repartitionexamencopie' contient les colonnes suivantes : id (int unsigned), idClasse (int), idMatiere (int unsigned), idSalle (int unsigned), idAnneescolaire (int unsigned), idSurveillant (int unsigned), idTrimestre (int unsigned), heureDeb (varchar(45)), heureFin (varchar(45)), duree (int unsigned), periodejour (varchar(45)), date (date), groupe (int unsigned), TypeExamen (int unsigned), idSurveillant2 (int unsigned)."
+  },
+  {
+    "table": "repartitionsemaine",
+    "description": "La table 'repartitionsemaine' contient les colonnes suivantes : id (int unsigned), date (date), motif (varchar(45)), idsemaine (varchar(45))."
+  },
+  {
+    "table": "representantlegal",
+    "description": "La table 'representantlegal' contient les colonnes suivantes : id (int unsigned), nomRepresentantLegal (varchar(45))."
+  },
+  {
+    "table": "retard",
+    "description": "La table 'retard' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Date (datetime), Heure (varchar(45)), Duree (varchar(45)), Matiere (int unsigned), Enseignant (int unsigned), Vu (tinyint unsigned), Definition (varchar(200)), Classe (int unsigned), anneeSco (int unsigned), seancedebut (varchar(45)), seancefin (varchar(45))."
+  },
+  {
+    "table": "rubrique",
+    "description": "La table 'rubrique' contient les colonnes suivantes : id (int unsigned), libelleRubrique (varchar(45)), htmlId (varchar(45)), htmlNom (varchar(45))."
+  },
+  {
+    "table": "salle",
+    "description": "La table 'salle' contient les colonnes suivantes : id (int unsigned), codeSalleAr (varchar(45)), codeSalleFr (varchar(45)), nomSalleFr (varchar(45)), nomSalleAr (varchar(45))."
+  },
+  {
+    "table": "seance",
+    "description": "La table 'seance' contient les colonnes suivantes : id (int unsigned), codeSeance (varchar(45)), nomSeance (varchar(45)), debut (varchar(45)), fin (varchar(45))."
+  },
+  {
+    "table": "section",
+    "description": "La table 'section' contient les colonnes suivantes : id (int), CodeSectFr (char(45)), NomSectFr (char(45)), CodeSectAr (char(45)), NomSectAr (char(45)), IdNiv (int)."
+  },
+  {
+    "table": "sectioncourete",
+    "description": "La table 'sectioncourete' contient les colonnes suivantes : id (int unsigned), CodeSectFr (varchar(45)), NomSectFr (varchar(45))."
+  },
+  {
+    "table": "semaine",
+    "description": "La table 'semaine' contient les colonnes suivantes : id (int unsigned), libelleSemaine (varchar(45))."
+  },
+  {
+    "table": "situationeleve",
+    "description": "La table 'situationeleve' contient les colonnes suivantes : id (int unsigned), eleve_id (varchar(45)), anneescolaire (varchar(45)), Motif (varchar(45)), id_inscri (int unsigned), date_mvt (date), debit (double(10,3)), credit (double(10,3)), modereg (varchar(45)), num_reg (varchar(45)), id_paiement (int unsigned), id_reglement (int unsigned)."
+  },
+  {
+    "table": "situationfamilliale",
+    "description": "La table 'situationfamilliale' contient les colonnes suivantes : id (int unsigned), libelleSituation (varchar(100))."
+  },
+  {
+    "table": "smscampagnes",
+    "description": "La table 'smscampagnes' contient les colonnes suivantes : id (int unsigned), DateEnvoi (datetime), Sms (varchar(450)), Type (varchar(45)), distinataire (varchar(45))."
+  },
+  {
+    "table": "smslog",
+    "description": "La table 'smslog' contient les colonnes suivantes : id (int unsigned), IdInscription (int unsigned), IdParent (int unsigned), NomPrenom (varchar(45)), MotifSms (varchar(450)), Tel (varchar(45)), IdCampagne (int unsigned), IdClasse (int unsigned)."
+  },
+  {
+    "table": "stagiaires_int",
+    "description": "La table 'stagiaires_int' contient les colonnes suivantes : idstag (int unsigned), numstag (int unsigned), niveauscol (varchar(45)), codegroupe (varchar(45)), anneeformation (varchar(45)), Montantparmois (varchar(45)), frais_inscrip (varchar(45)), mois_deb (varchar(45)), DateInscrip (varchar(45)), annuler (tinyint unsigned), observation (varchar(50)), annee (varchar(45)), lieuinscri (varchar(45)), Transport (tinyint unsigned), CodeCarte (varchar(45))."
+  },
+  {
+    "table": "statarithconcours",
+    "description": "La table 'statarithconcours' contient les colonnes suivantes : id (int unsigned), ideleve (varchar(45)), nomprenom (varchar(45)), notearabe (varchar(45)), notefrancais (varchar(45)), noteanglais (varchar(45)), notemath (varchar(45)), notescience (varchar(45)), moyarith (varchar(45)), trimestre (varchar(45)), niveau (varchar(45)), notephysique (varchar(45))."
+  },
+  {
+    "table": "statconcoursglobal",
+    "description": "La table 'statconcoursglobal' contient les colonnes suivantes : id (int unsigned), ideleve (varchar(45)), nomprenom (varchar(45)), idniveau (varchar(45)), moyaritht1 (decimal(10,2)), moyegenT1 (decimal(10,2)), moyarithT2 (decimal(10,2)), moyegenT2 (decimal(10,2)), moyarithT3 (decimal(10,2)), moyeGenT3 (decimal(10,2))."
+  },
+  {
+    "table": "suggestion",
+    "description": "La table 'suggestion' contient les colonnes suivantes : id (int unsigned), objet (varchar(45)), msg (varchar(45)), date (varchar(45)), idpersonne (int unsigned), archiver (tinyint(1)), type (varchar(45))."
+  },
+  {
+    "table": "suivicantineparjour",
+    "description": "La table 'suivicantineparjour' contient les colonnes suivantes : id (int unsigned), dateReglement (datetime), modeReglement (int unsigned), debit (int unsigned), credit (int unsigned), IdPersonne (int unsigned), NumCheque (varchar(45)), DateEcheance (datetime), Proprietaire (varchar(45)), Motif (varchar(45)), Solde (int unsigned)."
+  },
+  {
+    "table": "suivihomework",
+    "description": "La table 'suivihomework' contient les colonnes suivantes : id (int unsigned), ideleve (int unsigned), idhomework (int unsigned), date (varchar(45)), etat (tinyint(1))."
+  },
+  {
+    "table": "surveillant",
+    "description": "La table 'surveillant' contient les colonnes suivantes : id (int unsigned), dateNaissance (date), lieuNaissance (varchar(45)), mail (varchar(45)), coutHoraire (int unsigned), idPersonne (int), idSituation (int unsigned), idDip (int unsigned), idModPaiement (int unsigned), idQualite (int unsigned), rib (varchar(45)), banque (varchar(45)), sexe (varchar(45)), dateDip (varchar(45))."
+  },
+  {
+    "table": "teamspasswordstudent",
+    "description": "La table 'teamspasswordstudent' contient les colonnes suivantes : SISID (int unsigned), SISIDSCHOOLS (varchar(500)), USERNAMES (varchar(500)), password (varchar(500)), ClASS (varchar(50))."
+  },
+  {
+    "table": "teamspasswordteacher",
+    "description": "La table 'teamspasswordteacher' contient les colonnes suivantes : SISID (int unsigned), SHOOLSISIDT (varchar(500)), USERNAMET (varchar(500)), password (varchar(500))."
+  },
+  {
+    "table": "teamssection",
+    "description": "La table 'teamssection' contient les colonnes suivantes : id (int unsigned), SCHOOLSIS (varchar(500)), SectionName (varchar(500))."
+  },
+  {
+    "table": "teamsstudent",
+    "description": "La table 'teamsstudent' contient les colonnes suivantes : SISID (int unsigned), SISIDSCHOOL (varchar(500)), USERNAME (varchar(500))."
+  },
+  {
+    "table": "teamsstudentenrollement",
+    "description": "La table 'teamsstudentenrollement' contient les colonnes suivantes : SectionSISID (int), SISID (varchar(45))."
+  },
+  {
+    "table": "teamsteacher",
+    "description": "La table 'teamsteacher' contient les colonnes suivantes : SISID (int), SISIDSCHOOL (varchar(500)), USERNAME (varchar(500))."
+  },
+  {
+    "table": "teamsteacherrostar",
+    "description": "La table 'teamsteacherrostar' contient les colonnes suivantes : SectionSISID (int), SISID (varchar(500))."
+  },
+  {
+    "table": "teamsteacherrostarview",
+    "description": "La table 'teamsteacherrostarview' contient les colonnes suivantes : NULL (binary(0)), SISID (varchar(2)), nom (varchar(146)), nomprenom (varchar(201)), nommatierefr (varchar(100)), idpersonneenseignant (int), anneeScolaire (int unsigned)."
+  },
+  {
+    "table": "teamstudentenrollementview",
+    "description": "La table 'teamstudentenrollementview' contient les colonnes suivantes : NULL (binary(0)), SISID (varchar(2)), nom (varchar(146)), nomprenom (varchar(200)), idpersonneeleve (int), anneeScolaire (int unsigned)."
+  },
+  {
+    "table": "telechargement",
+    "description": "La table 'telechargement' contient les colonnes suivantes : id (int), nomFichier (varchar(255)), chemin (varchar(255)), idMotif (int), idClasse (int), idPersonne (int)."
+  },
+  {
+    "table": "test",
+    "description": "La table 'test' contient les colonnes suivantes : id (int unsigned), champ (int unsigned), cin (varchar(45))."
+  },
+  {
+    "table": "test2",
+    "description": "La table 'test2' contient les colonnes suivantes : id (int unsigned), champ (int unsigned)."
+  },
+  {
+    "table": "tokenfirebases",
+    "description": "La table 'tokenfirebases' contient les colonnes suivantes : id (int unsigned), device (varchar(100)), os (varchar(100)), version (varchar(100))."
+  },
+  {
+    "table": "trimestre",
+    "description": "La table 'trimestre' contient les colonnes suivantes : id (int unsigned), nom_trimestre (varchar(45)), actif (tinyint(1)), nom_trimestreAr (varchar(45)), configTrimstre (int unsigned), date_debut (datetime), date_fin (datetime)."
+  },
+  {
+    "table": "typeetablissement",
+    "description": "La table 'typeetablissement' contient les colonnes suivantes : id (int), LIBELLETYPEETABAR (char(45)), LIBELLETYPEETABFR (char(45))."
+  },
+  {
+    "table": "typematiere",
+    "description": "La table 'typematiere' contient les colonnes suivantes : id (int unsigned), libelleTypeMatiereFr (varchar(45)), libelleTypeMatiereAr (varchar(45))."
+  },
+  {
+    "table": "typemessagerie",
+    "description": "La table 'typemessagerie' contient les colonnes suivantes : id (int unsigned), type_message (varchar(60)), objet (varchar(45)), message (varchar(500))."
+  },
+  {
+    "table": "typepre",
+    "description": "La table 'typepre' contient les colonnes suivantes : id (int unsigned), libelleTypeEpreuveFr (varchar(45)), libelleTypeEpreuveAr (varchar(45)), AbbreviationTypeEpreuve (varchar(45))."
+  },
+  {
+    "table": "typesms",
+    "description": "La table 'typesms' contient les colonnes suivantes : id (int unsigned), typesms (varchar(45))."
+  },
+  {
+    "table": "uniformcommande",
+    "description": "La table 'uniformcommande' contient les colonnes suivantes : id (int unsigned), Inscription (double(10,3)), TauxTVA (double(10,3)), TotalTTC (double(10,3)), MontantRestant (double(10,3)), Date (datetime)."
+  },
+  {
+    "table": "uniformcommandedetails",
+    "description": "La table 'uniformcommandedetails' contient les colonnes suivantes : id (int unsigned), UniformCommande (int unsigned), Model (int unsigned), Taille (int unsigned), Couleur (int unsigned), Qte (int unsigned), TauxTVA (double(10,2)), PUTTC (double(10,3))."
+  },
+  {
+    "table": "uniformcouleur",
+    "description": "La table 'uniformcouleur' contient les colonnes suivantes : id (int unsigned), Couleur (varchar(145))."
+  },
+  {
+    "table": "uniformgenre",
+    "description": "La table 'uniformgenre' contient les colonnes suivantes : id (int unsigned), Genre (varchar(145))."
+  },
+  {
+    "table": "uniformmodel",
+    "description": "La table 'uniformmodel' contient les colonnes suivantes : id (int unsigned), Model (varchar(145)), Genre (int unsigned), Prix (double)."
+  },
+  {
+    "table": "uniformtaille",
+    "description": "La table 'uniformtaille' contient les colonnes suivantes : id (int unsigned), Taille (varchar(145))."
+  },
+  {
+    "table": "user",
+    "description": "La table 'user' contient les colonnes suivantes : id (int), email (varchar(255)), password (varchar(255)), idpersonne (int), roles (longtext), token (longtext), changepassword (tinyint unsigned)."
+  },
+  {
+    "table": "useradmin",
+    "description": "La table 'useradmin' contient les colonnes suivantes : id (int), username (varchar(180)), password (varchar(255)), codetypeentr (varchar(255)), failedLoginAttempts (int), lockoutTime (datetime), avatar (varchar(255)), nom (varchar(100)), prenom (varchar(100)), numeroDeTelephone (varchar(20))."
+  },
+  {
+    "table": "utilisateur",
+    "description": "La table 'utilisateur' contient les colonnes suivantes : id (int unsigned), nomUtilisateur (varchar(45)), prenomUtilisateur (varchar(45)), loginUtilisateur (varchar(45)), motpasseUtilisateur (varchar(45)), tel (varchar(45)), mail (varchar(45)), grade (int unsigned), role (varchar(45))."
+  },
+  {
+    "table": "veiwruniformete",
+    "description": "La table 'veiwruniformete' contient les colonnes suivantes : taille (varchar(145)), couleur (varchar(145)), Qte (decimal(33,0))."
+  },
+  {
+    "table": "viewabsence",
+    "description": "La table 'viewabsence' contient les colonnes suivantes : id (int unsigned), nomMatierefr (varchar(100)), IdMat (int unsigned), date (date), vu (tinyint unsigned), NomPrenomfr (varchar(201)), codeclassefr (char(45)), NomPrenomEnseignant (varchar(201)), ideleve (int)."
+  },
+  {
+    "table": "viewavertissement",
+    "description": "La table 'viewavertissement' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Object (varchar(45)), Description (varchar(200)), Enseignant (varchar(201)), Matiere (varchar(100)), Date (datetime), vu (tinyint unsigned)."
+  },
+  {
+    "table": "viewblame",
+    "description": "La table 'viewblame' contient les colonnes suivantes : ideleve (int), id (int unsigned), Object (varchar(45)), Description (varchar(200)), nomMatierefr (varchar(100)), IdMat (int unsigned), date (datetime), vu (tinyint unsigned), NomPrenomfr (varchar(201)), codeclassefr (char(45)), NomPrenomEnseignant (varchar(201))."
+  },
+  {
+    "table": "viewcantineparjour",
+    "description": "La table 'viewcantineparjour' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), Date (datetime), MontantTTC (double(10,3)), MontantRestant (double(10,3)), DateDePaiement (datetime), Utilisateur (int unsigned)."
+  },
+  {
+    "table": "viewcantineparjourenseignant",
+    "description": "La table 'viewcantineparjourenseignant' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), Date (datetime), MontantTTC (double(10,3)), MontantRestant (double(10,3)), DateDePaiement (datetime), Utilisateur (int unsigned)."
+  },
+  {
+    "table": "viewcasiervide",
+    "description": "La table 'viewcasiervide' contient les colonnes suivantes : id (int unsigned), Nom (varchar(45))."
+  },
+  {
+    "table": "vieweleveparclasse",
+    "description": "La table 'vieweleveparclasse' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), DateNaissance (date), Telephone (varchar(20)), Cin (varchar(100)), Classe (char(45)), idClasse (int), TypeInscri (varchar(45))."
+  },
+  {
+    "table": "viewelevereinscri",
+    "description": "La table 'viewelevereinscri' contient les colonnes suivantes : id (int), IdClasse (int), Classe (char(45)), Eleve (bigint)."
+  },
+  {
+    "table": "viewemploi",
+    "description": "La table 'viewemploi' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), idpersonne (int), NomFR (varchar(201)), NomAR (varchar(201)), IdMatiere (int unsigned), NomMatiereFr (varchar(100)), NomMatiereAr (varchar(100)), jour (int unsigned), AnneeScolaire (int unsigned), Classe (char(45)), IdClasse (int), Groupe (varchar(45)), IdGroupe (int unsigned), Semaine (varchar(45)), IdSemaine (int unsigned), NomSalle (varchar(45)), IdSalle (int unsigned), SeanceDebut (int unsigned), SeanceFin (int unsigned)."
+  },
+  {
+    "table": "viewemploi_enligne",
+    "description": "La table 'viewemploi_enligne' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), NomFR (varchar(201)), NomAR (varchar(201)), IdMatiere (int unsigned), NomMatiereFr (varchar(100)), NomMatiereAr (varchar(100)), jour (int unsigned), AnneeScolaire (int unsigned), Classe (char(45)), IdClasse (int), Groupe (varchar(45)), IdGroupe (int unsigned), Semaine (varchar(45)), IdSemaine (int unsigned), NomSalle (varchar(45)), IdSalle (int unsigned), SeanceDebut (int unsigned), SeanceFin (int unsigned)."
+  },
+  {
+    "table": "viewemploiexameneleve",
+    "description": "La table 'viewemploiexameneleve' contient les colonnes suivantes : id (int unsigned), idTrimestre (int unsigned), heureDeb (varchar(45)), heureFin (varchar(45)), groupe (int unsigned), TypeExamen (int unsigned), DateRepEx (date), duree (int unsigned), JOUR (varchar(8)), temps (varchar(102)), nomsectar (char(45)), idClasse (int), nomclassear (char(45)), nomMatiereAr (varchar(100)), nomMatiereFr (varchar(100)), dureeExamen (time), codesallefr (varchar(45)), nomSalleAr (varchar(45))."
+  },
+  {
+    "table": "viewenseignant",
+    "description": "La table 'viewenseignant' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), idPersonne (int)."
+  },
+  {
+    "table": "viewetatcantineparjour",
+    "description": "La table 'viewetatcantineparjour' contient les colonnes suivantes : id (int), NomPrenom (varchar(201)), Classe (char(45)), DateCantine (date), ParJour (bigint)."
+  },
+  {
+    "table": "viewetatdepaiementuniform",
+    "description": "La table 'viewetatdepaiementuniform' contient les colonnes suivantes : NomPrenomFR (varchar(201)), TotalTTC (double(10,3)), MontantRestant (double(10,3))."
+  },
+  {
+    "table": "viewextras",
+    "description": "La table 'viewextras' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), NomPrenom (varchar(201)), IdAnneeScolaire (int unsigned), AnneeScolaire (varchar(100)), Classe (char(45)), TotalTTC (double(10,3)), MontantRestant (double(10,3)), TypeExtra (varchar(100)), IdTypeExtra (int unsigned)."
+  },
+  {
+    "table": "viewgetblame",
+    "description": "La table 'viewgetblame' contient les colonnes suivantes : id (int unsigned), nomMatierefr (varchar(100)), date (datetime), description (varchar(200)), object (varchar(45)), vu (tinyint unsigned), NomPrenomfr (varchar(201)), cin (varchar(100)), anneescolaire (varchar(100)), codeclassefr (char(45)), NomPrenomEnseignant (varchar(201))."
+  },
+  {
+    "table": "viewgetclub",
+    "description": "La table 'viewgetclub' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), AnneeScolaire (varchar(100)), NomModalite (varchar(6)), Club (varchar(105)), Inscription (int unsigned), TotalTTC (double(10,3)), MontantRestant (double(10,3)), Classe (char(45))."
+  },
+  {
+    "table": "viewgeteleveinscri",
+    "description": "La table 'viewgeteleveinscri' contient les colonnes suivantes : id (int unsigned), NomPrenomFR (varchar(201)), NomPrenomAR (varchar(201)), Cin (varchar(100)), Tel1 (varchar(20)), IdParent (int unsigned), IdEleve (int), Inscription (int unsigned), AnneeScolaire (varchar(100)), Classe (int unsigned), IdCantine (int unsigned), IdBus (int), IdClub (int), IdPanier (int), IdCasier (int), Etablissement (char(10)), MoyennePrecedent (varchar(100)), MoyennePilote (double(10,3)), Moyenne_Arithmetique_General (double(10,3))."
+  },
+  {
+    "table": "viewgeteleveinscridup",
+    "description": "La table 'viewgeteleveinscridup' contient les colonnes suivantes : id (int unsigned), NomPrenomFR (varchar(201)), NomPrenomAR (varchar(201)), adresseFr (varchar(100)), AdresseAr (varchar(100)), Cin (varchar(100)), Tel1 (varchar(20)), IdParent (int unsigned), IdEleve (int), Inscription (int unsigned), Classe (int unsigned), AnneeScolaire (varchar(100)), IdCantine (int unsigned), IdBus (int), IdClub (int), IdPanier (int), IdCasier (int)."
+  },
+  {
+    "table": "viewgeteleveparent",
+    "description": "La table 'viewgeteleveparent' contient les colonnes suivantes : id (int unsigned), NomEleve (varchar(201)), TelEleve (varchar(20)), IdClasse (int), nomclassefr (char(45)), NomPere (varchar(201)), TelephonePere (varchar(20)), NomMere (varchar(201)), TelMere (varchar(20))."
+  },
+  {
+    "table": "viewgeteleveparentdup",
+    "description": "La table 'viewgeteleveparentdup' contient les colonnes suivantes : id (int unsigned), NomEleve (varchar(201)), TelEleve (varchar(20)), IdClasse (int), nomclassefr (char(45)), NomPere (varchar(201)), TelephonePere (varchar(20)), NomMere (varchar(201)), TelMere (varchar(20)), Type (varchar(45))."
+  },
+  {
+    "table": "viewgetinscricasier",
+    "description": "La table 'viewgetinscricasier' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), NomPrenomAr (varchar(201)), Anneescolaire (varchar(100)), NomModalite (varchar(6)), Inscription (int unsigned), Casier (varchar(45)), TotalTTC (double(10,3)), MontantRestant (double(10,3)), Classe (char(45))."
+  },
+  {
+    "table": "viewgetmatiereclasseenseignant",
+    "description": "La table 'viewgetmatiereclasseenseignant' contient les colonnes suivantes : id (int unsigned), Enseignant (int unsigned), NomFR (varchar(201)), NomAR (varchar(201)), IdMatiere (int unsigned), NomMatiereFr (varchar(100)), NomMatiereAr (varchar(100)), jour (int unsigned), AnneeScolaire (int unsigned), Classe (char(45)), IdClasse (int), Groupe (varchar(45)), IdGroupe (int unsigned), Semaine (varchar(45)), IdSemaine (int unsigned), NomSalle (varchar(45)), IdSalle (int unsigned), SeanceDebut (int unsigned), SeanceFin (int unsigned)."
+  },
+  {
+    "table": "viewgetpaiementextra",
+    "description": "La table 'viewgetpaiementextra' contient les colonnes suivantes : id (int unsigned), Tranche (varchar(45)), Total (double(22,3)), Paye (double(22,3)), Reste (double(22,3)), modalite (int unsigned), paiementmotif (int unsigned)."
+  },
+  {
+    "table": "viewgetpaiementscolaire",
+    "description": "La table 'viewgetpaiementscolaire' contient les colonnes suivantes : id (int unsigned), tranche (varchar(100)), Total (double(20,3)), Paye (double(20,3)), Reste (double(20,3)), modalite (int unsigned)."
+  },
+  {
+    "table": "viewgetpaiementscolairedetaillee",
+    "description": "La table 'viewgetpaiementscolairedetaillee' contient les colonnes suivantes : id (int unsigned), classe (int unsigned), tranche (varchar(100)), NomPrenom (varchar(201)), Total (double(20,3)), Paye (double(20,3)), Reste (double(20,3)), modalite (int unsigned)."
+  },
+  {
+    "table": "viewgetparent",
+    "description": "La table 'viewgetparent' contient les colonnes suivantes : id (int unsigned), NomFr (varchar(100)), NomAr (varchar(100)), tel1 (varchar(20)), tel2 (varchar(20)), type (varchar(45)), eleve (int)."
+  },
+  {
+    "table": "viewgetretard",
+    "description": "La table 'viewgetretard' contient les colonnes suivantes : id (int unsigned), nomMatierefr (varchar(100)), date (datetime), vu (tinyint unsigned), NomPrenomfr (varchar(201)), codeclassefr (char(45)), NomPrenomEnseignant (varchar(201))."
+  },
+  {
+    "table": "viewgetretards",
+    "description": "La table 'viewgetretards' contient les colonnes suivantes : IdMat (int unsigned), id (int unsigned), nomMatierefr (varchar(100)), date (datetime), vu (tinyint unsigned), NomPrenomfr (varchar(201)), codeclassefr (char(45)), NomPrenomEnseignant (varchar(201)), ideleve (int), duree (varchar(45))."
+  },
+  {
+    "table": "viewmatiereenseignant",
+    "description": "La table 'viewmatiereenseignant' contient les colonnes suivantes : id (int unsigned), NomMatiereFr (varchar(100)), NomMatiereAr (varchar(100)), idPersonne (int)."
+  },
+  {
+    "table": "viewnouveaueleve",
+    "description": "La table 'viewnouveaueleve' contient les colonnes suivantes : id (int), IdClasse (int), Classe (char(45)), Eleve (bigint)."
+  },
+  {
+    "table": "viewrchequeecheancier",
+    "description": "La table 'viewrchequeecheancier' contient les colonnes suivantes : Nom Prenom (varchar(201)), Proprietaire (varchar(200)), DateEcheance (datetime), numCheque (varchar(45)), Montant (double(10,3))."
+  },
+  {
+    "table": "viewreglementecheanciernonvalide",
+    "description": "La table 'viewreglementecheanciernonvalide' contient les colonnes suivantes : id (int unsigned), IdInscription (int unsigned), NomFr (varchar(201)), Proprietaire (varchar(200)), DateEcheance (datetime), NumCheque (varchar(45)), Montant (double(10,3))."
+  },
+  {
+    "table": "viewrepartitionenseignant",
+    "description": "La table 'viewrepartitionenseignant' contient les colonnes suivantes : JOUR (varchar(8)), enseignant (int unsigned), Nom_Enseignant (varchar(200)), Nom_Surveillant (varchar(201)), idsurveillant (int unsigned), nommatierefr (varchar(100)), idtrimestre (int unsigned), idclasse (int), nomclassefr (char(45)), heuredeb (varchar(45)), heurefin (varchar(45)), codesallefr (varchar(45)), date (date), idanneescolaire (int unsigned)."
+  },
+  {
+    "table": "viewrepartitionsurveillant",
+    "description": "La table 'viewrepartitionsurveillant' contient les colonnes suivantes : JOUR (varchar(8)), temps (varchar(102)), NomPrenomSurAR (varchar(201)), Civilite (int unsigned), id (int unsigned), idTrimestre (int unsigned), idAnneescolaire (int unsigned), idsurveillant (int unsigned), DateRepEx (date), nomsectar (char(45)), heuredebut (varchar(45)), idClasse (int), nomclassear (char(45)), NOMCLASSEFR (char(45)), codesallefr (varchar(45)), codesallear (varchar(45)), date (date)."
+  },
+  {
+    "table": "viewretard",
+    "description": "La table 'viewretard' contient les colonnes suivantes : id (int unsigned), Inscription (int unsigned), Definition (varchar(200)), Date (datetime), Heure (varchar(45)), Duree (varchar(45)), Matiere (varchar(100)), Enseignant (varchar(201)), Vu (tinyint unsigned)."
+  },
+  {
+    "table": "viewstatistiquelocalite",
+    "description": "La table 'viewstatistiquelocalite' contient les colonnes suivantes : id (int unsigned), Localite (varchar(45)), Nbr (bigint)."
+  },
+  {
+    "table": "viewstatmoyenneglobal",
+    "description": "La table 'viewstatmoyenneglobal' contient les colonnes suivantes : ideleve (varchar(45)), nomprenom (varchar(201)), libeclasar (varchar(100)), moyaritht1 (decimal(10,2)), moyegenT1 (decimal(10,2)), moyarithT2 (decimal(10,2)), moyegenT2 (decimal(10,2)), moyarithT3 (decimal(10,2)), moyegenT3 (decimal(10,2))."
+  },
+  {
+    "table": "viewtouslesinscri",
+    "description": "La table 'viewtouslesinscri' contient les colonnes suivantes : id (int), idClasse (int), Classe (char(45)), Eleve (bigint)."
+  },
+  {
+    "table": "viewtranchepaiement",
+    "description": "La table 'viewtranchepaiement' contient les colonnes suivantes : id (int unsigned), NomFr (varchar(201)), NomAr (varchar(201)), Modalite (int unsigned), Inscription (int unsigned), Tranche (varchar(100)), TotalTTC (double(10,3)), MontantRestant (double(10,3))."
+  },
+  {
+    "table": "viewuniformcommande",
+    "description": "La table 'viewuniformcommande' contient les colonnes suivantes : id (int unsigned), NomPrenom (varchar(201)), Date (datetime), TotalTTC (double(10,3)), MontantRestant (double(10,3)), AnneeScolaire (varchar(100)), IdAnneeScolaire (int unsigned)."
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "Absence": [
+    "SELECT i.id, i.Classe,i.Anneescolaire ,\n                 e.Seancedebut , e.Seancefin ,\n                 e.enseignant , e.matiere\n                 FROM Inscriptioneleve i ,\n                 Emploidutemps e ,\n                 Anneescolaire an  ,\n                 Seance s,\n                 enseingant en\n                WHERE e.Classe = i.Classe and s.id= e.Seancedebut\n                  and i.Personne=7818 and an.id=i.Anneescolaire  and an.actifmobile=1\n                 and e.enseignant=en.id and en.idpersonne=3979 and\n                 s.debut='14:00' ;"
+  ],
+  "Cantine": [
+    "SELECT a.id, a.image, a.jour FROM Cantine a ;"
+  ],
+  "Details Paiement Extra": [
+    "SELECT m.libelle AS modereglement, r.numcheque, r.montant, r.date\n             from Reglementeleve r, Modereglement m\n             where r.idextra = 1827 and m.id = r.modereglement ;"
+  ],
+  "Details Paiement Scolaire": [
+    "SELECT m.libelle AS modereglement, r.numcheque, r.montant, r.date\n            from Reglementeleve r, Modereglement m\n            where r.idinscription = 2197 and r.modereglement = m.id ;"
+  ],
+  "Eleve Parent": [
+    "SELECT p.id , p.Nomfr , p.Prenomfr,p.Civilite\n                from Personne p ,\n                Parenteleve pe,\n                Parent pa ,\n                Eleve e,\n                Inscriptioneleve i ,\n                Anneescolaire a\n                  where (a.actifmobile = 1) and (a.id = i.Anneescolaire)\n                   and (i.Eleve = e.id) and (e.id = pe.Eleve) and \n                   (e.Idpersonne = p.id)\n                and (pe.Parent=pa.id)and (pa.Personne=7819) ;"
+  ],
+  "Emploi eleve debut": [
+    "SELECT p.Nomfr, p.Prenomfr, en.sexe, M.Nommatierefr,se.debut , e.Jour ,g.libellegroupe , e.Semaine,  s.nomsallefr\n            FROM Emploidutemps e, Matiere M , Anneescolaire an,\n            Salle s,Seance se , Groupe g, Enseingant en, Personne p\n            WHERE g.id=e.Groupe and  se.id=e.Seancedebut and M.id = e.matiere and\n            s.id=e.salle and en.id = e.enseignant and en.idpersonne = p.id and an.id=e.Anneescolaire and an.actifmobile=1\n            and e.Classe=100 and e.Jour=3 ORDER by se.debut ASC ;"
+  ],
+  "Emploi eleve fin": [
+    "SELECT p.Nomfr, p.Prenomfr, en.sexe, M.Nommatierefr, se.fin, e.Jour, g.libellegroupe, e.Semaine, s.nomsallefr\n            FROM Emploidutemps e , Matiere M , Anneescolaire an,\n             Salle s, Seance se , Groupe g , Enseingant en, Personne p\n            WHERE  g.id=e.Groupe and  se.id=e.Seancefin and  M.id = e.matiere and\n             s.id=e.salle and  en.id = e.enseignant and en.idpersonne = p.id and an.id=e.Anneescolaire and an.actifmobile=1\n            and e.Classe=100 and e.Jour=3 ORDER by se.fin ASC ;"
+  ],
+  "Moyenne Trimestrielle": [
+    "SELECT er.moyeperiexam AS moyenneTrimestrielle, er.codeperiexam AS codeTrimestre\n            FROM Eleve e, Eduresultatcopie er\n            WHERE e.idedusrv=er.idenelev and e.Idpersonne= 7818 and er.codeperiexam = 33 ;"
+  ],
+  "Nombre Total des préinscriptions": [
+    "SELECT\n  annee_affichee AS libelle,\n  COUNT(*) AS nombre\nFROM (\n  SELECT\n    '2023/2024' AS annee_affichee,\n    p.id AS personne_unique\n  FROM preinscriptionlog l\n  JOIN personnepreinscriptionlog p ON p.id = l.personne\n  WHERE l.anneescolaire = 6 AND l.date BETWEEN '2024-04-01' AND '2024-08-31'\n\n  UNION\n\n  SELECT\n    '2024/2025' AS annee_affichee,\n    p.id AS personne_unique\n  FROM preinscriptionlog l\n  JOIN personnepreinscriptionlog p ON p.id = l.personne\n  WHERE l.anneescolaire = 7 AND l.date BETWEEN '2025-04-01' AND '2025-08-31'\n) AS combined_data\nGROUP BY annee_affichee\nORDER BY annee_affichee;"
+  ],
+  "Nombre des Réinscriptions": [
+    "SELECT\n  niveau.id AS id,\n  classe.id AS IdClasse,\n  classe.CODECLASSEFR AS Classe,\n  COUNT(*) AS Eleve\nFROM\n  inscriptioneleve\nJOIN classe ON inscriptioneleve.Classe = classe.id\nJOIN niveau ON classe.IDNIV = niveau.id\nWHERE \n  inscriptioneleve.AnneeScolaire = 6\n  AND inscriptioneleve.TypeInscri = 'R'\n  AND inscriptioneleve.annuler = 0\nGROUP BY\n  classe.CODECLASSEFR\nORDER BY\n  niveau.id;"
+  ],
+  "Nombre des nouvelles inscriptions": [
+    "SELECT \n    niveau.id AS id,\n    classe.id AS IdClasse,\n    classe.CODECLASSEFR AS Classe,\n    COUNT(*) AS Eleve\nFROM inscriptioneleve\nJOIN classe ON inscriptioneleve.Classe = classe.id\nJOIN niveau ON classe.IDNIV = niveau.id\nWHERE \n    inscriptioneleve.AnneeScolaire = '[ANNEESCOLAIRE]'\n    AND inscriptioneleve.TypeInscri = 'N'\n    AND inscriptioneleve.annuler = 0\nGROUP BY \n    classe.CODECLASSEFR,\n    classe.id,\n    niveau.id\nORDER BY \n    niveau.id;"
+  ],
+  "Nombre des élèves Acceptés Non inscrit": [
+    "SELECT niveau.id AS id, niveau.NOMNIVFR AS Classe,count(0) AS `Eleve` FROM `bd_eduise`.`preinscription`,personne ,eleve ,niveau where\n     Decision ='Acceptée' and anneescolaire= '\" + anneescoCourant+ \"'  and eleve.id=preinscription.eleve and eleve.idPersonne = personne.id and\n     niveau.id=preinscription.niveau and preinscription.id\n     not in (SELECT  PreinscriptionId  FROM `bd_eduise`.`inscriptioneleve` where anneescolaire= '\" + anneescoCourant+ \"'  and TypeInscri='N'\n     and PreinscriptionId is not null) group by niveau.NOMNIVFR order by niveau.id ;"
+  ],
+  "Nombre des élèves par délégation": [
+    "SELECT \n    l.IDLOCALITE AS id,\n    l.LIBELLELOCALITEFR AS Localite,\n    COUNT(0) AS Nbr,\n    i.AnneeScolaire AS AnneeScolaire\nFROM \n    personne p\nJOIN \n    localite l ON p.Localite = l.IDLOCALITE\nJOIN \n    inscriptioneleve i ON i.Personne = p.id\nWHERE \n    i.AnneeScolaire = '\"+AnneeScolaire+\"'\n    AND i.annuler = 0\nGROUP BY \n    p.Localite, i.AnneeScolaire\n\nUNION ALL\n\nSELECT \n    NULL AS id,\n    'Pas de localite' AS Localite,\n    COUNT(0) AS `count(*)`,\n    i.AnneeScolaire AS AnneeScolaire\nFROM \n    inscriptioneleve i\nJOIN \n    personne p ON i.Personne = p.id\nWHERE \n    i.AnneeScolaire = '\"+AnneeScolaire+\"'\n    AND p.Localite IS NULL\nGROUP BY \n    p.Localite, i.AnneeScolaire\n\nORDER BY \n    Nbr DESC;"
+  ],
+  "Nombre des élèves préinscrit": [
+    "SELECT niveau , niveau.NOMNIVFR,count(0) AS Eleve FROM `preinscriptionpreinscription` p,niveau where anneescolaire='\" + AnneeScolaire + \"' and p.niveau=niveau.id group by p.niveau order by niveau;"
+  ],
+  "Note": [
+    "SELECT n.id_trimestre, m.Nommatierefr AS matiere, n.orale, n.examenecrit , n.tp, n.ds, n.dc1, n.dc2\nFROM Noteeleveparmatiere n, Matiere m, Inscriptioneleve i\nWHERE i.Personne = 7825\nAND i.id = n.id_inscription\nAND n.id_matiere = m.id\nAND n.id_trimestre = 33\nAND n.id NOT IN (\n    SELECT n2.id\n    FROM Noteeleveparmatiere n2\n    WHERE n2.orale IS NULL\n    AND n2.tp IS NULL \n    AND n2.examenecrit IS NULL\n    AND n2.ds IS NULL\n    AND n2.dc1 IS NULL \n    AND n2.dc2 IS NULL ) ;"
+  ],
+  "Notes Annuelles": [
+    "SELECT em.libematifr AS matiere ,ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre FROM\n            Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e\n            WHERE e.idedusrv=ed.idenelev and ed.codemati=em.codemati and\n            ex.codeperiexam=ed.codeperiexam  and  e.Idpersonne=7818 and ed.moyemati not like '0.00' and ed.codeperiexam = 33 ;"
+  ],
+  "Paiement": [
+    "SELECT p.id, p.tranche AS tranche,sum(p.totalttc)\n             AS total,sum((p.totalttc - p.montantrestant)) AS Paye,sum(p.montantrestant)\n              AS Reste,i.modalite AS modalite\n              from Paiement p , Inscriptioneleve i,  Personne pe\n              where \n            ((i.id = p.inscription) and (i.Anneescolaire = 6)\n             and i.Personne=7818 and (pe.id = i.Personne))\n             group by i.id,p.tranche,i.modalite ;"
+  ],
+  "Paiement Extra": [
+    "SELECT pm.libelle AS libelleExtra, ped.totalttc AS montant, ped.montantrestant AS solde, ped.motif, ped.id AS idExtra\n             from Paiementextra pe, Paiementextradetails ped, Paiementmotif pm\n             where pe.inscription = 2958 and pe.id = ped.paiementextras and pe.paiementmotif = pm.id;"
+  ],
+  "Paiement Scolaire": [
+    "SELECT p.id, p.tranche, p.totalttc AS montant, p.montantrestant AS solde\n             from Paiement p where p.inscription = 2958 ;"
+  ],
+  "Repartition des examens": [
+    "SELECT r.id, m.Nommatierefr as nomMatiereFr, s.codesallefr as codeSalleFr, r.idAnneescolaire,  r.heureDeb as heureDeb, r.heureFin as heureFin,\n            r.date as DateRepEx, r.groupe as groupe, r.TypeExamen as examtype, r.duree as dureeExamen,  c.nomclassefr as nomclassefr , t.nom_trimestre\n\n            FROM   Repartitionexamen r ,   Classe c , Matiere m,  Trimestre t, Salle s\n            where c.id= r.idClasse and m.id=r.idMatiere and s.id=r.idSalle and r.idClasse=100 and r.TypeExamen= 2 and  r.idTrimestre = 33\n            and  t.id = r.idTrimestre  group by m.Nommatierefr order by r.date ;"
+  ],
+  "Retard": [
+    "SELECT r.duree, r.date, m.Nommatierefr, en.idpersonne\n                 FROM Retard r , Inscriptioneleve i,\n                 Anneescolaire a  , Matiere m ,Enseingant en\n                   WHERE m.id=r.matiere and r.inscription=i.id and r.enseignant=en.id\n                    and r.anneesco=a.id and a.actifmobile=1 and i.Personne=7818 ;"
+  ],
+  "Total des inscriptions": [
+    "SELECT \n    niveau.id AS id,\n    classe.id AS IdClasse,\n    classe.CODECLASSEFR AS Classe,\n    COUNT(*) AS Eleve\nFROM \n    inscriptioneleve\nJOIN \n    classe ON inscriptioneleve.Classe = classe.id\nJOIN \n    niveau ON classe.IDNIV = niveau.id\nWHERE \n    inscriptioneleve.AnneeScolaire = '2024-2025' -- remplace par ta variable ou paramètre\n    AND inscriptioneleve.TypeInscri = 'N'\n    AND inscriptioneleve.annuler = 0\nGROUP BY \n    classe.CODECLASSEFR\nORDER BY \n    niveau.id;"
+  ],
+  "élèves non reinscrit": [
+    "SELECT   i.id,concat( p.nomfr,' ',p.prenomfr) as 'nom' ,i.Eleve ,c.nomclassefr , concat( pp.nomfr,' ',pp.prenomfr) as 'parents' , par.type , pp.tel1 \"+\n  \" FROM `inscriptioneleve` i , personne p , classe c , personne pp , parenteleve par , parent pa  , niveau v  \"+\n  \" where anneescolaire='\" + anneescolaire + \"' and annuler=0  and p.id=i.personne and c.id=i.classe  and pp.id = pa.personne and pa.id=par.parent  and par.eleve=i.eleve and  c.idniv = v.id and v.id in (0,1,2,3,4,5,6) and i.eleve not in(select eleve from inscriptioneleve where anneescolaire='\" + anneescolaire + \"' +1  )order by eleve , nomclassefr asc"
+  ]
+}
