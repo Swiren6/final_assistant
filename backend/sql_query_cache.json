@@ -1,0 +1,38 @@
+{
+  "0b0d1f4bf8e0fbf37b375b172b4fd077": {
+    "question_template": "donne moi le nombre  des enseingnants",
+    "sql_template": "SELECT COUNT(*) AS nombre_enseignants\nFROM enseingant;"
+  },
+  "3765dc83c80283e626779cf08d19f54d": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} d'{nomfr} {prenomfr} l'{nomfr} {prenomfr} {nomfr} {prenomfr} matiere",
+    "sql_template": "SELECT \n    m.nomMatiereFr AS matiere,\n    COUNT(a.id) AS nombre_absences\nFROM \n    absence a\nJOIN \n    inscriptioneleve ie ON a.Inscription = ie.id\nJOIN \n    eleve e ON ie.Eleve = e.id\nJOIN \n    personne p ON e.IdPersonne = p.id\nJOIN \n    matiere m ON a.Matiere = m.id\nWHERE \n    p.NomFr = 'BENABDA' \n    AND p.PrenomFr = 'MALAK'\nGROUP BY \n    m.nomMatiereFr;"
+  },
+  "c2a9931543e872327965ca6e9ac5e201": {
+    "question_template": "{nomfr} {prenomfr} l'{nomfr} {prenomfr} l'élève {nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} données?",
+    "sql_template": "SELECT e.id\nFROM eleve e\nJOIN personne p ON e.IdPersonne = p.id\nWHERE p.NomFr = 'KLAI' AND p.PrenomFr = 'ISRAA';"
+  },
+  "8eb4c39c88a0aa64eeff694f3976ff92": {
+    "question_template": "nombre élèves",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves FROM eleve;"
+  },
+  "945cd20e9f90098ec228e59a6149ecea": {
+    "question_template": "donne moi les coordonées de l'eleve {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, p.NomAr, p.PrenomAr, p.Cin, p.AdresseFr, p.AdresseAr, p.Tel1, p.Tel2, p.Nationalite, p.Localite, p.Civilite\nFROM personne p\nJOIN eleve e ON p.id = e.IdPersonne\nWHERE CONCAT(p.NomFr, ' ', p.PrenomFr) = '{NomFr} {PrenomFr}' OR CONCAT(p.NomAr, ' ', p.PrenomAr) = '{NomFr} {PrenomFr}';"
+  },
+  "08b9e1da4e51f143a4ff6f37b29e3ddb": {
+    "question_template": "donne moi les retards effectué par l eleve {NomFr} {PrenomFr}",
+    "sql_template": "SELECT r.id, r.Date, r.Heure, r.Duree, m.NomMatiereFr AS Matiere, \n       CONCAT(p.NomFr, ' ', p.PrenomFr) AS Enseignant, r.Vu\nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nJOIN personne p_eleve ON e.IdPersonne = p_eleve.id\nJOIN matiere m ON r.Matiere = m.id\nJOIN enseingant ens ON r.Enseignant = ens.id\nJOIN personne p ON ens.idPersonne = p.id\nWHERE CONCAT(p_eleve.NomFr, ' ', p_eleve.PrenomFr) = '{NomFr} {PrenomFr}'\nORDER BY r.Date DESC;"
+  },
+  "270603fff1a5aeefe5b23cb0b88c6c18": {
+    "question_template": "donne moi le nombre des classes",
+    "sql_template": "SELECT COUNT(*) AS nombre_classes FROM classe;"
+  },
+  "1f5572e59e5cf5838f218b36446a676e": {
+    "question_template": "donne moi le nombre des eleves inscrits pendant {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_inscrits\nFROM inscriptioneleve\nWHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}');"
+  },
+  "e2bdd171a8df77b8b7306d49aa2566fa": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr}",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves FROM eleve;"
+  }
+}

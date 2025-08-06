@@ -1,0 +1,75 @@
+# === Flutter ===
+# Fichiers générés par Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+/build/
+/android/
+/ios/
+/web/
+/linux/
+/windows/
+/macos/
+
+# Fichiers de configuration locaux
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/
+.flutter/
+.settings/
+*.swp
+*.swo
+
+# Fichiers IDE (VS Code, Android Studio)
+.vscode/
+.idea/
+*.iml
+*.lock
+*.log
+
+# Fichiers spécifiques à Flutter
+Generated.xcconfig
+**/Podfile.lock
+**/GeneratedPluginRegistrant.*
+
+# === Python / Flask ===
+# Environnements virtuels
+venv/
+env/
+.venv/
+ENV/
+
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cache et fichiers de dépendances
+.pytest_cache/
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Fichiers de configuration et logs
+*.log
+*.sqlite
+*.db
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Fichiers spécifiques à Flask
+instance/
+.webassets-cache
+
+# Fichiers de déploiement
+*.DS_Store
+Thumbs.db
+
+# Fichiers de coverage
+.coverage
+htmlcov/

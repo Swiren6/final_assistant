@@ -1,0 +1,69 @@
+    [Relations principales]          
+        Relations clés principales entre tables :
+
+- absence liée à inscriptioneleve, matiere, classe, semaine, groupe, enseingant, jour , anneescolaire .
+- actionfonctionalitepriv liée à fonctionaliteprivelge.
+- avertissement liée à inscriptioneleve, enseingant, matiere, .
+- banque liée à localite, personne.
+- banquebordereaudetails liée à banquebordereau, reglementeleve.
+- banqueversement liée à banquebordereau, modereglement, utilisateur.
+- blame liée à inscriptioneleve, enseingant, matiere, classe, anneescolaire.
+- caisse liée à utilisateur.
+- caisse_log liée à personne, utilisateur, caisse, caissedetails, modereglement.
+- caissedetails liée à banqueversement, caisse, cantineparjour, paiementdetailscourete, personne, reglementeleve, utilisateur, modereglement.
+- cantineparjour liée à utilisateur, inscriptioneleve.
+- cantineparjourenseignant liée à utilisateur, enseingant.
+- classe liée à etablissement, niveau, anneescolaire, section.
+- delegation liée à gouvernorat.
+- disponibiliteenseignant liée à enseingant, jour, semaine, enseingant, jour.
+- dre liée à gouvernorat.
+- eleve liée à personne.
+- elevepreinscription liée à personnepreinscription.
+- enseigantmatiere liée à anneescolaire, matiere, personne.
+- emploidutemps liée à enseingant, salle, jour, matiere, anneescoalire, semaine, groupe, classe.
+- enseignant_paiement liée à personne, Anneescolaire.
+- enseignants_presence liée à jour, salle, classe, Anneescolaire, personne, semaine. 
+- enseingant liée à diplome, modalitepaiement, personne, qualite, situationfamilliale.
+- etablissement liée à dre, gouvernorat, typeetablissement, delegation.
+- fichierpreinscriptionpreinscription liée à preinscriptionpreinscription.
+- fonctionaliteprivelge liée à rubrique.
+- groupecourete liée à Anneescolaire, enseingant, matiere.
+- grouperepartition liée à inscriptioneleve, groupe, Anneescolaire, trimestre, groupe, classe, personne.
+- inscriptioneleve liée à anneescolaire, personne, eleve, classe, modalite, preinscription.
+- jourfr liée à anneescolaire.
+- justificationeleve liée à classe.
+- matieresection liée à section, matiere.
+- modalitetranche liée à anneescolaire, modalite.
+- noteeleveparmatiere liée à anneescolaire, classe, inscriptioneleve, matiere, trimestre.  
+- noteseleve liée à classe, eleve, anneescolaire.
+- paiement liée à inscriptioneleve, paiementmotif.
+- paiementdetailscourete liée à paiementcourete, inscriptioneleve, utilisateur, personne.
+- paiementextra liée à anneescolaire, classe, inscriptioneleve, modalite, paiementmotif, personne, extraclub, extracasier, extravauchers.
+- paiementextradetails liée à paiementextra.
+- parent liée à personne.
+- parenteleve liée à eleve, parent.
+- parentelevepreinscription liée à elevepreinscription, parentpreinscription.
+- parentpreinscription liée à personnepreinscription. 
+- personne liée à civilite, localite, nationalite.
+- personnepreinscription liée à civilite, localite, nationalite.
+- preinscription liée à eleve, niveau, personne, section, etablissement, niveau.
+- preinscriptionpreinscription liée à elevepreinscription, niveau, personnepreinscription, section, etablissement.
+- reglementeleve liée à modereglement, paiement, paiementextradetails, personne, uniformcommande, utilisateur, inscriptioneleve.
+- reglementeleve_echeancier liée à modereglement, paiementextradetails, personne, uniformcommande, utilisateur, inscriptioneleve.
+- reglementfornisseur liée à  
+- renseignementmedicaux liée à eleve, personne.
+- repartitionexamen liée à classe, matiere, salle, anneescolaire, surveillant, trimestre, 
+groupe, semaine.  
+- repartitionsemaine liée à semaine.
+- retard liée à matiere, inscriptioneleve, enseingant, anneescolaire, classe.
+- section liée à niveau.
+- situationeleve liée à eleve, anneescolaire, inscriptioneleve, paiement, reglementeleve.
+- statarithconcours liée à eleve, trimestre, niveau.
+- statconcoursglobal liée à eleve, niveau.
+- suivicantineparjour liée à modereglement, personne.  
+- surveillant liée à diplome, modalitepaiement, personne, qualite, situationfamilliale.
+- user liée à personne.
+- uniformcommandedetails liée à uniformcommande, uniformcouleur, uniformmodel, uniformtaille.
+- uniformmodel liée à uniformgenre.
+- utilisateur liée à grade.
+- wor3492_userfeedback_survey_responses liée à wor3492_userfeedback_surveys.
