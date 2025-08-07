@@ -14,7 +14,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
@@ -119,35 +119,41 @@ def create_app():
             logger.error(f"❌ Health check failed: {e}")
             return {"status": "ERROR", "database": str(e)}, 503
     
-    @app.route('/api/notifications', methods=['GET'])
-    def check_exam_notifications():
-        conn = get_db()
-        cursor = conn.cursor()
+    # @app.route('/api/notifications', methods=['GET'])
+    # def check_exam_notifications():
+    #     conn = None
+    #     cursor = None
+    #     try:
+    #         conn = get_db()
+    #         cursor = conn.cursor(dictionary=True)
+            
+    #         cursor.execute("SELECT * FROM notification_queue WHERE seen = 0")
+    #         notifications_non_vues = cursor.fetchall()
 
-        try:
-            cursor.execute("SELECT * FROM notification_queue WHERE seen = 0")
-            notifications_non_vues = cursor.fetchall()
+    #         messages = [{"id": notif["id"], "message": notif["message"]} 
+    #                 for notif in notifications_non_vues]
 
-            messages = [{"id": notif["id"], "message": notif["message"]} for notif in notifications_non_vues]
+    #         if notifications_non_vues:
+    #             ids = [str(notif['id']) for notif in notifications_non_vues]
+    #             format_strings = ",".join(["%s"] * len(ids))
+    #             update_query = f"UPDATE notification_queue SET seen = 1 WHERE id IN ({format_strings})"
+    #             cursor.execute(update_query, ids)
+    #             conn.commit()
 
+    #         return jsonify(messages)
 
-            if notifications_non_vues:
-                ids = [str(notif['id']) for notif in notifications_non_vues]
-                format_strings = ",".join(["%s"] * len(ids))
-                update_query = f"UPDATE notification_queue SET seen = 1 WHERE id IN ({format_strings})"
-                cursor.execute(update_query, ids)
-                conn.commit()
+    #     except Exception as e:
+    #         if conn:
+    #             conn.rollback()
+    #         return jsonify({"error": str(e)}), 500
 
-            return jsonify(messages)
+    #     finally:
+    #         if cursor:
+    #             cursor.close()
+    #         if conn:
+    #             conn.close()
 
-        except Exception as e:
-            conn.rollback()
-            return jsonify({"error": str(e)}), 500
-
-        finally:
-            cursor.close()
-
-    # ✅ Route de test d'authentification
+    #Route de test d'authentification
     @app.route('/api/test-db')
     def test_db():
         try:
