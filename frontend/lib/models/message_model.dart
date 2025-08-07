@@ -10,25 +10,24 @@ class Message {
   final String? graphBase64;
   final DateTime timestamp;
   final bool isTyping;
+   
 
-
+  // Retirer `const` ici
   Message({
-  required this.text,
-  required this.type,
-  this.isMe = false,
-  this.sqlQuery,
-  this.graphBase64,
-  DateTime? timestamp,
-  this.isTyping = false, 
-}) : timestamp = timestamp ?? DateTime.now();
-
+    required this.text,
+    required this.type,
+    this.isMe = false,
+    this.sqlQuery,
+    this.graphBase64,
+    DateTime? timestamp,
+    this.isTyping = false,
+  }) : timestamp = timestamp ?? DateTime.now();
 
   factory Message.notification({required String text}) {
     return Message(
       text: text,
       type: MessageType.notification,
       isMe: false,
-      isTyping: true,
     );
   }
 
