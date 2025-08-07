@@ -45,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _startNotificationPolling() {
     _notificationTimer = Timer.periodic(
-      const Duration(hours: 24),
+      const Duration(seconds: 15),
       (_) => _checkNotifications(),
     );
   }
@@ -53,10 +53,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _checkNotifications() async {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
+      if (authService.token == null) return;
+
       final response = await http.get(
         Uri.parse('${AppConstants.apiBaseUrl}/notifications'),
         headers: {'Authorization': 'Bearer ${authService.token}'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -68,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
             setState(() {
               _messages.add(Message.notification(
                 text: notif['message'],
+                // timestamp: DateTime.parse(notif['created_at']), // Retiré si non supporté
               ));
               _seenNotificationIds.add(id);
               hasNew = true;
@@ -84,7 +87,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _addWelcomeMessage() {
     setState(() {
-      _messages.add(Message.assistant(text: AppConstants.defaultWelcomeMessage));
+      _messages.add(Message.assistant(
+        text: AppConstants.defaultWelcomeMessage,
+        // timestamp: DateTime.now(), // Retiré si non supporté
+      ));
     });
   }
 
@@ -99,7 +105,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _addUserMessage(String message) {
     setState(() {
-      _messages.add(Message.user(text: message));
+      _messages.add(Message.user(
+        text: message,
+        // timestamp: DateTime.now(), // Retiré si non supporté
+      ));
       _messages.add(Message.typing());
       _isLoading = true;
     });
@@ -109,11 +118,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _processBotResponse(String userMessage) async {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final response = await _apiService.askQuestion(userMessage, authService.token ?? '');
+      final response = await _apiService.askQuestion(
+        userMessage, 
+        authService.token ?? '',
+      );
 
       _handleSuccessfulResponse(response);
+    } on ApiException catch (e) {
+      _handleApiError(e);
     } catch (e) {
-      _handleErrorResponse(e);
+      _handleGenericError(e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -127,24 +141,64 @@ class _ChatScreenState extends State<ChatScreen> {
           text: response['response'] ?? 'Aucune réponse reçue',
           sqlQuery: response['sql_query'],
           graphBase64: response['data']?['graph'] as String?,
+          // timestamp: DateTime.now(), // Retiré si non supporté
         ),
       );
     });
     _scrollToBottom();
   }
 
-  void _handleErrorResponse(dynamic error) {
-    debugPrint('Erreur: $error');
+  void _handleApiError(ApiException e) {
+    debugPrint('ApiException: ${e.message} (Code: ${e.statusCode})');
+    
+    String errorMessage;
+    switch (e.statusCode) {
+      case 422:
+        errorMessage = 'Question incomplète ou mal formulée. Reformulez svp.';
+        break;
+      case 401:
+        errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+        _showSessionExpiredSnackbar();
+        break;
+      case 500:
+        errorMessage = 'Erreur serveur. Contactez l\'administrateur.';
+        break;
+      default:
+        errorMessage = 'Erreur: ${e.message}';
+    }
+
     setState(() {
       _messages.removeLast();
-      _messages.add(Message.error(text: _getErrorMessage(error)));
+      _messages.add(Message.error(
+        text: errorMessage,
+        // timestamp: DateTime.now(), // Retiré si non supporté
+      ));
     });
   }
 
-  String _getErrorMessage(dynamic error) {
-    if (error is http.ClientException) return 'Erreur de connexion';
-    if (error is TimeoutException) return 'Temps d\'attente dépassé';
-    return 'Une erreur est survenue';
+  void _handleGenericError(dynamic error) {
+    debugPrint('Erreur: $error');
+    
+    final errorMessage = error is TimeoutException
+        ? 'Temps d\'attente dépassé'
+        : 'Erreur de connexion au serveur';
+
+    setState(() {
+      _messages.removeLast();
+      _messages.add(Message.error(
+        text: errorMessage,
+        // timestamp: DateTime.now(), // Retiré si non supporté
+      ));
+    });
+  }
+
+  void _showSessionExpiredSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Session expirée. Veuillez vous reconnecter.'),
+        backgroundColor: Colors.orange,
+      ),
+    );
   }
 
   void _scrollToBottom() {
@@ -164,7 +218,7 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Effacer la conversation'),
-        content: const Text('Êtes-vous sûr de vouloir effacer toute la conversation ?'),
+        content: const Text('Voulez-vous vraiment effacer cette conversation ?'),
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
@@ -176,7 +230,7 @@ class _ChatScreenState extends State<ChatScreen> {
               setState(() => _messages.clear());
               _addWelcomeMessage();
             },
-            child: const Text('Effacer'),
+            child: const Text('Effacer', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -226,7 +280,7 @@ class _ChatScreenState extends State<ChatScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppConstants.primaryColor.withOpacity(0.05),
+            AppConstants.primaryColor.withAlpha(20), // Remplace withOpacity
             Colors.transparent,
           ],
           begin: Alignment.topCenter,
@@ -238,8 +292,8 @@ class _ChatScreenState extends State<ChatScreen> {
           : ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.paddingSmall,
-                vertical: AppConstants.paddingMedium,
+                horizontal: AppConstants.paddingMedium,
+                vertical: AppConstants.paddingSmall,
               ),
               itemCount: _messages.length,
               itemBuilder: (context, index) => MessageBubble(
@@ -269,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           const SizedBox(height: AppConstants.paddingSmall),
           Text(
-            'Posez une question sur le système scolaire',
+            'Posez votre question sur le système scolaire',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey.shade500,
                 ),
@@ -283,16 +337,16 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppConstants.paddingMedium,
-        vertical: AppConstants.paddingMedium,
+        vertical: AppConstants.paddingSmall,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(top: BorderSide(color: Colors.grey.shade300)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
+            color: Colors.black.withAlpha(25), // Remplace withOpacity
+            blurRadius: 12,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -300,7 +354,13 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             if (_messages.length <= 1) _buildQuickSuggestions(),
-            _buildInputField(),
+            Row(
+              children: [
+                Expanded(child: _buildTextField()),
+                const SizedBox(width: AppConstants.paddingSmall),
+                _buildSendButton(),
+              ],
+            ),
           ],
         ),
       ),
@@ -308,29 +368,23 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildQuickSuggestions() {
+    const suggestions = [
+      'élèves', 'classes', 'enseignants', 
+      'parents', 'effectifs', 'statistiques'
+    ];
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppConstants.paddingMedium),
       padding: const EdgeInsets.all(AppConstants.paddingSmall),
       decoration: BoxDecoration(
-        color: AppConstants.primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        color: AppConstants.primaryColor.withAlpha(20), // Remplace withOpacity
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
       ),
       child: Wrap(
         spacing: 8,
-        children: [
-          'élèves', 'classes', 'enseignants', 'parents', 'nombre élèves'
-        ].map((text) => _buildQuickButton(text)).toList(),
+        runSpacing: 6,
+        children: suggestions.map(_buildQuickButton).toList(),
       ),
-    );
-  }
-
-  Widget _buildInputField() {
-    return Row(
-      children: [
-        Expanded(child: _buildTextField()),
-        const SizedBox(width: AppConstants.paddingSmall),
-        _buildSendButton(),
-      ],
     );
   }
 
@@ -338,9 +392,9 @@ class _ChatScreenState extends State<ChatScreen> {
     return TextField(
       controller: _messageController,
       decoration: InputDecoration(
-        hintText: 'Tapez votre question... Même courte ! Ex: "élèves", "classes"',
+        hintText: 'Posez votre question... Ex: "Nombre d\'élèves en CP"',
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.radiusRound),
+          borderRadius: BorderRadius.circular(30), // Remplace radiusExtraLarge
           borderSide: BorderSide.none,
         ),
         filled: true,
@@ -351,7 +405,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         suffixIcon: _messageController.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear),
+                icon: const Icon(Icons.clear, size: 20),
                 onPressed: () {
                   _messageController.clear();
                   setState(() {});
@@ -373,48 +427,52 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: _isLoading
-              ? [Colors.grey.shade400, Colors.grey.shade500]
-              : [AppConstants.primaryColor, AppConstants.primaryColorDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: _isLoading
+            ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
+            : LinearGradient( // Remplace primaryGradient
+                colors: [AppConstants.primaryColor, AppConstants.primaryColorDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
       ),
       child: IconButton(
         icon: _isLoading
             ? const SizedBox(
-                width: 20,
-                height: 20,
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 3,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Icon(Icons.send, color: Colors.white),
+            : const Icon(Icons.send_rounded, color: Colors.white),
         onPressed: _isLoading ? null : _sendMessage,
       ),
     );
   }
 
   Widget _buildQuickButton(String text) {
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: () {
         _messageController.text = text;
         _sendMessage();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: AppConstants.primaryColor.withOpacity(0.2),
+          color: AppConstants.primaryColor.withAlpha(38), // Remplace withOpacity(0.15)
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppConstants.primaryColor.withOpacity(0.3)),
+          border: Border.all(
+            color: AppConstants.primaryColor.withAlpha(64), // Remplace withOpacity(0.25)
+            width: 1,
+          ),
         ),
         child: Text(
           text,
           style: TextStyle(
             color: AppConstants.primaryColor,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -426,20 +484,31 @@ class _ChatScreenState extends State<ChatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Assistant Scolaire'),
+        title: const Text('À propos'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Cet assistant peut répondre à vos questions sur le système scolaire.'),
+            const Text(
+              'Assistant scolaire - Version ${AppConstants.appVersion}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: AppConstants.paddingMedium),
             Consumer<AuthService>(
               builder: (context, authService, _) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Utilisateur: ${authService.user?.idpersonne ?? "Non connecté"}'),
-                  if (authService.user?.roles.isNotEmpty ?? false)
-                    Text('Rôles: ${authService.user!.roles.join(", ")}'),
+                  if (authService.user != null) ...[
+                    Text('Utilisateur: ${authService.user!.idpersonne}'),
+                    if (authService.user!.roles.isNotEmpty)
+                      Text('Rôles: ${authService.user!.roles.join(", ")}'),
+                    const SizedBox(height: AppConstants.paddingSmall),
+                  ],
+                  Text(
+                    // Retiré lastLogin si non disponible
+                    'Connecté depuis: ${DateTime.now().toString()}',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  ),
                 ],
               ),
             ),
