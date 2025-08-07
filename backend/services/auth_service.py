@@ -2,6 +2,7 @@ import json
 import logging
 from flask import current_app
 from config.database import get_db
+import MySQLdb
 
 class AuthService:
     @staticmethod
@@ -24,21 +25,21 @@ class AuthService:
     def authenticate_user(login_identifier, password):
         connection = None
         cursor = None
-        
         try:
             current_app.logger.info(f"🔍 Tentative authentification: {login_identifier}")
-            
+
             connection = get_db()
-            
             if connection is None:
                 current_app.logger.error("❌ Impossible d'obtenir une connexion DB")
                 return None
-                
-            cursor = connection.cursor(dictionary=True)  # ✅
 
-            current_app.logger.debug("✅ Curseur DB créé")
+            try:
+                cursor = connection.cursor(MySQLdb.cursors.DictCursor)
+                current_app.logger.debug("✅ Curseur DB créé")
+            except Exception as cursor_error:
+                current_app.logger.error(f"❌ Erreur création curseur: {cursor_error}")
+                return None
 
-            # ✅ Requête avec logging
             query = """
                 SELECT idpersonne, email, roles, changepassword 
                 FROM user 
@@ -55,9 +56,8 @@ class AuthService:
                 return None
 
             roles = AuthService.parse_roles(user['roles'])
-
             current_app.logger.info(f"✅ Utilisateur authentifié: {user['idpersonne']} avec rôles: {roles}")
-            
+
             return {
                 'idpersonne': user['idpersonne'],
                 'email': user['email'],
@@ -66,19 +66,15 @@ class AuthService:
             }
 
         except Exception as e:
-            current_app.logger.error(f"❌ Erreur authentification: {str(e)}")
+            current_app.logger.error(f"❌ Erreur authentification: {str(e)}", exc_info=True)
             return None
-            
         finally:
-            # ✅ Nettoyage des ressources
             if cursor:
                 try:
                     cursor.close()
                     current_app.logger.debug("✅ Curseur fermé")
                 except:
                     pass
-                    
-            # ✅ Fermer la connexion seulement si c'est une connexion directe
             if connection and hasattr(connection, '_direct_connection'):
                 try:
                     connection.close()

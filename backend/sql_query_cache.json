@@ -34,5 +34,9 @@
   "e2bdd171a8df77b8b7306d49aa2566fa": {
     "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr}",
     "sql_template": "SELECT COUNT(*) AS nombre_eleves FROM eleve;"
+  },
+  "d44cf1c9ea54b828f88543792d2530b8": {
+    "question_template": "{nomfr} {prenomfr} l'{nomfr} {prenomfr} {nomfr} {prenomfr}",
+    "sql_template": "SELECT * FROM eduattestation WHERE nom = 'Benabda' AND prenom = 'Malak';"
   }
 }

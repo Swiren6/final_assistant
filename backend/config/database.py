@@ -1,51 +1,147 @@
+from flask_mysqldb import MySQL
+from langchain_community.utilities import SQLDatabase
+import MySQLdb
+from urllib.parse import quote_plus
 import os
+import logging
 from dotenv import load_dotenv
-from mysql.connector import pooling
-from langchain_community.utilities import SQLDatabase  # ✅ Ajout requis
+from contextlib import contextmanager
 
 load_dotenv()
 
-config = {
-    'user': os.getenv('MYSQL_USER'),
-    'password': os.getenv('MYSQL_PASSWORD'),
-    'host': os.getenv('MYSQL_HOST'),
-    'database': os.getenv('MYSQL_DATABASE'),
-    'port': int(os.getenv('MYSQL_PORT', 3306)),
-    'charset': 'utf8mb4',
-    'use_unicode': True,
-    'autocommit': True
-}
+mysql = MySQL()
+logger = logging.getLogger(__name__)
 
-connection_pool = None
-
-def init_db(app=None):
-    global connection_pool
-    connection_pool = pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=10,
-        pool_reset_session=True,
-        **config
-    )
-    print("✅ Pool de connexions MySQL initialisé")
-    return connection_pool
-
-def get_db():
-    global connection_pool
-    if not connection_pool:
-        init_db()
-    return connection_pool.get_connection()
-
-class ExtendedSQLDatabase(SQLDatabase):
+# ✅ Classe étendue pour LangChain
+class CustomSQLDatabase(SQLDatabase):
     def get_schema(self):
         try:
-            result = self.run("SHOW TABLES")
-            if isinstance(result, str):
-                return [line.strip() for line in result.split('\n') if line.strip()]
-            return result
+            return self.run("SHOW TABLES")
         except Exception as e:
-            print(f"Erreur get_schema : {e}")
-            return []
+            logger.error(f"Erreur get_schema: {e}")
+            return None
 
+    def get_simplified_relations_text(self):
+        try:
+            tables = self.run("SHOW TABLES")
+            relations = []
+            for table in tables:
+                table_name = list(table.values())[0]
+                relations.append(f"- {table_name}")
+            return "\n".join(["Relations entre tables:"] + relations)
+        except Exception as e:
+            logger.error(f"Erreur get_simplified_relations_text: {e}")
+            return ""
+
+# ✅ Initialisation de Flask MySQL
+def init_db(app):
+    try:
+        app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+        app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+        app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+        app.config['MYSQL_DB'] = os.getenv('MYSQL_DATABASE')
+        app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+        app.config['MYSQL_AUTOCOMMIT'] = True
+        app.config['MYSQL_CONNECT_TIMEOUT'] = 60
+
+        required_vars = ['MYSQL_HOST', 'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_DATABASE']
+        missing_vars = [var for var in required_vars if not os.getenv(var)]
+        if missing_vars:
+            raise ValueError(f"Variables d'environnement manquantes: {missing_vars}")
+
+        mysql.init_app(app)
+
+        test_connection = create_direct_connection()
+        if test_connection:
+            test_connection.close()
+            logger.info("✅ Configuration MySQL initialisée et testée")
+        else:
+            raise Exception("Impossible de se connecter à MySQL")
+
+        return mysql
+    except Exception as e:
+        logger.error(f"❌ Erreur init MySQL: {e}")
+        raise
+
+# ✅ Connexion directe via MySQLdb
+def create_direct_connection():
+    try:
+        connection = MySQLdb.connect(
+            host=os.getenv('MYSQL_HOST'),
+            user=os.getenv('MYSQL_USER'),
+            passwd=os.getenv('MYSQL_PASSWORD'),
+            db=os.getenv('MYSQL_DATABASE'),
+            cursorclass=MySQLdb.cursors.DictCursor,
+            autocommit=True,
+            connect_timeout=10
+        )
+        connection._direct_connection = True  # Marqueur pour fermeture plus tard
+        logger.debug("✅ Connexion MySQL directe créée")
+        return connection
+    except Exception as e:
+        logger.error(f"❌ Erreur connexion MySQL directe: {e}")
+        return None
+
+# ✅ Utilisation dans contexte Flask ou fallback direct
+def get_db():
+    try:
+        from flask import current_app
+        if current_app and hasattr(current_app, 'extensions') and 'mysql' in current_app.extensions:
+            mysql_connection = current_app.extensions['mysql'].connection
+            if mysql_connection:
+                try:
+                    cursor = mysql_connection.cursor()
+                    cursor.execute("SELECT 1")
+                    cursor.close()
+                    logger.debug("✅ Connexion Flask MySQL OK")
+                    return mysql_connection
+                except Exception as test_error:
+                    logger.warning(f"⚠️ Connexion Flask MySQL échouée: {test_error}")
+    except Exception as e:
+        logger.warning(f"⚠️ Contexte Flask indisponible: {e}")
+
+    logger.info("🔄 Utilisation de la connexion directe")
+    return create_direct_connection()
+
+# ✅ Context manager pour les requêtes SQL
+@contextmanager
+def get_db_cursor():
+    connection = None
+    cursor = None
+    try:
+        connection = get_db()
+        cursor = connection.cursor(MySQLdb.cursors.DictCursor)  # ✅ Sûr avec MySQLdb
+        yield cursor
+        connection.commit()
+    except Exception as e:
+        if connection:
+            connection.rollback()
+        logger.error(f"❌ Erreur base de données: {e}")
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and hasattr(connection, '_direct_connection'):
+            connection.close()
+            logger.debug("✅ Connexion directe fermée")
+
+# ✅ Intégration LangChain
 def get_db_connection():
-    db_uri = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
-    return ExtendedSQLDatabase.from_uri(db_uri)
+    try:
+        db_user = os.getenv('MYSQL_USER')
+        db_password = quote_plus(os.getenv('MYSQL_PASSWORD'))
+        db_host = os.getenv('MYSQL_HOST')
+        db_name = os.getenv('MYSQL_DATABASE')
+
+        if not all([db_user, db_password, db_host, db_name]):
+            raise ValueError("Variables de connexion DB manquantes")
+
+        db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
+        db = CustomSQLDatabase.from_uri(db_uri)
+        db.run("SELECT 1")
+        logger.info("✅ Connexion LangChain SQLDatabase établie")
+        return db
+
+    except Exception as e:
+        logger.error(f"❌ Erreur connexion LangChain: {e}")
+        return None

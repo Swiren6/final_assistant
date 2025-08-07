@@ -8,7 +8,7 @@ import os
 from functools import lru_cache
 from decimal import Decimal
 from datetime import datetime
-from config.database import get_db_connection,get_db
+from config.database import get_db_connection
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -17,7 +17,7 @@ import io
 import base64
 import matplotlib.pyplot as plt
 
-matplotlib.use('Agg')  #
+matplotlib.use('Agg')  # Important pour les environnements sans affichage
 plt.switch_backend('Agg')
 
 logger = logging.getLogger(__name__)
@@ -174,7 +174,6 @@ Schéma disponible :
 
     def extract_name_from_query(self, query):
         pattern = r"attestation de\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)*)"
-       
         match = re.search(pattern, query, re.IGNORECASE)
         if match:
             return match.group(1).strip()
@@ -182,44 +181,70 @@ Schéma disponible :
 
     def get_student_info_by_name(self, full_name):
         try:
-            conn = get_db()
-            cursor = conn.cursor(dictionary=True)
-
             sql = """
             SELECT 
-                p.NomFr, p.PrenomFr,
-                CONCAT(p.NomFr, ' ', p.PrenomFr) AS nom_complet,
-                e.DateNaissance, IFNULL(e.LieuNaissance, e.AutreLieuNaissance) AS lieu_de_naissance,
-
-                c.CODECLASSEFR as classe, n.NOMNIVAR as niveau,
-                e.id as eleve_id, e.IdPersonne as matricule, 
-                e.idedusrv as id_service,
-                ie.id as inscription_id
-            FROM eleve e
-            JOIN personne p ON e.IdPersonne = p.id
-            JOIN inscriptioneleve ie ON e.id = ie.Eleve
-            JOIN classe c ON ie.Classe = c.id
-            JOIN niveau n ON c.IDNIV = n.id
-            JOIN anneescolaire a ON ie.AnneeScolaire = a.id
-            WHERE LOWER(CONCAT(p.NomFr, ' ', p.PrenomFr)) = LOWER(%s)
-            AND a.AnneeScolaire = %s
-            LIMIT 1
+                ei.NomPrenomFr AS nom,
+                e.DateNaissance AS date_naissance,
+                IFNULL(e.LieuNaissance, e.AutreLieuNaissance) AS lieu_de_naissance,
+                ei.nomclassefr AS classe,
+                e.IdPersonne AS matricule
+            FROM 
+                eleveinscri ei
+            JOIN 
+                eleve e ON ei.NomPrenomFr = %s
+            WHERE 
+                ei.NomPrenomFr = %s
+            LIMIT 1;
             """
-
-            current_year = "2024/2025"  
-            cursor.execute(sql, (full_name, current_year))
-            row = cursor.fetchone()
-            cursor.close()
-            conn.close()
-
-            if not row:
+            result = self.db.execute_query(sql, (full_name, full_name))
+            if not result['success'] or not result['data']:
                 return None
 
-            return row
+            row = result['data'][0]
+            keys = ['nom', 'date_naissance', 'lieu_de_naissance', 'classe', 'matricule']
+            return dict(zip(keys, row)) if isinstance(row, (list, tuple)) else row
 
         except Exception as e:
             logger.error(f"Erreur get_student_info_by_name: {str(e)}")
             return None
+
+
+
+
+
+    @staticmethod
+    def create_clean_graph(data_dict):
+        import matplotlib.pyplot as plt
+        import io
+        import base64
+
+        labels = list(data_dict.keys())
+        values = list(data_dict.values())
+
+        plt.figure(figsize=(10, max(6, len(labels) * 0.4)))
+        bars = plt.barh(labels, values, color='skyblue')
+
+        min_val = min(values)
+        max_val = max(values)
+        plt.xlim(max(0, min_val - 5), max_val + 5)
+
+        for bar, val in zip(bars, values):
+            plt.text(val + 1, bar.get_y() + bar.get_height() / 2,
+                    str(val), va='center', ha='left')
+
+        plt.title("Valeurs par catégorie")
+        plt.xlabel("Valeur")
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        plt.close()
+        buf.seek(0)
+
+        img_bytes = buf.read()
+        print(base64.b64encode(img_bytes).decode('utf-8'))
+
+        return base64.b64encode(img_bytes).decode('utf-8')
 
 
 
@@ -232,39 +257,44 @@ Schéma disponible :
         plt.rcParams['axes.unicode_minus'] = False
 
         try:
-            # Détection automatique des colonnes
-            numeric_cols = df.select_dtypes(include='number').columns.tolist()
-            category_cols = df.select_dtypes(include='object').columns.tolist()
+            # Colonnes à exclure (techniques ou non pertinentes)
+            exclude_cols = ['id', 'ids', 'anneescolaire', 'année scolaire', 'annee_scolaire']
 
-            if not numeric_cols or not category_cols:
-                return None  # Besoin d'au moins une numérique + une catégorielle
+            # Colonnes numériques et catégorielles utiles
+            numeric_cols = [col for col in df.select_dtypes(include='number').columns if col.lower() not in exclude_cols]
+            categorical_cols = [col for col in df.select_dtypes(exclude='number').columns if col.lower() not in exclude_cols]
 
-            # Choix par défaut des colonnes à utiliser
+            if not numeric_cols or not categorical_cols:
+                return None  # Besoin d'au moins une de chaque
+
+            # Choix des colonnes à afficher
             y_col = numeric_cols[0]
-            x_col = category_cols[0]
+            x_col = categorical_cols[0]
 
-            # Nettoyage et tri
             df = df[[x_col, y_col]].dropna()
             df = df.sort_values(by=y_col, ascending=False)
 
-            y = df[x_col].astype(str)
-            x = df[y_col].astype(float)
+            x = df[x_col].astype(str)
+            y = df[y_col].astype(float)
 
-            # Création du graphique
-            fig, ax = plt.subplots(figsize=(12, max(6, len(df)*0.4)))  # taille dynamique
-            bars = ax.barh(x, y, color='skyblue')
+            # Création du graphique (barres verticales)
+            fig, ax = plt.subplots(figsize=(max(8, len(df)*0.6), 6))
 
+            bars = ax.bar(x, y, color='skyblue')
+
+            # Affichage des valeurs au-dessus des barres
             for bar in bars:
-                width = bar.get_width()
-                ax.text(width + 0.5,
-                        bar.get_y() + bar.get_height()/2,
-                        f'{int(width)}',
-                        va='center', ha='left', fontsize=9)
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2,
+                        height + max(y)*0.01,
+                        f'{int(height)}',
+                        ha='center', va='bottom', fontsize=9)
 
-            ax.set_xlabel(y_col)
-            ax.set_ylabel(x_col)
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
             ax.set_title(f"{y_col} par {x_col}")
-            ax.grid(axis='x', linestyle='--', alpha=0.6)
+            ax.grid(axis='y', linestyle='--', alpha=0.6)
+            plt.xticks(rotation=45, ha='right')
             plt.tight_layout(pad=2)
 
             # Encodage en base64
@@ -282,39 +312,32 @@ Schéma disponible :
             return None
 
 
-
-            
     def _format_results(self, data, user_query=None):
         serialized_data = self._serialize_data(data)
-
         if not serialized_data:
-            return {
-                "status": "success",
-                "message": "Requête exécutée mais aucun résultat trouvé.",  
-                "data": None,
-                "sql_query": self.last_generated_sql
-            }
+            return "Aucun résultat trouvé."
 
         df = pd.DataFrame(serialized_data)
-        response = {
-            "status": "success",
-            "question": user_query,
-            "sql_query": self.last_generated_sql,
-            "data": df.to_dict('records'),
-            "response": f"✅ {len(df)} résultats trouvés"
-        }
 
-        if len(df.columns) >= 2:
-            try:
-                graph_type = self.detect_graph_type(user_query or "")
-                graph = self.generate_auto_graph(df, graph_type)
-                if graph:
-                    response["graph"] = graph
-            except Exception as e:
-                logger.error(f"Erreur génération graphique: {str(e)}")
-                response["graph_error"] = str(e)
+        # Détection du type de graphique demandé dans la requête utilisateur
+        graph_type = None
+        if user_query:
+            graph_type = self.detect_graph_type(user_query)
 
-        return response
+        # Logique existante avec passage de graph_type
+        if (len(df.columns) >= 2 and 
+            any('niveau' in col.lower() for col in df.columns) and 
+            any('inscription' in col.lower() for col in df.columns)):
+            return self.generate_auto_graph(df, graph_type=graph_type)
+        
+        if df.empty:
+            return "Aucun résultat trouvé."
+
+        if len(df) > 10 or len(df.select_dtypes(include='number').columns) > 1:
+            return self.generate_auto_graph(df, graph_type=graph_type)
+
+        return tabulate(df, headers='keys', tablefmt='github')
+
 
     def get_response(self, user_query):
         if "attestation de présence" in user_query.lower():
