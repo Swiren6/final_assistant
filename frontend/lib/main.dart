@@ -11,7 +11,6 @@ import 'utils/theme.dart';
 import 'utils/constants.dart';
 import 'screens/notification_checker.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -40,7 +39,6 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/chat': (context) => const ChatScreen(),
           '/notifications': (context) => const NotificationChecker(),
-          
         },
       ),
     );
@@ -108,5 +106,4 @@ class GraphPage extends StatelessWidget {
       );
     }
   }
-
 }

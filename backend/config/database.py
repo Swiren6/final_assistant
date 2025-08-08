@@ -13,26 +13,29 @@ mysql = MySQL()
 logger = logging.getLogger(__name__)
 
 class CustomSQLDatabase(SQLDatabase):
-    def execute_query(self, query, params=None):
+    def execute_query(self, sql_query: str) -> dict:
         try:
-            if params:
-                if len(params) == 1:
-                    safe_value = str(params[0]).replace("'", "''")
-                    query = query.replace("%s", f"'{safe_value}'")
-                elif len(params) == 2:
-                    safe_1 = str(params[0]).replace("'", "''")
-                    safe_2 = str(params[1]).replace("'", "''")
-                    query = query.replace("%s", f"'{safe_1}'", 1)
-                    query = query.replace("%s", f"'{safe_2}'", 1)
-                else:
-                    logger.warning("⚠️ Plus de 2 paramètres non pris en charge")
-                    return {'success': False, 'data': [], 'error': "Trop de paramètres"}
+            connection = get_db()  
+            cursor = connection.cursor()
+            cursor.execute(sql_query)
 
-            result = self.run(query)
-            return {'success': True, 'data': result, 'error': None}
+            columns = [desc[0] for desc in cursor.description]
+            results = cursor.fetchall()
+            data = [dict(zip(columns, row)) for row in results]
+
+            return {"success": True, "data": data}
+
         except Exception as e:
-            logger.error(f"Erreur exécution query dans CustomSQLDatabase: {e}")
-            return {'success': False, 'data': [], 'error': str(e)}
+            logger.error(f"Erreur d'exécution SQL : {e}")
+            return {"success": False, "error": str(e), "sql_query": sql_query}
+
+        finally:
+            cursor.close()
+            # Ne ferme la connexion que si elle a été créée en direct
+            if hasattr(connection, '_direct_connection'):
+                connection.close()
+
+
 
     def get_schema(self):
         try:

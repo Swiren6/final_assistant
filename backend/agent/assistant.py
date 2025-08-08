@@ -1,4 +1,3 @@
-
 from config.database import get_db_connection,get_db
 from langchain_community.utilities import SQLDatabase
 from typing import List, Dict, Optional, Any, Tuple
@@ -1047,10 +1046,12 @@ class SQLAssistant:
     def _format_sql_agent_response(self, sql_agent_result, question: str) -> str:
         """Formate les résultats de SQLAgent pour l'affichage"""
         if not sql_agent_result:
-            return "❌ Aucun résultat"
+            return "⚠️ Aucun résultat"
         
         response = sql_agent_result.get('response', '')
+        
+        # Ajouter le graphique si disponible
         if sql_agent_result.get('graph'):
-            response += f"\n\n📊 Graphique généré"
+            response += f"\n\n📊 Graphique généré: <img src='{sql_agent_result['graph']}' alt='Graphique des résultats'/>"
         
         return response
