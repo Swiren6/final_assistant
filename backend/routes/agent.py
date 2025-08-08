@@ -183,9 +183,9 @@ def ask_sql():
             except Exception as e:
                 logger.error(f"Erreur génération PDF: {str(e)}")
                 return jsonify({"response": "Erreur lors de la génération du document"})
+        
         # 🧾 Cas spécial bulletin
         if "bulletin" in question.lower():
-            # Extraction du prénom/nom ou de l'identifiant dans la requête
             match = re.search(r"(?:bulletin\s+(?:de|pour)\s+)([A-Za-zÀ-ÿ\s\-']+)", question, re.IGNORECASE)
             if not match:
                 return jsonify({"response": "Veuillez spécifier un nom complet (ex: 'bulletin de Nom Prénom')"})
@@ -194,16 +194,14 @@ def ask_sql():
             if not validate_name(full_name):
                 return jsonify({"response": "Format de nom invalide. Utilisez uniquement des lettres et espaces"})
 
-            # Récupérer les données de l'élève
             student_data = engine.get_student_info_by_name(full_name)
             if not student_data:
                 return jsonify({"response": f"Aucun élève trouvé avec le nom '{full_name}'"})
 
-            # Appel au générateur de bulletin
             try:
                 bulletin_result = export_bulletin_pdf(
                     student_id=student_data["matricule"],
-                    trimestre_id=31,  # Tu peux rendre ce paramètre dynamique si besoin
+                    trimestre_id=31,
                     annee_scolaire="2024/2025"
                 )
 
@@ -226,15 +224,30 @@ def ask_sql():
         # Traitement IA classique
         try:
             sql_query, response = assistant.ask_question(question, user_id, roles)
-            # rows = engine.execute_natural_query(question)
             
+            # Récupérer les données brutes pour générer un graphique si pertinent
+            db_results = engine.execute_natural_query(question)
+            graph_data = None
+            
+            if db_results and 'data' in db_results and len(db_results['data']) > 1:
+                try:
+                    df = pd.DataFrame(db_results['data'])
+                    graph_type = engine.detect_graph_type(question, df.columns)
+                    if graph_type:
+                        graph_data = engine.generate_auto_graph(df, graph_type)
+                except Exception as graph_error:
+                    logger.error(f"Erreur génération graphique: {graph_error}")
+
             result = {
                 "sql_query": sql_query,
-                "response": response,  # Déjà formaté par assistant
+                "response": response,
                 "status": "success",
                 "question": question,
-                "data": None  # Les données sont déjà dans 'response'
+                "data": db_results['data'] if db_results and 'data' in db_results else None
             }
+
+            if graph_data:
+                result["graph"] = graph_data
 
             if jwt_valid:
                 result["user"] = current_user
@@ -249,15 +262,12 @@ def ask_sql():
                 "question": question
             }), 500
 
-        
-
     except Exception as e:
         logger.error(f"Erreur générale: {e}")
         return jsonify({
             "error": "Erreur serveur interne",
             "details": str(e)
         }), 500
-
 
 @agent_bp.route('/reinit', methods=['POST'])
 def reinitialize():

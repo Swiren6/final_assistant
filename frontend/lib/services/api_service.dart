@@ -16,6 +16,8 @@ class ApiException implements Exception {
       '$message${statusCode != null ? ' (Code: $statusCode)' : ''}';
 }
 
+
+
 class ApiService {
   static const String baseUrl = AppConstants.apiBaseUrl;
   static const Duration defaultTimeout = Duration(seconds: 30);
@@ -24,43 +26,41 @@ class ApiService {
     return {
       'Content-Type': 'application/json; charset=utf-8',
       'Accept': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      if (token != null && token.isNotEmpty) 
+        'Authorization': 'Bearer $token',
     };
   }
 
   // Méthode générique pour gérer les réponses
   Map<String, dynamic> _handleResponse(http.Response response) {
-    final statusCode = response.statusCode;
     if (kDebugMode) {
       print('↪️ Réponse ${response.statusCode} | ${response.request?.url}');
       print('📦 Body: ${response.body}');
     }
 
-    try {
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-      
-      if (statusCode >= 200 && statusCode < 300) {
-        // Formatage spécial pour les réponses de chat
-        if (data.containsKey('response') && data.containsKey('sql_query')) {
-          return {
-            'response': data['response'] ?? data['msg'] ?? 'Réponse reçue',
-            'sql_query': data['sql_query'],
-            'status': 'success',
-          };
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        try {
+          return jsonDecode(response.body);
+        } catch (e) {
+          throw ApiException('Format de réponse invalide', 500);
         }
-        return data;
-      } else {
-        final message = data['error'] ?? 
-                       data['message'] ?? 
-                       data['msg'] ?? 
-                       'Erreur serveur (code $statusCode)';
-        throw ApiException(message, statusCode);
-      }
-    } on FormatException catch (e) {
-      if (kDebugMode) {
-        print('❌ Erreur de format JSON: $e');
-      }
-      throw ApiException('Format de réponse invalide du serveur', statusCode);
+      case 400:
+        throw ApiException('Requête incorrecte', 400);
+      case 401:
+        throw ApiException('Authentification requise', 401);
+      case 403:
+        throw ApiException('Accès refusé', 403);
+      case 404:
+        throw ApiException('Ressource non trouvée', 404);
+      case 500:
+        throw ApiException('Erreur serveur', 500);
+      default:
+        throw ApiException(
+          'Erreur inattendue: ${response.statusCode}',
+          response.statusCode,
+        );
     }
   }
 
@@ -72,22 +72,20 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse('$baseUrl$endpoint');
-      final headers = _getHeaders(token);
-
       if (kDebugMode) {
         print('🌐 GET $uri');
       }
 
       final response = await http.get(
         uri,
-        headers: headers,
+        headers: _getHeaders(token),
       ).timeout(timeout ?? defaultTimeout);
 
       return _handleResponse(response);
     } on SocketException {
-      throw ApiException('Pas de connexion internet. Vérifiez votre réseau.');
+      throw ApiException('Pas de connexion internet');
     } on TimeoutException {
-      throw ApiException('Temps d\'attente dépassé. Le serveur ne répond pas.');
+      throw ApiException('Temps d\'attente dépassé');
     } on http.ClientException catch (e) {
       throw ApiException('Erreur réseau: ${e.message}');
     } catch (e) {
@@ -104,9 +102,8 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse('$baseUrl$endpoint');
-      final headers = _getHeaders(token);
       final body = jsonEncode(data);
-
+      
       if (kDebugMode) {
         print('🌐 POST $uri');
         print('📤 Body: $body');
@@ -114,15 +111,15 @@ class ApiService {
 
       final response = await http.post(
         uri,
-        headers: headers,
+        headers: _getHeaders(token),
         body: body,
       ).timeout(timeout ?? defaultTimeout);
 
       return _handleResponse(response);
     } on SocketException {
-      throw ApiException('Pas de connexion internet. Vérifiez votre réseau.');
+      throw ApiException('Pas de connexion internet');
     } on TimeoutException {
-      throw ApiException('Temps d\'attente dépassé. Le serveur ne répond pas.');
+      throw ApiException('Temps d\'attente dépassé');
     } on http.ClientException catch (e) {
       throw ApiException('Erreur réseau: ${e.message}');
     } catch (e) {
@@ -135,21 +132,11 @@ class ApiService {
     String question,
     String token,
   ) async {
-    final trimmedQuestion = question.trim();
-    if (trimmedQuestion.isEmpty) {
-      throw ApiException('Veuillez entrer une question', 422);
-    }
-
-    if (kDebugMode) {
-      print('💬 Envoi de question: $trimmedQuestion');
-      print('🔑 Token: ${token.isNotEmpty ? "présent" : "absent"}');
-    }
-
     return post(
-      '/ask',
-      {'question': trimmedQuestion},
+      '/ask', // Note: pas de double /api
+      {'question': question.trim()},
       token: token,
-      timeout: const Duration(seconds: 40), // Augmenté à 40s
+      timeout: const Duration(seconds: 30),
     );
   }
 
@@ -172,12 +159,8 @@ class ApiService {
     String loginIdentifier,
     String password,
   ) async {
-    if (kDebugMode) {
-      print('🔐 Tentative de connexion pour: $loginIdentifier');
-    }
-
     try {
-      final response = await post(
+      return await post(
         '/login',
         {
           'login_identifier': loginIdentifier,
@@ -185,11 +168,6 @@ class ApiService {
         },
         timeout: const Duration(seconds: 15),
       );
-
-      if (kDebugMode) {
-        print('✅ Connexion réussie');
-      }
-      return response;
     } on ApiException {
       rethrow;
     } catch (e) {

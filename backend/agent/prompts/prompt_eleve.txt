@@ -24,6 +24,7 @@ GROUP BY
 
 UNION ALL
 
+
 SELECT
     NULL AS id,
     'Pas de localite' AS Localite,
