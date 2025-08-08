@@ -11,6 +11,9 @@ import arabic_reshaper
 from bidi.algorithm import get_display
 import logging
 from typing import Dict, Any
+import os
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 logger = logging.getLogger(__name__)
 
@@ -21,33 +24,9 @@ def export_attestation_pdf(donnees):
     base_path = Path(__file__).parent
 
     # Police dans: agent/pdf_utils/fonts/Amiri-1.002/
-    font_dir = base_path / "fonts" / "Amiri-1.002"
-    font_path_regular = font_dir / "Amiri-Regular.ttf"
-    font_path_bold = font_dir / "Amiri-Bold.ttf"
-
-    # Conversion en chemin absolu
-    font_path_regular = str(font_path_regular.resolve())
-    font_path_bold = str(font_path_bold.resolve())
-
-    # Ajout des polices au PDF
-    pdf.add_font("Amiri", "", font_path_regular, uni=True)
-    pdf.add_font("Amiri", "B", font_path_bold, uni=True)
-
-    pdf.set_font("Amiri", size=14)
-
-    def render_ar(text):
-        return get_display(arabic_reshaper.reshape(text))
-
-    logo_path = "C:/Users/rania/Downloads/logo_ise.jpeg"
-    if os.path.exists(logo_path):
-        pdf.image(logo_path, x=10, y=10, w=30)
-
-    pdf.set_xy(110, 10)
-    pdf.multi_cell(
-        0, 8,
-        render_ar("الجمهورية التونسية\nوزارة التربية\nالمندوبية الجهوية للتربية بنابل\nالمدرسة الدولية للنخبة"),
-        align='R'
-    )
+    base_dir = os.path.dirname(__file__)
+    font_path = os.path.join(base_dir, 'fonts', 'Amiri', 'Amiri-Regular.ttf')
+    pdfmetrics.registerFont(TTFont('Amiri', font_path))
 
     pdf.ln(30)
 

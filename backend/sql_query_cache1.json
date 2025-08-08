@@ -26,5 +26,9 @@
   "ce5e7ac6161cdd1c0bbdb56c4d4dcb4d": {
     "question_template": "donne moi les notes de {family_relation}",
     "sql_template": "SELECT \n    m.NomMatiereFr AS nom_matiere,\n    n.orale,\n    n.TP,\n    n.ExamenEcrit,\n    n.DS,\n    n.DC1,\n    n.DC2\nFROM \n    noteeleveparmatiere n\nJOIN \n    matiere m ON n.id_matiere = m.id\nWHERE \n    n.id_inscription IN (SELECT id FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne})));"
+  },
+  "a2bcfe4bfc5e04b21afe0e3c76da4919": {
+    "question_template": "donne moi le nombre des absences de {family_relation}",
+    "sql_template": "SELECT COUNT(*) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}));"
   }
 }

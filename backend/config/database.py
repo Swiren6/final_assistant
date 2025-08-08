@@ -12,8 +12,28 @@ load_dotenv()
 mysql = MySQL()
 logger = logging.getLogger(__name__)
 
-# ✅ Classe étendue pour LangChain
 class CustomSQLDatabase(SQLDatabase):
+    def execute_query(self, query, params=None):
+        try:
+            if params:
+                if len(params) == 1:
+                    safe_value = str(params[0]).replace("'", "''")
+                    query = query.replace("%s", f"'{safe_value}'")
+                elif len(params) == 2:
+                    safe_1 = str(params[0]).replace("'", "''")
+                    safe_2 = str(params[1]).replace("'", "''")
+                    query = query.replace("%s", f"'{safe_1}'", 1)
+                    query = query.replace("%s", f"'{safe_2}'", 1)
+                else:
+                    logger.warning("⚠️ Plus de 2 paramètres non pris en charge")
+                    return {'success': False, 'data': [], 'error': "Trop de paramètres"}
+
+            result = self.run(query)
+            return {'success': True, 'data': result, 'error': None}
+        except Exception as e:
+            logger.error(f"Erreur exécution query dans CustomSQLDatabase: {e}")
+            return {'success': False, 'data': [], 'error': str(e)}
+
     def get_schema(self):
         try:
             return self.run("SHOW TABLES")
@@ -33,6 +53,7 @@ class CustomSQLDatabase(SQLDatabase):
             logger.error(f"Erreur get_simplified_relations_text: {e}")
             return ""
 
+    
 # ✅ Initialisation de Flask MySQL
 def init_db(app):
     try:
@@ -145,3 +166,69 @@ def get_db_connection():
     except Exception as e:
         logger.error(f"❌ Erreur connexion LangChain: {e}")
         return None
+
+def get_schema(self):
+    """
+    Get database schema information for the SQLAgent
+    
+    Returns:
+        list: List of table names available in the database
+    """
+    try:
+        cursor = self.connection.cursor()
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+        cursor.close()
+        
+        # Extract table names from the result
+        table_names = [table[0] for table in tables]
+        return table_names
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error getting schema: {str(e)}")
+        return []
+
+def get_simplified_relations_text(self):
+    """
+    Get simplified foreign key relationships as text for the prompt
+    
+    Returns:
+        str: Text description of table relationships
+    """
+    try:
+        cursor = self.connection.cursor()
+        
+        # Get foreign key information
+        query = """
+        SELECT 
+            TABLE_NAME,
+            COLUMN_NAME,
+            REFERENCED_TABLE_NAME,
+            REFERENCED_COLUMN_NAME
+        FROM 
+            INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+        WHERE 
+            REFERENCED_TABLE_SCHEMA = %s
+            AND REFERENCED_TABLE_NAME IS NOT NULL
+        """
+        
+        cursor.execute(query, (self.connection.database,))
+        foreign_keys = cursor.fetchall()
+        cursor.close()
+        
+        if not foreign_keys:
+            return "Aucune relation de clé étrangère trouvée."
+        
+        relations_text = "Relations entre les tables :\n"
+        for fk in foreign_keys:
+            relations_text += f"- {fk[0]}.{fk[1]} → {fk[2]}.{fk[3]}\n"
+        
+        return relations_text
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error getting relations: {str(e)}")
+        return "Erreur lors de la récupération des relations."
