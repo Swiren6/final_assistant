@@ -7,7 +7,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from config.database import get_db
 import os
-
+import MySQLdb.cursors
 logger = logging.getLogger(__name__)
 
 class BulletinPDFGenerator:
@@ -46,30 +46,25 @@ class BulletinPDFGenerator:
         
         try:
             conn = get_db()
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor(MySQLdb.cursors.DictCursor)
             
             # ✅ Requête pour récupérer les informations de base de l'élève
             student_query = """
-            SELECT 
-                p.NomFr, 
-                p.PrenomFr,
-                e.DateNaissance,
-                e.LieuNaissance,
-                e.AutreLieuNaissance,
-                c.CODECLASSEFR as classe,
-                n.NOMNIVFR as niveau,
-                e.id as eleve_id,
-                e.IdPersonne as matricule,
-                ie.id as inscription_id
-            FROM eleve e
-            JOIN personne p ON e.IdPersonne = p.id
-            JOIN inscriptioneleve ie ON e.id = ie.Eleve
-            JOIN classe c ON ie.Classe = c.id
-            JOIN niveau n ON c.Niveau = n.id
-            JOIN anneescolaire a ON ie.AnneeScolaire = a.id
-            WHERE e.IdPersonne = %s AND a.AnneeScolaire = %s
-            LIMIT 1
-            """
+    SELECT 
+        p.NomFr, p.PrenomFr,
+        e.DateNaissance, e.LieuNaissance, e.AutreLieuNaissance,
+        c.CODECLASSEFR as classe, n.NOMNIVAR as niveau,
+        e.id as eleve_id, e.IdPersonne as matricule, ie.id as inscription_id
+    FROM eleve e
+    JOIN personne p ON e.IdPersonne = p.id
+    JOIN inscriptioneleve ie ON e.id = ie.Eleve
+    JOIN classe c ON ie.Classe = c.id
+    JOIN niveau n ON c.IDNIV = n.id
+    JOIN anneescolaire a ON ie.AnneeScolaire = a.id
+    WHERE e.IdPersonne = %s AND a.AnneeScolaire = %s
+    LIMIT 1
+"""
+
             
             cursor.execute(student_query, (student_id, annee_scolaire))
             student_info = cursor.fetchone()
@@ -81,8 +76,8 @@ class BulletinPDFGenerator:
             # ✅ Requête pour récupérer les notes par matière
             notes_query = """
             SELECT 
-                m.NomMatiereFr as matiere,
-                4 as coefficient,
+                m.LibelleMatiereCourtFr as matiere,
+                m.CoefficientMatiere as coefficient,
                 AVG(CAST(erc.Note as DECIMAL(5,2))) as moyenne_matiere,
                 COUNT(erc.Note) as nb_notes
             FROM eduresultatcopie erc
@@ -93,8 +88,9 @@ class BulletinPDFGenerator:
                 AND t.id = %s 
                 AND erc.Note IS NOT NULL 
                 AND erc.Note != ''
-            GROUP BY m.id, m.NomMatiereFr
-            ORDER BY m.NomMatiereFr
+            GROUP BY m.id, m.LibelleMatiereCourtFr, m.CoefficientMatiere
+            ORDER BY m.LibelleMatiereCourtFr
+            
             """
             
             cursor.execute(notes_query, (student_info['inscription_id'], trimestre_id))
@@ -106,9 +102,9 @@ class BulletinPDFGenerator:
             matieres_formatted = []
             
             for note in notes_data:
-                if note['moyenne_matiere']:
+                if note['moyenne_matiere'] and note['coefficient']:
                     moyenne = float(note['moyenne_matiere'])
-                    coeff = int(note['coefficient']) if note['coefficient'] else 4  # Coefficient par défaut
+                    coeff = int(note['coefficient'])
                     
                     total_points += moyenne * coeff
                     total_coefficients += coeff
@@ -141,9 +137,10 @@ class BulletinPDFGenerator:
             FROM (
                 SELECT 
                     ie2.id,
-                    AVG(CAST(erc2.Note as DECIMAL(5,2))) as moyenne_gen
+                    SUM(CAST(erc2.Note as DECIMAL(5,2)) * m2.CoefficientMatiere) / SUM(m2.CoefficientMatiere) as moyenne_gen
                 FROM inscriptioneleve ie2
                 JOIN eduresultatcopie erc2 ON ie2.id = erc2.Inscription
+                JOIN matiere m2 ON erc2.Matiere = m2.id
                 JOIN trimestre t2 ON erc2.Trimestre = t2.id
                 WHERE ie2.Classe = (SELECT Classe FROM inscriptioneleve WHERE id = %s)
                     AND t2.id = %s
@@ -198,8 +195,7 @@ class BulletinPDFGenerator:
                     "moyenne_generale": moyenne_generale,
                     "rang": f"{rang}ème/{effectif}",
                     "mention": mention,
-                    "date_naissance": student_info['DateNaissance'].strftime('%d/%m/%Y') if student_info['DateNaissance'] else "N/A",
-                    "lieu_naissance": student_info['LieuNaissance'] or student_info['AutreLieuNaissance'] or "N/A"
+                    "date_naissance": student_info['DateNaissance'].strftime('%d/%m/%Y') if student_info['DateNaissance'] else "N/A"
                 },
                 "matieres": matieres_formatted
             }

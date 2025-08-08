@@ -16,7 +16,6 @@ class CacheManager1:
     def __init__(self, cache_file: str = "sql_query_cache1.json"):
         self.cache_file = Path(cache_file)
         self.cache = self._load_cache()
-
         
         # Patterns de base pour les valeurs structurées
         self.auto_patterns = {
@@ -264,15 +263,16 @@ class CacheManager1:
         # Patterns pour remplacer les IDs spécifiques par des variables
         patterns_to_replace = [
             # WHERE clauses avec IdPersonne (un seul ID)
-            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s*=\s*({'|'.join(children_ids_str)})\b", 
-            r'\1 = {id_personne}'),
+            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({r',\s*'.join(children_ids_str)})\s*\)", 
+     r'\1 IN ({id_personne})'),
             
             # WHERE clauses avec IN (un seul ID)
             (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({'|'.join(children_ids_str)})\s*\)", 
             r'\1 IN ({id_personne})'),
             
             # WHERE clauses avec IN (plusieurs IDs)
-            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({', '.join(children_ids_str)})\s*\)",),
+            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({r',\s*'.join(children_ids_str)})\s*\)", 
+     r'\1 IN ({id_personne})'),
         ]
         
         for pattern, replacement in patterns_to_replace:

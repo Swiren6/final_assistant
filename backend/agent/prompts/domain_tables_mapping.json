@@ -52,7 +52,7 @@
         "repartitionsemaine", "salle", "seance", "sectioncourete", "semaine", "trimestre", "typepre", "jourfr"
     ],
     "GENERAL_ADMINISTRATION_CONFIG": [
-        "viewcasiervide", "viewgetinscicasier", "viewstatistiquelocalite",
+        "viewcasiervide", "viewstatistiquelocalite",
         "actualite1", "actualites","anneescolaire", "civilite", "codepostal", "configaffichage", "configmatiereclsstat",
         "configmatierenivstat", "diplome", "dre", "educlasse", "edusection", "eduniveau", "gouvernorat",
         "localite", "extracasier", "extraclub", "extravaucher", "motifdoc", "motifsms", "motiftelechargement",
