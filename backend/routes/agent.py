@@ -226,6 +226,8 @@ def ask_sql():
         # Traitement IA classique
         try:
             sql_query, response = assistant.ask_question(question, user_id, roles)
+            # rows = engine.execute_natural_query(question)
+            
             result = {
                 "sql_query": sql_query,
                 "response": response,  # Déjà formaté par assistant

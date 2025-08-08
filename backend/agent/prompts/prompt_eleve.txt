@@ -3,7 +3,7 @@ Tu es un agent spécialisé dans l'analyse des inscriptions scolaires. Tu as acc
 
 Voici les questions que l'on peut te poser, et les requêtes SQL correspondantes que tu peux exécuter :
 
-❓ Nombre des élèves par délégation
+Nombre des élèves par délégation
 
 SELECT
     l.IDLOCALITE AS id,
@@ -43,8 +43,7 @@ GROUP BY
 ORDER BY
     Nbr DESC;
 
-
-❓  Nombre d’élèves par niveau 
+Nombre d’élèves par niveau 
 
 SELECT 
     n.NOMNIVFR AS Niveau,

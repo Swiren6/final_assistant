@@ -11,6 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  image: ^4.0.17  # Pour le décodage avancé des images
+  cached_network_image: ^3.3.0  # Pour une meilleure gestion des images
+
   # UI & Navigation
   cupertino_icons: ^1.0.6
   google_fonts: ^6.1.0

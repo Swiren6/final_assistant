@@ -226,110 +226,19 @@ Schéma disponible :
             return None
 
 
-
-    def generate_auto_graph(self, df, graph_type=None):
-        if df.empty or len(df.columns) < 2:
-            return None
-
-        plt.style.use('ggplot' if 'ggplot' in plt.style.available else 'default')
-        plt.rcParams['font.family'] = 'DejaVu Sans'
-        plt.rcParams['axes.unicode_minus'] = False
-
-        try:
-            # Détection automatique des colonnes
-            numeric_cols = df.select_dtypes(include='number').columns.tolist()
-            category_cols = df.select_dtypes(include='object').columns.tolist()
-
-            if not numeric_cols or not category_cols:
-                return None  # Besoin d'au moins une numérique + une catégorielle
-
-            # Choix par défaut des colonnes à utiliser
-            y_col = numeric_cols[0]
-            x_col = category_cols[0]
-
-            # Nettoyage et tri
-            df = df[[x_col, y_col]].dropna()
-            df = df.sort_values(by=y_col, ascending=False)
-
-            y = df[x_col].astype(str)
-            x = df[y_col].astype(float)
-
-            # Création du graphique
-            fig, ax = plt.subplots(figsize=(12, max(6, len(df)*0.4)))  # taille dynamique
-            bars = ax.barh(x, y, color='skyblue')
-
-            for bar in bars:
-                width = bar.get_width()
-                ax.text(width + 0.5,
-                        bar.get_y() + bar.get_height()/2,
-                        f'{int(width)}',
-                        va='center', ha='left', fontsize=9)
-
-            ax.set_xlabel(y_col)
-            ax.set_ylabel(x_col)
-            ax.set_title(f"{y_col} par {x_col}")
-            ax.grid(axis='x', linestyle='--', alpha=0.6)
-            plt.tight_layout(pad=2)
-
-            # Encodage en base64
-            buf = io.BytesIO()
-            fig.savefig(buf, format='png', dpi=120, bbox_inches='tight')
-            plt.close(fig)
-            buf.seek(0)
-            encoded = base64.b64encode(buf.read()).decode('utf-8')
-            buf.close()
-
-            return f"data:image/png;base64,{encoded}"
-
-        except Exception as e:
-            print(f"Erreur lors de la génération du graphique : {str(e)}")
-            return None
-   
-    def _format_results(self, data, user_query=None):
-        serialized_data = self._serialize_data(data)
-
-        if not serialized_data:
-            return {
-                "status": "success",
-                "message": "Requête exécutée mais aucun résultat trouvé.",  
-                "data": None,
-                "sql_query": self.last_generated_sql
-            }
-
-        df = pd.DataFrame(serialized_data)
-        response = {
-            "status": "success",
-            "question": user_query,
-            "sql_query": self.last_generated_sql,
-            "data": df.to_dict('records'),
-            "response": f"✅ {len(df)} résultats trouvés"
-        }
-
-        if len(df.columns) >= 2:
-            try:
-                graph_type = self.detect_graph_type(user_query or "")
-                graph = self.generate_auto_graph(df, graph_type)
-                if graph:
-                    response["graph"] = graph
-            except Exception as e:
-                logger.error(f"Erreur génération graphique: {str(e)}")
-                response["graph_error"] = str(e)
-
-        return response
-
     def get_response(self, user_query):
         if "attestation de présence" in user_query.lower():
             from pdf_utils.attestation import export_attestation_pdf
-            donnees_etudiant = {
-                "nom": "Rania Zahraoui",
-                "date_naissance": "15/03/2005",
-                "matricule": "2023A0512",
-                "etablissement": "Lycée Pilote de Sfax",
-                "classe": "3ème Sciences",
-                "annee_scolaire": "2024/2025",
-                "lieu": "Sfax"
-            }
-            pdf_path = export_attestation_pdf(donnees_etudiant)
+            # donnees_etudiant = {
+            #     "nom": "Rania Zahraoui",
+            #     "date_naissance": "15/03/2005",
+            #     "matricule": "2023A0512",
+            #     "etablissement": "Lycée Pilote de Sfax",
+            #     "classe": "3ème Sciences",
+            #     "annee_scolaire": "2024/2025",
+            #     "lieu": "Sfax"
+            # }
+            # pdf_path = export_attestation_pdf(donnees_etudiant)
             return {
                 "response": f"L'attestation a été générée : <a href='/{pdf_path.replace(os.sep, '/')}' download>Télécharger le PDF</a>"
             }
@@ -373,3 +282,145 @@ Schéma disponible :
         except Exception as e:
             logger.error(f"Erreur: {str(e)}", exc_info=True)
             return {"response": "Une erreur est survenue lors du traitement de la requête."}
+        
+        
+    def generate_auto_graph(self, df, graph_type):
+        if df.empty:
+            return "Aucun résultat à afficher."
+
+        exclude_cols = ['id', 'ids', 'anneescolaire', 'année scolaire', 'annee_scolaire']
+        numeric_cols = [col for col in df.select_dtypes(include='number').columns if col.lower() not in exclude_cols]
+        categorical_cols = [col for col in df.select_dtypes(exclude='number').columns if col.lower() not in exclude_cols]
+
+        if not numeric_cols or not categorical_cols:
+            return df.to_markdown()
+
+        x_col = categorical_cols[0]
+        y_cols = numeric_cols
+        
+        if graph_type == "pie":
+            df_grouped = df.groupby(x_col)[y_cols[0]].sum()
+            plt.figure(figsize=(6, 6))
+            df_grouped.plot(kind='pie', autopct='%1.1f%%', ylabel='', legend=False)
+            plt.title(f"{y_cols[0]} par {x_col}")
+            plt.tight_layout()
+
+        elif graph_type == "line":
+            print("Colonnes catégorielles:", categorical_cols)
+            print("Colonnes numériques:", numeric_cols)
+            print("x_col choisi:", x_col)
+
+            order = ["1ère", "2ème", "3ème", "4ème", "5ème", "6ème", "7ème", "8ème", "9ème"]
+
+            if 'niveau' in x_col.lower():
+                df_sorted = df.copy()
+                df_sorted[x_col] = df_sorted[x_col].str.strip().str.replace(" ", "").str.lower()
+                order_clean = [x.lower() for x in order]
+                df_sorted[x_col] = pd.Categorical(df_sorted[x_col], categories=order_clean, ordered=True)
+                df_sorted = df_sorted.sort_values(x_col)
+            elif 'date' in x_col.lower() or 'année' in x_col.lower():
+                df_sorted = df.sort_values(x_col)
+            else:
+                df_sorted = df
+
+            plt.figure(figsize=(10, 6))
+            plt.plot(df_sorted[x_col], df_sorted[y_cols[0]], marker='o')
+            plt.title(f"Évolution de {y_cols[0]} selon {x_col}")
+            plt.xlabel(x_col)
+            plt.ylabel(y_cols[0])
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+        elif graph_type == "bar":
+            plt.figure(figsize=(10, 6))
+            df.plot(x=x_col, y=y_cols, kind='bar')
+            plt.title(f"{', '.join(y_cols)} par {x_col}")
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+        else:
+            # Logique par défaut si aucun type précisé
+            if len(y_cols) == 1 and df[x_col].nunique() <= 7:
+                df_grouped = df.groupby(x_col)[y_cols[0]].sum()
+                plt.figure(figsize=(6, 6))
+                df_grouped.plot(kind='pie', autopct='%1.1f%%', ylabel='', legend=False)
+                plt.title(f"{y_cols[0]} par {x_col}")
+            elif 'date' in x_col.lower() or 'année' in x_col.lower() or pd.to_datetime(df[x_col], errors='coerce').notna().all():
+                df_sorted = df.sort_values(x_col)
+                plt.figure(figsize=(10, 6))
+                df_sorted.plot(x=x_col, y=y_cols, kind='line', marker='o')
+                plt.title(f"Évolution de {', '.join(y_cols)} selon {x_col}")
+            else:
+                plt.figure(figsize=(10, 6))
+                df.plot(x=x_col, y=y_cols, kind='bar')
+                plt.title(f"{', '.join(y_cols)} par {x_col}")
+
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+        # Générer le graphique en base64
+        tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+        tmp_path = tmpfile.name
+        tmpfile.close()
+        plt.savefig(tmp_path)
+        plt.close()
+
+        with open(tmp_path, 'rb') as f:
+            img_bytes = f.read()
+        encoded = base64.b64encode(img_bytes).decode('utf-8')
+
+        return f"data:image/png;base64,{encoded}"
+
+
+
+
+    def _format_results(self, data, user_query):
+            serialized_data = self._serialize_data(data)
+            print("🧪 Données brutes reçues:", data)
+            print("🧪 Données sérialisées:", serialized_data)
+
+            if not serialized_data:
+                return {
+                    "status": "success",
+                    "message": "Requête exécutée mais aucun résultat trouvé.",
+                    "data": None,
+                    "sql_query": self.last_generated_sql
+                }
+
+            df = pd.DataFrame(serialized_data)
+            print(f"DEBUG - DataFrame shape: {df.shape}")
+            print(f"DEBUG - Columns: {df.columns.tolist()}")
+            print(f"DEBUG - Head:\n{df.head()}")
+
+            response = {
+                "status": "success",
+                "question": user_query,
+                "sql_query": self.last_generated_sql,
+                "data": df.to_dict('records'),
+                "response": f"✅ {len(df)} résultats trouvés"
+            }
+            user_query = user_query.lower()
+            print(f"{user_query}")
+            if any(k in user_query for k in ["pie", "camembert", "diagramme circulaire"]):
+                graph_type= "pie"
+            elif any(k in user_query for k in ["histogramme", "bar chart", "barres"]):
+                graph_type= "bar"
+            elif any(k in user_query for k in ["ligne", "line chart", "courbe"]):
+                graph_type= "line"
+            else:
+                graph_type= None
+
+            if len(df.columns) >= 2 and not df.empty:
+                try:
+                    
+                    print (f"type de graphique detecté :{graph_type}")
+                    
+                    
+                    graph = self.generate_auto_graph(df, graph_type)
+                    if graph:
+                        response["graph"] = graph
+                except Exception as e:
+                    logger.error(f"Erreur génération graphique: {str(e)}")
+                    response["graph_error"] = str(e)
+
+            return response
