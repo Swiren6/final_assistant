@@ -1,11 +1,16 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'screens/login_screen.dart';
 import 'screens/chat_screen.dart';
 import 'services/auth_service.dart';
 import 'services/storage_service.dart';
 import 'utils/theme.dart';
 import 'utils/constants.dart';
+import 'screens/notification_checker.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +39,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/chat': (context) => const ChatScreen(),
+          '/notifications': (context) => const NotificationChecker(),
+          
         },
       ),
     );
@@ -79,4 +86,27 @@ class _AuthWrapperState extends State<AuthWrapper> {
       },
     );
   }
+}
+
+class GraphPage extends StatelessWidget {
+  final String base64Image;
+
+  const GraphPage(this.base64Image, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      Uint8List imageBytes = base64Decode(base64Image);
+      return Scaffold(
+        appBar: AppBar(title: const Text("Graphique généré")),
+        body: Center(child: Image.memory(imageBytes)),
+      );
+    } catch (e) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Erreur")),
+        body: Center(child: Text("Impossible d'afficher l'image.")),
+      );
+    }
+  }
+
 }

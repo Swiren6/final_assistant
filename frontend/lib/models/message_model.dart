@@ -10,12 +10,12 @@ class Message {
   final String? graphBase64;
   final DateTime timestamp;
   final bool isTyping;
-   
 
   // Retirer `const` ici
   Message({
     required this.text,
     required this.type,
+    
     this.isMe = false,
     this.sqlQuery,
     this.graphBase64,

@@ -1,45 +1,56 @@
 import json
 import logging
 from flask import current_app
-from config.database import get_db
-import MySQLdb
+from config.database import get_db  
+import re
 
 class AuthService:
     @staticmethod
     def parse_roles(raw_roles):
+        current_app.logger.info(f"Raw roles received: {raw_roles} (type: {type(raw_roles)})")
+        
         if raw_roles is None:
             return []
-
+        
         if isinstance(raw_roles, list):
             return raw_roles
-
+        
         try:
-            parsed = json.loads(raw_roles)
-            return parsed if isinstance(parsed, list) else [parsed]
-
+            if isinstance(raw_roles, str) and raw_roles.startswith('["') and raw_roles.endswith('"]'):
+                parsed = json.loads(raw_roles)
+                return parsed
+            
+            if isinstance(raw_roles, str):
+                parsed = json.loads(raw_roles)
+                return parsed if isinstance(parsed, list) else [parsed]
+                
         except json.JSONDecodeError as e:
-            current_app.logger.error(f"❌ JSON decode failed: {str(e)}")
+            current_app.logger.warning(f"JSON decode failed: {str(e)}")
             return [raw_roles] if raw_roles else []
+        
+        return [raw_roles] if raw_roles else []
+    
+    
 
     @staticmethod
     def authenticate_user(login_identifier, password):
         connection = None
         cursor = None
+        
         try:
             current_app.logger.info(f"🔍 Tentative authentification: {login_identifier}")
-
+            
             connection = get_db()
+            
             if connection is None:
                 current_app.logger.error("❌ Impossible d'obtenir une connexion DB")
                 return None
+                
+            cursor = connection.cursor(dictionary=True)  # ✅
 
-            try:
-                cursor = connection.cursor(MySQLdb.cursors.DictCursor)
-                current_app.logger.debug("✅ Curseur DB créé")
-            except Exception as cursor_error:
-                current_app.logger.error(f"❌ Erreur création curseur: {cursor_error}")
-                return None
+            current_app.logger.debug("✅ Curseur DB créé")
 
+            # ✅ Requête avec logging
             query = """
                 SELECT idpersonne, email, roles, changepassword 
                 FROM user 
@@ -56,8 +67,9 @@ class AuthService:
                 return None
 
             roles = AuthService.parse_roles(user['roles'])
-            current_app.logger.info(f"✅ Utilisateur authentifié: {user['idpersonne']} avec rôles: {roles}")
 
+            current_app.logger.info(f"✅ Utilisateur authentifié: {user['idpersonne']} avec rôles: {roles}")
+            
             return {
                 'idpersonne': user['idpersonne'],
                 'email': user['email'],
@@ -66,18 +78,5 @@ class AuthService:
             }
 
         except Exception as e:
-            current_app.logger.error(f"❌ Erreur authentification: {str(e)}", exc_info=True)
+            current_app.logger.error(f"❌ Erreur authentification: {str(e)}")
             return None
-        finally:
-            if cursor:
-                try:
-                    cursor.close()
-                    current_app.logger.debug("✅ Curseur fermé")
-                except:
-                    pass
-            if connection and hasattr(connection, '_direct_connection'):
-                try:
-                    connection.close()
-                    current_app.logger.debug("✅ Connexion directe fermée")
-                except:
-                    pass

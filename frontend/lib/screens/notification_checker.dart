@@ -19,8 +19,8 @@ class _NotificationCheckerState extends State<NotificationChecker> {
   @override
   void initState() {
     super.initState();
-    // Démarre la vérification toutes les 5 secondes
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) => fetchNotifications());
+   
+    _timer = Timer.periodic(const Duration(seconds: 3000), (_) => fetchNotifications());
   }
 
   Future<void> fetchNotifications() async {

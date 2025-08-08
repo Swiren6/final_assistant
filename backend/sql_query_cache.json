@@ -2,5 +2,9 @@
   "ce5e7ac6161cdd1c0bbdb56c4d4dcb4d": {
     "question_template": "donne moi les notes de {family_relation}",
     "sql_template": "SELECT \n    m.NomMatiereFr AS nom_matiere,\n    n.orale,\n    n.TP,\n    n.ExamenEcrit,\n    n.DS,\n    n.DC1,\n    n.DC2\nFROM \n    noteeleveparmatiere n\nJOIN \n    matiere m ON n.id_matiere = m.id\nWHERE \n    n.id_inscription IN (SELECT id FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne})));"
+  },
+  "bd0a735c0b7d88f38cfdc4bcad721b43": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} élèves {nomfr} {prenomfr}",
+    "sql_template": "SELECT d.LIBELLEDELEGATIONFR AS delegation, COUNT(e.id) AS nombre_eleves\nFROM eleve e\nJOIN personne p ON e.IdPersonne = p.id\nJOIN localite l ON p.Localite = l.IDLOCALITE\nJOIN delegation d ON l.CODEDELEGATION = d.id\nGROUP BY d.LIBELLEDELEGATIONFR;"
   }
 }

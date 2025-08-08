@@ -278,6 +278,8 @@ class SQLAssistant:
         self.cache = CacheManager()
         self.cache1 = CacheManager1()
         self.template_matcher = SemanticTemplateMatcher()
+        self.sql_agent = SQLAgent(db=self.db)
+
         
         try:
             self.templates_questions = self.load_question_templates()
@@ -548,6 +550,7 @@ class SQLAssistant:
     def _process_super_admin_question(self, question: str) -> tuple[str, str]:
         """Traite une question avec accès admin complet"""
         
+        # 1. Vérifier le cache
         cached = self.cache.get_cached_query(question)
         if cached:
             sql_template, variables = cached
@@ -562,7 +565,7 @@ class SQLAssistant:
             except Exception as db_error:
                 return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}"
         
-        # 2. Vérifier les templates
+        # 2. Vérifier les templates existants
         template_match = self.find_matching_template(question)
         if template_match:
             print("🔍 Template admin trouvé")
@@ -573,13 +576,29 @@ class SQLAssistant:
             try:
                 result = self.db.run(sql_query)
                 formatted_result = self._format_sql_agent_result(result, question)
-
                 return sql_query, formatted_result
             except Exception as db_error:
                 return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}"
         
-        # 3. Génération via LLM (template admin)
-        print("🔍 Génération LLM pour admin")
+        # ✅ 3. NOUVEAU: Essayer SQLAgent avec ses prompts spécialisés
+        try:
+            print("🤖 Tentative avec SQLAgent et prompts spécialisés")
+            sql_agent_result = self.sql_agent.get_response(question)
+            
+            if sql_agent_result and sql_agent_result.get('status') == 'success':
+                sql_query = sql_agent_result.get('sql_query', '')
+                formatted_response = self._format_sql_agent_response(sql_agent_result, question)
+                self.cache.cache_query(question, sql_query)
+                return sql_query, formatted_response
+            else:
+                print("⚠️ SQLAgent n'a pas réussi, passage au LLM standard")
+                
+        except Exception as sql_agent_error:
+            print(f"❌ Erreur SQLAgent: {sql_agent_error}")
+            # Continue vers le LLM standard
+        
+        # 4. Génération via LLM (template admin) - Fallback
+        print("🔍 Génération LLM standard pour admin")
         relevant_domains = self.get_relevant_domains(question, self.domain_descriptions)
         if relevant_domains:
             # 2. Tables associées
@@ -591,13 +610,13 @@ class SQLAssistant:
                 f"{dom}: {self.domain_descriptions[dom]}" for dom in relevant_domains if dom in self.domain_descriptions
             )
         else:
-            # fallback : tout injecter si rien trouvé
+            # fallback : tout injecter si rien trouvé
             table_info = self.db.get_table_info()
             relevant_domain_descriptions = "\n".join(self.domain_descriptions.values())
 
         prompt = ADMIN_PROMPT_TEMPLATE.format(
             input=question,
-            table_info=self.db.get_table_info(),
+            table_info=table_info,
             relevant_domain_descriptions=relevant_domain_descriptions,
             relations=self.relations_description
         )
@@ -638,7 +657,17 @@ class SQLAssistant:
         except Exception as e:
             print(f"❌ Erreur chargement domain descriptions: {e}")
             return {}
-    
+    def find_matching_template(self, question: str) -> Optional[Dict[str, Any]]:
+        exact_match = self._find_exact_template_match(question)
+        if exact_match:
+            return exact_match
+        
+        semantic_match, score = self.template_matcher.find_similar_template(question)
+        if semantic_match:
+            print(f"🔍 Template sémantiquement similaire trouvé (score: {score:.2f})")
+            return self._extract_variables(question, semantic_match)
+        
+        return None
     def _safe_load_domain_to_tables_mapping(self) -> dict:
         """Charge le mapping domaine-tables avec gestion d'erreurs"""
         try:
@@ -734,7 +763,19 @@ class SQLAssistant:
         except Exception as e:
             print(f"❌ Erreur chargement domain descriptions: {e}")
             return {}
-    
+    def _find_exact_template_match(self, question: str) -> Optional[Dict[str, Any]]:
+        cleaned_question = question.rstrip(' ?')
+        for template in self.templates_questions:
+            pattern = template["template_question"]
+            regex_pattern = re.sub(r'\{(.+?)\}', r'(?P<\1>.+?)', pattern)
+            match = re.fullmatch(regex_pattern, cleaned_question, re.IGNORECASE)
+            if match:
+                variables = {k: v.strip() for k, v in match.groupdict().items()}
+                return {
+                    "template": template,
+                    "variables": variables if variables else {}
+                }
+        return None
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str]:
         """Traite une question avec restrictions parent"""
         
@@ -1002,3 +1043,14 @@ class SQLAssistant:
                 return str(data_list)
             except:
                 return f"❌ Erreur de formatage: {str(e)}\nDonnées: {data_list}"
+    
+    def _format_sql_agent_response(self, sql_agent_result, question: str) -> str:
+        """Formate les résultats de SQLAgent pour l'affichage"""
+        if not sql_agent_result:
+            return "❌ Aucun résultat"
+        
+        response = sql_agent_result.get('response', '')
+        if sql_agent_result.get('graph'):
+            response += f"\n\n📊 Graphique généré"
+        
+        return response
