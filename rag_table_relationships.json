@@ -504,13 +504,9 @@
     "description": "La colonne `PaiementExtras` de la table `paiementextradetails` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementextra`."
   },
   {
-    "relation": "parent.Personne = personne.id",
-    "tables": [
-      "parent",
-      "personne"
-    ],
-    "join_column": "id",
-    "description": "Les coordonnées des parents (Tel1, Tel2, Tel3, Email) sont dans `personne`. On récupère `personne` du parent via `parent.Personne = personne.id`."
+  "relation": "`parenteleve`.`Parent` -> `parent`.`id` -> `parent`.`Personne` -> `personne`.`id`",
+  "tables": ["`parenteleve`", "`parent`", "`personne`"],
+  "description": "Passage obligatoire par `parenteleve` pour retrouver le parent, puis `personne` pour ses coordonnées."
   },
   {
   "relation": "parenteleve.Parent = parent.id, parenteleve.Eleve = eleve.id",
@@ -906,12 +902,6 @@
     "description": "La colonne `idenelev` de la table `edumoymati` est une clé étrangère qui fait référence à la colonne `id` de la table `edueleve`."
   },
   {
-  "relation": "personne (élève) → eleve → parenteleve → parent → personne (parent)",
-  "tables": ["personne", "eleve", "parenteleve", "parent"],
-  "join_column": "id",
-  "description": "Les noms et prénoms d’élèves se trouvent dans `personne`, et sont liés à la table `eleve` via `eleve.IdPersonne = personne.id`. L’élève est ensuite lié à la table `parenteleve` via `parenteleve.IdEleve = eleve.Id`. Celle-ci relie à `parent` via `parenteleve.IdParent = parent.id`. Enfin, chaque parent est lié à sa propre personne via `parent.Personne = personne.id`. Les informations de contact à retourner (`Tel1`, `Tel2`, `Tel3`, `Email`) sont dans cette dernière table `personne`, alias `parent_p`."
-  },
-  {
   "relation": "Alias multiples à éviter entre eleve et personne",
   "tables": ["eleve", "personne"],
   "join_column": "IdPersonne",
@@ -919,11 +909,7 @@
   },
   {
   "relation": "CHEMIN CONTACTS PARENTS (canonique)",
-  "tables": ["personne (eleve_p)", "eleve (e)", "parenteleve (pe)", "parent (pa)", "personne (parent_p)"],
-  "description": "Filtrer le nom/prénom de l'élève UNIQUEMENT sur personne (alias eleve_p). Jointures: e.IdPersonne = eleve_p.id → pe.Eleve = e.id → pa.id = pe.Parent → parent_p.id = pa.Personne. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans personne (alias parent_p)."
-  },
-  {
-  "relation": "RÈGLES À NE PAS FAIRE (contacts parents)",
-  "description": "NE PAS utiliser edueleve pour identifier un élève par nom/prénom; NE PAS filtrer sur e.NomFr/e.PrenomFr (ces colonnes n'existent pas dans eleve); NE PAS inventer de colonnes (ex: parent.id_eleve). Toujours: personne(eleve_p) → eleve(e) → parenteleve(pe) → parent(pa) → personne(parent_p)."
+  "tables": ["`personne` (eleve_p)", "`eleve` (e)", "`parenteleve` (pe)", "`parent` (pa)", "`personne` (parent_p)"],
+  "description": "`e`.`IdPersonne` = `eleve_p`.`id` -> `pe`.`Eleve` = `e`.`id` -> `pa`.`id` = `pe`.`Parent` -> `parent_p`.`id` = `pa`.`Personne`. Filtrer le nom/prénom de l'élève UNIQUEMENT sur `eleve_p`. Coordonnées (`Tel1`, `Tel2`, `Tel3`, `Email`) dans `parent_p`."
   }
 ]

@@ -65,7 +65,7 @@ def normalize(text: str) -> str:
     text = re.sub(r'[^\w\s\-@\.]', '', text)
     return text.strip()
 
-def chunk_text(text: str, max_length: int = 600) -> List[str]:
+def chunk_text(text: str, max_length: int = 300) -> List[str]:
     sentences = re.split(r'(?<=[.?!])\s+', text)
     chunks, current = [], ""
     for sentence in sentences:
@@ -163,107 +163,8 @@ def load_documents():
     except Exception as e:
         print("⚠️ Erreur rag_table_relationships.json :", e)
 
-    # Charger les questions SQL d'entraînement
-    """try:
-        with open("questions_sql.json", encoding="utf-8") as f:
-            for q in json.load(f):
-                docs.append(Document(
-                    page_content=f"Question: {q['question']}\nRéponse SQL: {q['sql']}",
-                    metadata={"type": "example_sql"}
-                ))
-    except Exception as e:
-        print("⚠️ Erreur questions_sql.json :", e)"""
-
-    # reglementeleve_chunks.json
-    """try:
-        with open("reglementeleve_chunks.json", encoding="utf-8") as f:
-            for entry in json.load(f):
-                chunk = entry.get("text", "")
-                if chunk:
-                    docs.append(Document(
-                        page_content=normalize(chunk),
-                        metadata={"type": "table_row_example", "table": "Reglementeleve"}
-                    ))
-    except Exception as e:
-        print("⚠️ Erreur reglementeleve_chunks.json :", e)"""
-
-    # column_values_explained.json
-    """try:
-        with open("column_values_explained.json", encoding="utf-8") as f:
-            column_data = json.load(f)
-
-            if isinstance(column_data, dict):
-                items = column_data.items()
-            elif isinstance(column_data, list):
-                # transformer la liste en paires (clé, entrée)
-                items = [(entry["column"], entry) for entry in column_data if "column" in entry]
-            else:
-                raise ValueError("Format inattendu dans column_values_explained.json")
-
-            for column, entry in items:
-                base_desc = entry.get("description", "")
-                values_desc = entry.get("values", {})
-                full_text = base_desc + " " + " ".join(f"{k}: {v}" for k, v in values_desc.items())
-                for chunk in chunk_text(full_text):
-                    docs.append(Document(
-                        page_content=normalize(chunk),
-                        metadata={"type": "column_values", "column": column}
-                    ))
-
-    except Exception as e:
-        print("⚠️ Erreur column_values_explained.json :", e)"""
- 
-
     print(f"📄 {len(docs)} documents à indexer.")
     return docs
-
-    # etat_sql.json
-    """try:
-        with open("etat_sql.json", encoding="utf-8") as f:
-            raw = json.load(f)
-
-            # Si c’est une liste de dictionnaires [{ "question": "...", "sql": "..." }, ...]
-            if isinstance(raw, list):
-                for entry in raw:
-                    question = entry.get("question", "")
-                    sql_clean = entry.get("sql", "")
-                    metadata = filter_complex_metadata({
-                        "type": "etat_sql",
-                        "sql": sql_clean
-                    })
-                    for chunk in chunk_text(question):
-                        docs.append(Document(page_content=normalize(chunk), metadata=metadata))
-
-            # Si c’est un dictionnaire { "question1": "sql1", "question2": "sql2" }
-            elif isinstance(raw, dict):
-                for question, sql in raw.items():
-                    sql_clean = sql[0] if isinstance(sql, list) else sql
-                    metadata = filter_complex_metadata({
-                        "type": "etat_sql",
-                        "sql": sql_clean
-                    })
-                    for chunk in chunk_text(question):
-                        docs.append(Document(page_content=normalize(chunk), metadata=metadata))
-
-            else:
-                print("⚠️ Format inattendu dans etat_sql.json")
-    except Exception as e:
-        print("⚠️ Erreur etat_sql.json :", e)"""
-
-
-    # domain_to_tables_mapping.json
-    """try:
-        with open("domain_to_tables_mapping.json", encoding="utf-8") as f:
-            for entry in json.load(f):
-                if "domaine" in entry and "description" in entry:
-                    metadata = filter_complex_metadata({
-                        "type": "domain_description",
-                        "domain": entry["domaine"]
-                    })
-                    for chunk in chunk_text(entry["description"]):
-                        docs.append(Document(page_content=normalize(chunk), metadata=metadata))
-    except Exception as e:
-        print("⚠️ Erreur domain_to_tables_mapping.json :", e)"""
 
 
 def build_rag_index():
@@ -306,7 +207,7 @@ class SQLAssistant:
         self.cache = self.load_cache()
         self.vectordb = shared_vectordb
 
-    def retrieve_context(self, question: str, k=10) -> List[str]:
+    def retrieve_context(self, question: str, k=6) -> List[str]:
         query = f"query: {question}"
         results = self.vectordb.similarity_search_with_score(query, k)
         results = [(doc, score) for doc, score in results if score <= 1.5]  # augmente le seuil

@@ -1,4 +1,0 @@
-[{
-  "question": "Donne-moi le nom et le téléphone des parents de Zeineb Bouharb",
-  "sql": "SELECT personne.NomFr, personne.PrenomFr, personne.Tel1 FROM parenteleve JOIN eleve ON parenteleve.Eleve = eleve.id JOIN parent ON parenteleve.Parent = parent.id JOIN personne ON parent.Personne = personne.IdPersonne WHERE personne.Type = 'Parent' AND eleve.id IN (SELECT e.id FROM eleve e JOIN personne p ON e.IdPersonne = p.IdPersonne WHERE p.NomFr = 'Bouharb' AND p.PrenomFr = 'Zeineb')"
-}]
