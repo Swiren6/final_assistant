@@ -372,6 +372,7 @@ class SQLAssistant:
 
         llm_response = self.ask_llm(prompt)
         sql_query = self._clean_sql(llm_response)
+        sql_query = self._auto_fix_quotes_in_sql(sql_query)
         
         # Validation
         try:
@@ -459,6 +460,31 @@ class SQLAssistant:
         except Exception as e:
             raise ValueError(f"❌ Requête invalide : {str(e)}")
 
+    def _validate_sql_semantics(self, sql: str, question: str) -> bool:
+        """Valide la cohérence sémantique entre question et SQL"""
+        
+        # Mappings question → table attendue
+        expected_mappings = {
+            'section': ['section'],
+            'civilité': ['civilite'],
+            'nationalité': ['nationalite'],
+            'niveau': ['niveau'],
+            'élève': ['eleve', 'personne', 'inscriptioneleve'],
+            'classe': ['classe'],
+            'localité': ['localite']
+        }
+        
+        question_lower = question.lower()
+        sql_lower = sql.lower()
+        
+        # Vérifier que les tables correspondent à la question
+        for keyword, expected_tables in expected_mappings.items():
+            if keyword in question_lower:
+                if not any(table in sql_lower for table in expected_tables):
+                    raise ValueError(f"Question sur '{keyword}' mais table correspondante absente")
+        
+        return True
+    
     # ================================
     # EXÉCUTION SQL
     # ================================
@@ -501,99 +527,176 @@ class SQLAssistant:
     # ================================
 
     def format_response_with_ai(self, data: List[Dict], question: str, sql_query: str) -> str:
-        """Formate la réponse en langage naturel avec IA"""
+        """Version améliorée du formatage avec validation des données"""
+        
         if not data:
             return "✅ Requête exécutée mais aucun résultat trouvé."
         
-        try:
-            # Ajouter la conversation à l'historique
-            self.conversation_history.append({'role': 'user', 'content': question})
-
-            # Préparer les données pour l'IA (limiter la taille)
-            data_summary = json.dumps(data[:50], ensure_ascii=False)[:1500]  # Limiter à 1500 caractères
+        # Cas spéciaux avec vérification des données réelles
+        if len(data) == 1 and len(data[0]) == 1:
+            value = list(data[0].values())[0]
+            column_name = list(data[0].keys())[0]
             
-            # Messages pour l'IA
+            # Améliorer la réponse selon le contexte
+            if "combien" in question.lower():
+                if "élève" in question.lower():
+                    return f"Il y a {value} élèves qui correspondent à votre critère."
+                elif "inscription" in question.lower():
+                    return f"Il y a {value} inscriptions enregistrées."
+                else:
+                    return f"Nombre trouvé : {value}"
+        
+        # Pour les listes, vérifier si les données sont valides
+        try:
+            df = pd.DataFrame(data)
+            
+            # Détecter les données invalides (headers comme valeurs)
+            first_row = data[0]
+            column_names = list(first_row.keys())
+            first_values = list(first_row.values())
+            
+            # Si les valeurs sont identiques aux noms de colonnes → données invalides
+            if (all(v is None or str(v).strip() == "" for v in first_values) or 
+                (len(set(str(v) for v in first_values)) == 1 and str(first_values[0]).lower() in [col.lower() for col in column_names])):
+                return "❌ Erreur dans les données : Les résultats semblent corrompus ou vides."
+            # Formatage normal
             messages = [
                 {
-                    "role": "system", 
-                    "content": """Tu es un assistant pédagogique expert. 
-                    Reformule les résultats SQL en réponse naturelle, claire et utile en français.
-                    Si la requête retourne un seul nombre (comme COUNT), dis par exemple "Il y a X élèves inscrits".
-                    Si ce sont des listes, présente-les de manière organisée.
-                    Sois concis mais informatif."""
+                    "role": "system",
+                    "content": """Analysez les données SQL et donnez une réponse claire en français. 
+                    Si les données semblent corrompues (valeurs = noms colonnes), signalez-le.
+                    Sinon, présentez les résultats de manière structurée et utile."""
                 },
                 {
-                    "role": "user", 
-                    "content": f"""Question: {question}
-
-Requête SQL générée: {sql_query}
-
-Résultats de la base de données:
-{data_summary}
-
-Nombre total de résultats: {len(data)}
-
-Formule une réponse claire et concise en français basée sur ces données."""
+                    "role": "user",
+                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:10], ensure_ascii=False)}"
                 }
             ]
-
-            # Appel à l'IA
+            
             response = openai.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=0.3,
+                temperature=0.2,
                 max_tokens=400
             )
-
-            response_text = response.choices[0].message.content.strip()
-            self.conversation_history.append({'role': 'assistant', 'content': response_text})
             
-            # Créer graphique si pertinent et possible
-            graph_data = self.generate_graph_if_relevant(data, question)
-            if graph_data:
-                response_text += f"\n\n📊 Graphique généré: <img src='{graph_data}' alt='Graphique des résultats' style='max-width:100%; height:auto;'/>"
+            return response.choices[0].message.content.strip()
             
-            return response_text
-
         except Exception as e:
-            logger.error(f"Erreur formatage réponse IA: {e}")
-            # Fallback: formatage simple
+            logger.error(f"Erreur formatage: {e}")
             return self._format_simple_response(data, question)
+    # def _format_simple_response(self, data: List[Dict], question: str) -> str:
+    #     """Formatage simple sans IA en cas d'erreur"""
+    #     if not data:
+    #         return "✅ Requête exécutée mais aucun résultat trouvé."
+        
+    #     # Cas spécial: une seule valeur numérique (COUNT, etc.)
+    #     if len(data) == 1 and len(data[0]) == 1:
+    #         value = list(data[0].values())[0]
+    #         if isinstance(value, (int, float)):
+    #             if "combien" in question.lower() or "nombre" in question.lower():
+    #                 if "élève" in question.lower() or "eleve" in question.lower():
+    #                     return f"Il y a {value} élèves."
+    #                 elif "absence" in question.lower():
+    #                     return f"Nombre d'absences : {value}"
+    #                 else:
+    #                     return f"Résultat : {value}"
+    #             else:
+    #                 return f"Résultat : {value}"
+        
+    #     # Cas général: tableau
+    #     try:
+    #         df = pd.DataFrame(data)
+    #         table = tabulate(df.head(20), headers='keys', tablefmt='grid', showindex=False)
+            
+    #         result = f"Résultats pour: {question}\n\n{table}"
+    #         if len(data) > 20:
+    #             result += f"\n\n... et {len(data) - 20} autres résultats"
+            
+    #         return result
+            
+    #     except Exception:
+    #         # Ultimate fallback
+    #         return f"Résultats trouvés: {len(data)} éléments"
 
-    def _format_simple_response(self, data: List[Dict], question: str) -> str:
-        """Formatage simple sans IA en cas d'erreur"""
+
+    def format_response_with_ai(self, data: List[Dict], question: str, sql_query: str) -> str:
+        """Version améliorée du formatage avec validation des données"""
+        
         if not data:
             return "✅ Requête exécutée mais aucun résultat trouvé."
         
-        # Cas spécial: une seule valeur numérique (COUNT, etc.)
+        # Cas spéciaux avec vérification des données réelles
         if len(data) == 1 and len(data[0]) == 1:
             value = list(data[0].values())[0]
-            if isinstance(value, (int, float)):
-                if "combien" in question.lower() or "nombre" in question.lower():
-                    if "élève" in question.lower() or "eleve" in question.lower():
-                        return f"Il y a {value} élèves."
-                    elif "absence" in question.lower():
-                        return f"Nombre d'absences : {value}"
-                    else:
-                        return f"Résultat : {value}"
+            column_name = list(data[0].keys())[0]
+            
+            # Améliorer la réponse selon le contexte
+            if "combien" in question.lower():
+                if "élève" in question.lower():
+                    return f"Il y a {value} élèves qui correspondent à votre critère."
+                elif "inscription" in question.lower():
+                    return f"Il y a {value} inscriptions enregistrées."
                 else:
-                    return f"Résultat : {value}"
+                    return f"Nombre trouvé : {value}"
         
-        # Cas général: tableau
+        # Pour les listes, vérifier si les données sont valides
         try:
             df = pd.DataFrame(data)
-            table = tabulate(df.head(20), headers='keys', tablefmt='grid', showindex=False)
             
-            result = f"Résultats pour: {question}\n\n{table}"
-            if len(data) > 20:
-                result += f"\n\n... et {len(data) - 20} autres résultats"
+            # Détecter les données invalides (headers comme valeurs)
+            first_row = data[0]
+            column_names = list(first_row.keys())
+            first_values = list(first_row.values())
             
-            return result
+            # Si les valeurs sont identiques aux noms de colonnes → données invalides
+            if set(first_values) == set(column_names):
+                return "❌ Erreur dans les données : Les résultats semblent corrompus ou vides."
             
-        except Exception:
-            # Ultimate fallback
-            return f"Résultats trouvés: {len(data)} éléments"
-
+            # Formatage normal
+            messages = [
+                {
+                    "role": "system",
+                    "content": """Analysez les données SQL et donnez une réponse claire en français. 
+                    Si les données semblent corrompues (valeurs = noms colonnes), signalez-le.
+                    Sinon, présentez les résultats de manière structurée et utile."""
+                },
+                {
+                    "role": "user",
+                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:10], ensure_ascii=False)}"
+                }
+            ]
+            
+            response = openai.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.2,
+                max_tokens=400
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Erreur formatage: {e}")
+            return self._format_simple_response(data, question)    
+    def _auto_fix_quotes_in_sql(self, sql: str) -> str:
+        """Corrige automatiquement les guillemets manquants dans les requêtes SQL"""
+        
+        # Pattern pour détecter les valeurs alphanumériques sans guillemets après =, IN, etc.
+        patterns = [
+            # Cas: WHERE colonne = valeur_alphanum
+            (r'(\w+\s*=\s*)([A-Za-z][A-Za-z0-9]*\b)(?!\s*[,)])', r"\1'\2'"),
+            # Cas: WHERE colonne = valeur avec chiffres et lettres
+            (r'(\w+\s*=\s*)([0-9][A-Za-z0-9]*\b)', r"\1'\2'"),
+            # Cas: IN (valeur1, valeur2)
+            (r'(\bIN\s*\(\s*)([A-Za-z0-9][A-Za-z0-9]*)', r"\1'\2'"),
+        ]
+        
+        corrected_sql = sql
+        for pattern, replacement in patterns:
+            corrected_sql = re.sub(pattern, replacement, corrected_sql, flags=re.IGNORECASE)
+        
+        return corrected_sql
     # ================================
     # GÉNÉRATION DE GRAPHIQUES
     # ================================
@@ -812,7 +915,36 @@ Formule une réponse claire et concise en français basée sur ces données."""
         except Exception as e:
             logger.error(f"❌ Erreur lors de l'identification des domaines: {e}")
             return []
-
+    def get_relevant_domains_improved(self, query: str) -> List[str]:
+        """Version améliorée de la détection des domaines"""
+        
+        # Mappings directs question → domaine
+        direct_mappings = {
+            'section': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'civilité': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'nationalité': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'niveau': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'élève': ['ELEVES_INSCRIPTIONS'],
+            'inscription': ['ELEVES_INSCRIPTIONS'],
+            'classe': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'localité': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'gouvernorat': ['GENERAL_ADMINISTRATION_CONFIG'],
+            'établissement': ['GENERAL_ADMINISTRATION_CONFIG']
+        }
+        
+        query_lower = query.lower()
+        relevant_domains = set()
+        
+        # Recherche directe
+        for keyword, domains in direct_mappings.items():
+            if keyword in query_lower:
+                relevant_domains.update(domains)
+        
+        # Si aucun domaine trouvé, utiliser l'IA
+        if not relevant_domains:
+            return self.get_relevant_domains(query, self.domain_descriptions)
+    
+        return list(relevant_domains)
     def get_tables_from_domains(self, domains: List[str], domain_to_tables_map: Dict[str, List[str]]) -> List[str]:
         """Récupère toutes les tables associées aux domaines donnés"""
         tables = []

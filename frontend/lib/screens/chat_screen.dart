@@ -120,31 +120,85 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSuccessfulResponse(Map<String, dynamic> response) {
+    debugPrint('📥 Réponse complète du backend: $response');
+    
+    // Extraire la réponse principale
+    String responseText = response['response'] ?? 'Aucune réponse reçue';
+    String? sqlQuery = response['sql_query'] as String?;
+    String? graphBase64;
+
+    // Le backend peut renvoyer le graphique de plusieurs façons :
+    // 1. Intégré dans le texte de réponse (data:image/png;base64,...)
+    // 2. Dans un champ séparé (si implémenté plus tard)
+    
+    // Extraire le graphique du texte s'il est intégré
+    final graphRegex = RegExp(r"data:image/png;base64,([A-Za-z0-9+/=]+)");
+    final match = graphRegex.firstMatch(responseText);
+    
+    if (match != null) {
+      graphBase64 = match.group(0); // Récupérer le data:image complet
+      debugPrint('🖼️ Graphique détecté dans la réponse, taille: ${graphBase64?.length}');
+    }
+
+    // Vérifier aussi si le graphique est dans un autre champ de la réponse
+    if (graphBase64 == null) {
+      if (response['graph'] != null && response['graph'].toString().isNotEmpty) {
+        graphBase64 = response['graph'] as String?;
+        debugPrint('🖼️ Graphique trouvé dans response["graph"]');
+      } else if (response['data'] != null && response['data']['graph'] != null) {
+        graphBase64 = response['data']['graph'] as String?;
+        debugPrint('🖼️ Graphique trouvé dans response["data"]["graph"]');
+      }
+    }
+
     setState(() {
-      _messages.removeLast();
+      _messages.removeLast(); // Retirer le message "typing..."
       _messages.add(
         Message.assistant(
-          text: response['response'] ?? 'Aucune réponse reçue',
-          sqlQuery: response['sql_query'],
-          graphBase64: response['data']?['graph'] as String?,
+          text: responseText,
+          sqlQuery: sqlQuery,
+          graphBase64: graphBase64,
         ),
       );
     });
+    
+    debugPrint('✅ Message ajouté avec graphique: ${graphBase64 != null}');
     _scrollToBottom();
   }
 
   void _handleErrorResponse(dynamic error) {
-    debugPrint('Erreur: $error');
+    debugPrint('❌ Erreur de traitement: $error');
     setState(() {
-      _messages.removeLast();
+      _messages.removeLast(); // Retirer le message "typing..."
       _messages.add(Message.error(text: _getErrorMessage(error)));
     });
   }
 
   String _getErrorMessage(dynamic error) {
-    if (error is http.ClientException) return 'Erreur de connexion';
-    if (error is TimeoutException) return 'Temps d\'attente dépassé';
-    return 'Une erreur est survenue';
+    if (error is ApiException) {
+      switch (error.statusCode) {
+        case 401:
+          return 'Votre session a expiré. Veuillez vous reconnecter.';
+        case 403:
+          return 'Vous n\'avez pas l\'autorisation pour cette action.';
+        case 404:
+          return 'Service non trouvé. Veuillez réessayer plus tard.';
+        case 500:
+          return 'Erreur du serveur. Veuillez réessayer dans quelques instants.';
+        default:
+          return 'Erreur: ${error.message}';
+      }
+    }
+    
+    if (error is http.ClientException) {
+      return 'Problème de connexion réseau. Vérifiez votre connexion internet.';
+    }
+    
+    if (error is TimeoutException) {
+      return 'Temps d\'attente dépassé. Le serveur met trop de temps à répondre.';
+    }
+    
+    return 'Une erreur inattendue s\'est produite. Veuillez réessayer.';
   }
 
   void _scrollToBottom() {
@@ -173,7 +227,10 @@ class _ChatScreenState extends State<ChatScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              setState(() => _messages.clear());
+              setState(() {
+                _messages.clear();
+                _seenNotificationIds.clear();
+              });
               _addWelcomeMessage();
             },
             child: const Text('Effacer'),
@@ -242,10 +299,44 @@ class _ChatScreenState extends State<ChatScreen> {
                 vertical: AppConstants.paddingMedium,
               ),
               itemCount: _messages.length,
-              itemBuilder: (context, index) => MessageBubble(
-                message: _messages[index],
-                isMe: _messages[index].isMe,
-              ),
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+                
+                // Ne pas afficher le message "typing..."
+                if (message.type == MessageType.system && 
+                    message.text == 'typing...') {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppConstants.primaryColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Assistant en train de réfléchir...',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                
+                return MessageBubble(
+                  message: message,
+                  isMe: message.isMe,
+                );
+              },
             ),
     );
   }
@@ -274,7 +365,43 @@ class _ChatScreenState extends State<ChatScreen> {
                   color: Colors.grey.shade500,
                 ),
           ),
+          const SizedBox(height: AppConstants.paddingLarge),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              'Combien d\'élèves ?',
+              'Classes disponibles',
+              'Liste des enseignants',
+              'Statistiques',
+            ].map((text) => _buildSuggestionChip(text)).toList(),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestionChip(String text) {
+    return GestureDetector(
+      onTap: () {
+        _messageController.text = text;
+        _sendMessage();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppConstants.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppConstants.primaryColor.withOpacity(0.3)),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: AppConstants.primaryColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
@@ -315,11 +442,26 @@ class _ChatScreenState extends State<ChatScreen> {
         color: AppConstants.primaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
       ),
-      child: Wrap(
-        spacing: 8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          'élèves', 'classes', 'enseignants', 'parents', 'nombre élèves'
-        ].map((text) => _buildQuickButton(text)).toList(),
+          Text(
+            '💡 Suggestions rapides:',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppConstants.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              'élèves', 'classes', 'enseignants', 'parents', 
+              'nombre élèves', 'moyennes', 'absences'
+            ].map((text) => _buildQuickButton(text)).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -338,7 +480,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return TextField(
       controller: _messageController,
       decoration: InputDecoration(
-        hintText: 'Tapez votre question... Même courte ! Ex: "élèves", "classes"',
+        hintText: 'Tapez votre question... (ex: "Combien d\'élèves ?", "Classes de 1ère année")',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusRound),
           borderSide: BorderSide.none,
@@ -374,7 +516,7 @@ class _ChatScreenState extends State<ChatScreen> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: _isLoading
+          colors: _isLoading || _messageController.text.trim().isEmpty
               ? [Colors.grey.shade400, Colors.grey.shade500]
               : [AppConstants.primaryColor, AppConstants.primaryColorDark],
           begin: Alignment.topLeft,
@@ -392,7 +534,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               )
             : const Icon(Icons.send, color: Colors.white),
-        onPressed: _isLoading ? null : _sendMessage,
+        onPressed: _isLoading || _messageController.text.trim().isEmpty 
+            ? null 
+            : _sendMessage,
       ),
     );
   }
@@ -426,21 +570,71 @@ class _ChatScreenState extends State<ChatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Assistant Scolaire'),
+        title: Row(
+          children: [
+            Icon(Icons.school, color: AppConstants.primaryColor),
+            const SizedBox(width: 8),
+            const Text('Assistant Scolaire'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Cet assistant peut répondre à vos questions sur le système scolaire.'),
+            const Text(
+              'Cet assistant IA peut répondre à vos questions sur le système scolaire et générer des graphiques automatiquement.',
+            ),
             const SizedBox(height: AppConstants.paddingMedium),
-            Consumer<AuthService>(
-              builder: (context, authService, _) => Column(
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue[200]!),
+              ),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Utilisateur: ${authService.user?.idpersonne ?? "Non connecté"}'),
-                  if (authService.user?.roles.isNotEmpty ?? false)
-                    Text('Rôles: ${authService.user!.roles.join(", ")}'),
+                  Text(
+                    '✨ Fonctionnalités:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[800],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('• Réponses en langage naturel'),
+                  const Text('• Génération automatique de graphiques'),
+                  const Text('• Statistiques et analyses'),
+                  const Text('• Export de documents PDF'),
                 ],
+              ),
+            ),
+            const SizedBox(height: AppConstants.paddingMedium),
+            Consumer<AuthService>(
+              builder: (context, authService, _) => Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '👤 Informations utilisateur:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('ID: ${authService.user?.idpersonne ?? "Non connecté"}'),
+                    if (authService.user?.roles.isNotEmpty ?? false)
+                      Text('Rôles: ${authService.user!.roles.join(", ")}'),
+                  ],
+                ),
               ),
             ),
           ],
