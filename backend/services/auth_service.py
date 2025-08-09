@@ -3,6 +3,7 @@ import logging
 from flask import current_app
 from config.database import get_db  
 import re
+import MySQLdb.cursors
 
 class AuthService:
     @staticmethod
@@ -46,7 +47,7 @@ class AuthService:
                 current_app.logger.error("❌ Impossible d'obtenir une connexion DB")
                 return None
                 
-            cursor = connection.cursor(dictionary=True)  # ✅
+            cursor = connection.cursor(MySQLdb.cursors.DictCursor)
 
             current_app.logger.debug("✅ Curseur DB créé")
 

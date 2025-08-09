@@ -1,0 +1,58 @@
+{"question": "Combien d'élèves ont été inscrits pour l'année 2019/2020 ?", "sql": "SELECT COUNT(*) FROM inscriptioneleve WHERE AnneeScolaire = 1;"}
+{"question": "Quelle est la date de naissance de l'élève avec l'id 1 ?", "sql": "SELECT DateNaissance FROM eleve WHERE id = 1;"}
+{"question": "Liste des élèves inscrits pour l'année 2019/2020 ?", "sql": "SELECT Eleve FROM inscriptioneleve WHERE AnneeScolaire = 1;"}
+{"question": "Quel est le niveau associé au code 0 ?", "sql": "SELECT NOMNIVFR FROM niveau WHERE id = 0;"}
+{"question": "Quel est le nom de la localité ayant le code postal 2032 ?", "sql": "SELECT LIBELLELOCALITEFR FROM localite WHERE CODEPOSTAL = '2032';"}
+{"question": "Combien y a-t-il de civilités ?", "sql": "SELECT COUNT(*) FROM civilite;"}
+{"question": "Quelle est l’année scolaire active ?", "sql": "SELECT * FROM anneescolaire WHERE Actif = 1;"}
+{"question": "Quelles sont les civilités disponibles ?", "sql": "SELECT * FROM civilite;"}
+{"question": "Liste des nationalités enregistrées ?", "sql": "SELECT * FROM nationalite;"}
+{"question": "Quelle est la liste des niveaux scolaires ?", "sql": "SELECT * FROM niveau;"}
+{"question": "Quelles sections sont disponibles ?", "sql": "SELECT * FROM section;"}
+{"question": "Quel est le solde moyen des élèves ?", "sql": "SELECT AVG(Solde) FROM inscriptioneleve;"}
+{"question": "Combien d’élèves sont nés en 2010 ?", "sql": "SELECT COUNT(*) FROM eleve WHERE YEAR(DateNaissance) = 2010;"}
+{"question": "Nombre de localités différentes ?", "sql": "SELECT COUNT(*) FROM localite;"}
+{"question": "Quels élèves sont nés à la localité 'Cebalet Ben Ammar' ?", "sql": "SELECT e.* FROM eleve e JOIN localite l ON e.LieuNaissance = l.IDLOCALITE WHERE l.LIBELLELOCALITEFR = 'Cebalet Ben Ammar';"}
+{"question": "Qui est inscrit dans le niveau '6 ème' ?", "sql": "SELECT el.* FROM inscriptioneleve i JOIN eleve el ON i.Eleve = el.id JOIN niveau n ON i.Classe = n.id WHERE n.NOMNIVFR = '6 ème';"}
+{"question": "Liste des élèves avec une inscription active en 2021 ?", "sql": "SELECT el.* FROM inscriptioneleve i JOIN eleve el ON i.Eleve = el.id WHERE i.AnneeScolaire = 2;"}
+{"question": "Quels élèves ont une nationalité étrangère ?", "sql": "SELECT el.* FROM eleve el JOIN personne p ON el.IdPersonne = p.id WHERE p.Nationalite != 1;"}
+{"question": "Qui a un solde supérieur à 0 ?", "sql": "SELECT * FROM eleve WHERE Solde > 0;"}
+{"question": "Quels sont les lieux de naissance des élèves ?", "sql": "SELECT DISTINCT LieuNaissance FROM eleve;"}
+{"question": "Quel est le montant total des frais scolaires TTC ?", "sql": "SELECT SUM(TTC_Scolaire) FROM inscriptioneleve;"}
+{"question": "Quel est le montant restant global ?", "sql": "SELECT SUM(Restant_Scolaire) FROM inscriptioneleve;"}
+{"question": "Quels sont les groupes existants dans les inscriptions ?", "sql": "SELECT DISTINCT groupe FROM inscriptioneleve;"}
+{"question": "Quels élèves ont été inscrits par la personne 161 ?", "sql": "SELECT * FROM inscriptioneleve WHERE Personne = 161;"}
+{"question": "Combien d’élèves sont nés à Tunis ?", "sql": "SELECT COUNT(*) FROM eleve WHERE LieuNaissance = (SELECT IDLOCALITE FROM localite WHERE LIBELLELOCALITEFR = 'Tunis');"}
+{"question": "Liste des années de préinscription ?", "sql": "SELECT DISTINCT AnneePreinscription FROM anneescolaire;"}
+{"question": "Liste des années scolaires disponibles ?", "sql": "SELECT DISTINCT AnneeScolaire FROM anneescolaire;"}
+{"question": "Liste des élèves avec photo disponible ?", "sql": "SELECT * FROM eleve WHERE photo IS NOT NULL;"}
+{"question": "Quel est l’élève avec le plus grand solde ?", "sql": "SELECT * FROM eleve ORDER BY Solde DESC LIMIT 1;"}
+{"question": "Quels sont les niveaux avec des inscriptions ?", "sql": "SELECT DISTINCT Classe FROM inscriptioneleve;"}
+{"question": "Quel est le nom complet de l'élève avec l'identifiant 5 ?", "sql": "SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id WHERE e.id = 5;"}
+{"question": "Liste des noms et prénoms de tous les élèves ?", "sql": "SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id;"}
+{"question": "Combien d'élèves sont inscrits dans la quatrième année  ?", "sql": "SELECT COUNT(DISTINCT ie.Eleve) FROM inscriptioneleve ie WHERE ie.Classe = 7;"}
+{"question": "Quelle est l'adresse en français de la personne avec le CIN '12345678' ?", "sql": "SELECT AdresseFr FROM personne WHERE Cin = '12345678';"}
+{"question": "Combien de personnes ont la nationalité tunisienne (ID 1) ?", "sql": "SELECT COUNT(*) FROM personne WHERE Nationalite = 1;"}
+{"question": "Quel est le libellé français de la civilité avec l'ID 2 ?", "sql": "SELECT libelleCiviliteFr FROM civilite WHERE idCivilite = 2;"}
+{"question": "Quelle est la date de naissance de l'élève dont le nom est 'Ben Foulen' et le prénom est 'Foulen' ?", "sql": "SELECT e.DateNaissance FROM eleve e JOIN personne p ON e.IdPersonne = p.id WHERE p.NomFr = 'Ben Foulen' AND p.PrenomFr = 'Foulen';"}
+{"question": "Donnez le code et le nom français de la classe avec l'ID 10.", "sql": "SELECT CODECLASSEFR, NOMCLASSEFR FROM classe WHERE id = 10;"}
+{"question": "Combien d'inscriptions ont été enregistrées pour l'année scolaire 2020/2021 (ID 2) ?", "sql": "SELECT COUNT(*) FROM inscriptioneleve WHERE AnneeScolaire = 2;"}
+{"question": "Quel est le solde total des frais scolaires pour toutes les inscriptions annulées ?", "sql": "SELECT SUM(TTC_Scolaire) FROM inscriptioneleve WHERE Annuler = 1;"}
+{"question": "Listez les nationalités disponibles avec leur ID.", "sql": "SELECT id, NationaliteFr FROM nationalite;"}
+{"question": "Quel est le code postal de la localité 'Tunis' ?", "sql": "SELECT CODEPOSTAL FROM localite WHERE LIBELLELOCALITEFR = 'Tunis';"}
+{"question": "Combien d'établissements sont enregistrés ?", "sql": "SELECT COUNT(*) FROM etablissement;"}
+{"question": "Quel est le libellé français du gouvernorat avec l'ID 5 ?", "sql": "SELECT LIBELLEGOUVFR FROM gouvernorat WHERE id = 5;"}
+{"question": "Donnez la liste des élèves qui ont un solde restant supérieur à 50.000 (TND).", "sql": "SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id JOIN inscriptioneleve ie ON e.id = ie.Eleve WHERE ie.Restant_Scolaire > 50.000;"}
+{"question": "Afficher les questions avec une inscription active (Annuler = 0) pour l'année scolaire 2022/2023 (ID 3).", "sql": "SELECT q.* FROM inscriptioneleve q WHERE q.Annuler = 0 AND q.AnneeScolaire = 3;"}
+{"question": "Quel est le nombre d'élèves nés après le 1er janvier 2015 ?", "sql": "SELECT COUNT(*) FROM eleve WHERE DateNaissance > '2015-01-01';"}
+{"question": "Quelle est la moyenne du solde des élèves nés en 2008 ?", "sql": "SELECT AVG(e.Solde) FROM eleve e WHERE YEAR(e.DateNaissance) = 2008;"}
+{"question": "Combien d'élèves ont une photo enregistrée ?", "sql": "SELECT COUNT(*) FROM eleve WHERE photo IS NOT NULL;"}
+{"question": "Quel est le nom de l'établissement avec l'ID 1 ?", "sql": "SELECT LIBELLEETABFR FROM etablissement WHERE id = 1;"}
+{"question": "Liste des délégations du gouvernorat avec l'ID 1 ?", "sql": "SELECT LIBELLEDELEGATIONFR FROM delegation WHERE CODEGOUV = 1;"}
+{"question": "Quel est le nombre de classes pour l'année scolaire active ?", "sql": "SELECT COUNT(*) FROM classe c JOIN anneescolaire a ON c.ID_ANNEE_SCO = a.id WHERE a.Actif = 1;"}
+{"question": "Quels sont les identifiants des personnes qui ont des inscriptions avec un groupe non nul ?", "sql": "SELECT DISTINCT Personne FROM inscriptioneleve WHERE groupe IS NOT NULL AND groupe != 0;"}
+{"question": "Quel est le nom français de la civilité avec l'ID 1 ?", "sql": "SELECT libelleCiviliteFr FROM civilite WHERE idCivilite = 1;"}
+{"question": "Donnez le libellé français de toutes les localités qui ont un code postal non vide.", "sql": "SELECT LIBELLELOCALITEFR FROM localite WHERE CODEPOSTAL IS NOT NULL AND CODEPOSTAL != '';"}
+{"question": "Quel est le plus grand solde d'un élève ?", "sql": "SELECT MAX(Solde) FROM eleve;"}
+{"question": "Combien de nationalités sont enregistrées dans la base de données ?", "sql": "SELECT COUNT(*) FROM nationalite;"}
+{"question": "Quels sont les détails de l'inscription avec l'ID 7 ?", "sql": "SELECT * FROM inscriptioneleve WHERE id = 7;"}

@@ -17,16 +17,20 @@ assistant_scolaire/
 │   │   ├── auth_service.py       # Service d'authentification
 |   ├──agent/
 │   │   ├──assistant.py
-│   │   ├──sql_agent.py
+│   │   ├──sql_agent.py //a supprimer
 │   │   ├──cache_manager.py
+│   │   ├──cache_manager1.py
 │   │   ├──llm_utils.py
 │   │   ├──sql_query_cache.json
+│   │   ├──sql_query_cache1.json
 │   │   ├──templates_questions.json
 │   │   ├── pdf_utils/
 |   |   |   ├── attestation.py
 |   |   |   ├── bulletin.py
 |   |   |   ├── fonts/ #contient les fonts d'ecriture 
 │   │   ├── static/ #contient les pdfs 
+│   │   ├── security/
+|   |   |   ├── roles.py
 │   │   ├── prompts/
 |   |   |   ├── domain_description.json
 |   |   |   ├── domain_tables_mapping.json
@@ -34,6 +38,7 @@ assistant_scolaire/
 |   |   |   ├── prompt_finance.txt
 |   |   |   ├── prompt_inscriptions.txt
 |   |   |   ├── prompt_pedagogie.txt
+|   |   |   ├── templates.py
 |   |   |   ├── relation.txt
 │   │   └── template_matcher
 |   |   |   ├── matcher.py

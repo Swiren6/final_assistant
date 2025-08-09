@@ -1,3 +1,54 @@
 {
-  
+  "5d6184bd8ccb9159dd38da5938173550": {
+    "question_template": "combien d'élèves {nomfr} {prenomfr}?",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_{PrenomFr} \nFROM inscriptioneleve"
+  },
+  "12e1f5dc3784df16d727bcb9b638302d": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} annee",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_inscrits\nFROM inscriptioneleve\nWHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '2024/2025')"
+  },
+  "ba0a7d3ff96c12cfcd7273fd358dbdea": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} inscrit",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_inscrits \nFROM inscriptioneleve"
+  },
+  "7bd0d038486cd6389f0fa720f066c5dc": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} malak",
+    "sql_template": "SELECT e.id AS id_eleve, p.NomFr AS nom, p.PrenomFr AS prenom, ed.moyemati AS note\nFROM eleve e\nJOIN personne p ON e.IdPersonne = p.id\nJOIN edumoymati ed ON e.id = ed.idenelev\nWHERE CONCAT(p.NomFr, ' ', p.PrenomFr) = 'BENABDA MALAK'"
+  },
+  "d16f499b11bcfcf30c5885ca091f4b99": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} des élèves {nomfr} {prenomfr} l'année {anneescolaire} ?",
+    "sql_template": "SELECT e.id AS id_eleve, p.NomFr AS nom, p.PrenomFr AS prenom\nFROM eleve e\nJOIN personne p ON e.IdPersonne = p.id\nJOIN inscriptioneleve i ON e.id = i.Eleve\nJOIN anneescolaire a ON i.AnneeScolaire = a.id\nWHERE a.AnneeScolaire = {AnneeScolaire}"
+  },
+  "e21bd037d778073a84bd54cbd14c3feb": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} des élèves {nomfr} {prenomfr} annee ?",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, e.DateNaissance, e.LieuNaissance, e.IdEdusrv \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nWHERE e.IdEdusrv IN (\n    SELECT id \n    FROM inscriptioneleve \n    WHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '2023/2024')\n)"
+  },
+  "e0f37898ffe22bf5590f5d4193509e1c": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} code 0 ?",
+    "sql_template": "SELECT * FROM niveau WHERE id = 0"
+  },
+  "b300d9b5f9214508f35f75ba06b78922": {
+    "question_template": "{nomfr} {prenomfr} l’{nomfr} {prenomfr} active ?",
+    "sql_template": "SELECT AnneeScolaire FROM anneescolaire WHERE Actif = 1"
+  },
+  "b425f38ffb3c9b4bd13c18271e9f49b5": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} disponibles ?",
+    "sql_template": "SELECT * FROM civilite"
+  },
+  "79178d9aec6d219ebeeea49a50d46347": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} ?",
+    "sql_template": "SELECT * FROM nationalite"
+  },
+  "6e3c77f3b5218bdfc2e878b0bd31c5d3": {
+    "question_template": "quels élèves {nomfr} {prenomfr} à {nomfr} {prenomfr} '{nomfr} {prenomfr} ammar' ?",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, e.DateNaissance \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nWHERE p.Localite = (SELECT IDLOCALITE FROM localite WHERE LIBELLELOCALITEFR = 'Cebalet Ben Ammar')"
+  },
+  "ebdb386f0071de230f36626f130a66d8": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} '6 ème' ?",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, e.DateNaissance, e.LieuNaissance \nFROM eleve e\nJOIN personne p ON e.IdPersonne = p.id\nJOIN inscriptioneleve ie ON e.id = ie.Eleve\nJOIN niveau n ON ie.Classe = n.id\nWHERE n.NOMNIVFR = '6 ème'"
+  },
+  "6b3343d7f1a45b2e5abd3423dfccc498": {
+    "question_template": "{nomfr} {prenomfr} l'évolution {nomfr} {prenomfr}",
+    "sql_template": "SELECT \n    i.Date, \n    COUNT(i.Eleve) AS nombre_inscriptions \nFROM \n    inscriptioneleve i \nGROUP BY \n    i.Date \nORDER BY \n    i.Date"
+  }
 }
