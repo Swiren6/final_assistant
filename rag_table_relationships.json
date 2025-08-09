@@ -1,185 +1,629 @@
-{
-  "absence": [
-    "inscriptioneleve"
-  ],
-  "actionfonctionalitepriv": [
-    "fonctionaliteprivelge"
-  ],
-  "avertissement": [
-    "inscriptioneleve"
-  ],
-  "banque": [
-    "localite",
-    "personne"
-  ],
-  "banquebordereaudetails": [
-    "banquebordereau",
-    "reglementeleve"
-  ],
-  "banqueversement": [
-    "banquebordereau"
-  ],
-  "blame": [
-    "inscriptioneleve"
-  ],
-  "caisse": [
-    "utilisateur"
-  ],
-  "caisse_log": [
-    "personne",
-    "utilisateur"
-  ],
-  "caissedetails": [
-    "banqueversement",
-    "caisse",
-    "cantineparjour",
-    "paiementdetailscourete",
-    "personne",
-    "reglementeleve",
-    "utilisateur"
-  ],
-  "cantineparjour": [
-    "utilisateur"
-  ],
-  "cantineparjourenseignant": [
-    "utilisateur"
-  ],
-  "classe": [
-    "etablissement",
-    "niveau"
-  ],
-  "delegation": [
-    "gouvernorat"
-  ],
-  "disponibiliteenseignant": [
-    "enseingant",
-    "jour"
-  ],
-  "dre": [
-    "gouvernorat"
-  ],
-  "eleve": [
-    "personne"
-  ],
-  "enseigantmatiere": [
-    "anneescolaire",
-    "matiere",
-    "personne"
-  ],
-  "enseingant": [
-    "diplome",
-    "modalitepaiement",
-    "personne",
-    "qualite",
-    "situationfamilliale"
-  ],
-  "etablissement": [
-    "dre",
-    "gouvernorat",
-    "typeetablissement"
-  ],
-  "fichierpreinscriptionpreinscription": [
-    "preinscriptionpreinscription"
-  ],
-  "fonctionaliteprivelge": [
-    "rubrique"
-  ],
-  "inscriptioneleve": [
-    "anneescolaire",
-    "personne"
-  ],
-  "jourfr": [
-    "anneescolaire"
-  ],
-  "modalitetranche": [
-    "anneescolaire",
-    "modalite"
-  ],
-  "paiement": [
-    "inscriptioneleve",
-    "paiementmotif"
-  ],
-  "paiementdetailscourete": [
-    "paiementcourete"
-  ],
-  "paiementextra": [
-    "anneescolaire",
-    "classe",
-    "inscriptioneleve",
-    "modalite",
-    "paiementmotif",
-    "personne"
-  ],
-  "paiementextradetails": [
-    "paiementextra"
-  ],
-  "parent": [
-    "personne"
-  ],
-  "parenteleve": [
-    "eleve",
-    "parent"
-  ],
-  "personne": [
-    "civilite",
-    "localite",
-    "nationalite"
-  ],
-  "personnepreinscription": [
-    "civilite",
-    "localite"
-  ],
-  "preinscription": [
-    "eleve",
-    "niveau",
-    "personne",
-    "section"
-  ],
-  "preinscriptionpreinscription": [
-    "elevepreinscription",
-    "niveau",
-    "personnepreinscription",
-    "section"
-  ],
-  "reglementeleve": [
-    "modereglement",
-    "paiement",
-    "paiementextradetails",
-    "personne",
-    "uniformcommande",
-    "utilisateur"
-  ],
-  "reglementeleve_echeancier": [
-    "modereglement",
-    "paiementextradetails",
-    "personne",
-    "uniformcommande",
-    "utilisateur"
-  ],
-  "renseignementmedicaux": [
-    "eleve",
-    "personne"
-  ],
-  "section": [
-    "niveau"
-  ],
-  "surveillant": [
-    "diplome",
-    "modalitepaiement",
-    "personne",
-    "qualite",
-    "situationfamilliale"
-  ],
-  "uniformcommandedetails": [
-    "uniformcommande",
-    "uniformcouleur",
-    "uniformmodel",
-    "uniformtaille"
-  ],
-  "uniformmodel": [
-    "uniformgenre"
-  ],
-  "utilisateur": [
-    "grade"
-  ]
-}
+[
+  {
+    "relation": "absence.Inscription = inscriptioneleve.id",
+    "tables": ["absence", "inscriptioneleve"],
+    "join_column": "id",
+    "description": "La colonne `Inscription` de `absence` référence `inscriptioneleve.id`."
+  },
+  {
+    "relation": "actionfonctionalitepriv.idFonctionalite = fonctionaliteprivelge.id",
+    "tables": ["actionfonctionalitepriv", "fonctionaliteprivelge"],
+    "join_column": "id",
+    "description": "La colonne `idFonctionalite` de `actionfonctionalitepriv` référence `fonctionaliteprivelge.id`."
+  },
+  {
+    "relation": "avertissement.Inscription = inscriptioneleve.id",
+    "tables": ["avertissement", "inscriptioneleve"],
+    "join_column": "id",
+    "description": "La colonne `Inscription` de `avertissement` référence `inscriptioneleve.id`."
+  },
+  {
+    "relation": "banque.idLocalite = localite.IDLOCALITE",
+    "tables": ["banque", "localite"],
+    "join_column": "IDLOCALITE",
+    "description": "La colonne `idLocalite` de `banque` référence `localite.IDLOCALITE`."
+  },
+  {
+    "relation": "banque.idPersonne = personne.id",
+    "tables": ["banque", "personne"],
+    "join_column": "id",
+    "description": "La colonne `idPersonne` de `banque` référence `personne.id`."
+  },
+  {
+    "relation": "banquebordereaudetails.BanqueBordereau = banquebordereau.id",
+    "tables": ["banquebordereaudetails", "banquebordereau"],
+    "join_column": "id",
+    "description": "`BanqueBordereau` référence `banquebordereau.id`."
+  },
+  {
+    "relation": "banquebordereaudetails.Reglement = reglementeleve.id",
+    "tables": ["banquebordereaudetails", "reglementeleve"],
+    "join_column": "id",
+    "description": "`Reglement` référence `reglementeleve.id`."
+  },
+  {
+    "relation": "banqueversement.Bordereau = banquebordereau.id",
+    "tables": ["banqueversement", "banquebordereau"],
+    "join_column": "id",
+    "description": "`Bordereau` référence `banquebordereau.id`."
+  },
+  {
+    "relation": "blame.Inscription = inscriptioneleve.id",
+    "tables": ["blame", "inscriptioneleve"],
+    "join_column": "id",
+    "description": "`Inscription` référence `inscriptioneleve.id`."
+  },
+  {
+    "relation": "caisse.Utilisateur = utilisateur.id",
+    "tables": ["caisse", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "caisse_log.Personne = personne.id",
+    "tables": ["caisse_log", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "caisse_log.Utilisateur = utilisateur.id",
+    "tables": ["caisse_log", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "caissedetails.Caisse = caisse.id",
+    "tables": ["caissedetails", "caisse"],
+    "join_column": "id",
+    "description": "`Caisse` référence `caisse.id`."
+  },
+  {
+    "relation": "caissedetails.Utilisateur = utilisateur.id",
+    "tables": ["caissedetails", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "caissedetails.Personne = personne.id",
+    "tables": ["caissedetails", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "caissedetails.IdVersement = banqueversement.id",
+    "tables": ["caissedetails", "banqueversement"],
+    "join_column": "id",
+    "description": "`IdVersement` référence `banqueversement.id`."
+  },
+  {
+    "relation": "caissedetails.Reglement = reglementeleve.id",
+    "tables": ["caissedetails", "reglementeleve"],
+    "join_column": "id",
+    "description": "`Reglement` référence `reglementeleve.id`."
+  },
+  {
+    "relation": "caissedetails.CantineParJour = cantineparjour.id",
+    "tables": ["caissedetails", "cantineparjour"],
+    "join_column": "id",
+    "description": "`CantineParJour` référence `cantineparjour.id`."
+  },
+  {
+    "relation": "caissedetails.CourEteId = paiementdetailscourete.id",
+    "tables": ["caissedetails", "paiementdetailscourete"],
+    "join_column": "id",
+    "description": "`CourEteId` référence `paiementdetailscourete.id`."
+  },
+  {
+    "relation": "cantineparjour.Utilisateur = utilisateur.id",
+    "tables": ["cantineparjour", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "cantineparjourenseignant.Utilisateur = utilisateur.id",
+    "tables": ["cantineparjourenseignant", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "classe.CODEETAB = etablissement.id",
+    "tables": ["classe", "etablissement"],
+    "join_column": "id",
+    "description": "`CODEETAB` référence `etablissement.id`."
+  },
+  {
+    "relation": "classe.IDNIV = niveau.id",
+    "tables": ["classe", "niveau"],
+    "join_column": "id",
+    "description": "`IDNIV` référence `niveau.id`."
+  },
+  {
+    "relation": "delegation.CODEGOUV = gouvernorat.id",
+    "tables": ["delegation", "gouvernorat"],
+    "join_column": "id",
+    "description": "`CODEGOUV` référence `gouvernorat.id`."
+  },
+  {
+    "relation": "disponibiliteenseignant.idEnseignant = enseingant.id",
+    "tables": ["disponibiliteenseignant", "enseingant"],
+    "join_column": "id",
+    "description": "`idEnseignant` référence `enseingant.id`."
+  },
+  {
+    "relation": "disponibiliteenseignant.idJour = jour.id",
+    "tables": ["disponibiliteenseignant", "jour"],
+    "join_column": "id",
+    "description": "`idJour` référence `jour.id`."
+  },
+  {
+    "relation": "dre.CODEGOUV = gouvernorat.id",
+    "tables": ["dre", "gouvernorat"],
+    "join_column": "id",
+    "description": "`CODEGOUV` référence `gouvernorat.id`."
+  },
+  {
+    "relation": "eleve.IdPersonne = personne.id",
+    "tables": ["eleve", "personne"],
+    "join_column": "id",
+    "description": "Les noms/prénoms (NomFr, PrenomFr, NomAr, PrenomAr) sont dans `personne`, PAS dans `eleve`. Pour identifier un élève par nom/prénom, joindre `eleve.IdPersonne = personne.id` et filtrer sur `personne.Nom*/Prenom*`."
+  },
+  {
+    "relation": "enseigantmatiere.idPersonne = personne.id",
+    "tables": ["enseigantmatiere", "personne"],
+    "join_column": "id",
+    "description": "`idPersonne` référence `personne.id`."
+  },
+  {
+    "relation": "enseigantmatiere.idMatiere = matiere.id",
+    "tables": ["enseigantmatiere", "matiere"],
+    "join_column": "id",
+    "description": "`idMatiere` référence `matiere.id`."
+  },
+  {
+    "relation": "enseigantmatiere.anneeSco = anneescolaire.id",
+    "tables": ["enseigantmatiere", "anneescolaire"],
+    "join_column": "id",
+    "description": "`anneeSco` référence `anneescolaire.id`."
+  },
+  {
+    "relation": "enseingant.IdDip = diplome.id",
+    "tables": ["enseingant", "diplome"],
+    "join_column": "id",
+    "description": "`IdDip` référence `diplome.id`."
+  },
+  {
+    "relation": "enseingant.IdModPaiement = modalitepaiement.id",
+    "tables": ["enseingant", "modalitepaiement"],
+    "join_column": "id",
+    "description": "`IdModPaiement` référence `modalitepaiement.id`."
+  },
+  {
+    "relation": "enseingant.idPersonne = personne.id",
+    "tables": ["enseingant", "personne"],
+    "join_column": "id",
+    "description": "`idPersonne` référence `personne.id`."
+  },
+  {
+    "relation": "enseingant.IdQualite = qualite.id",
+    "tables": ["enseingant", "qualite"],
+    "join_column": "id",
+    "description": "`IdQualite` référence `qualite.id`."
+  },
+  {
+    "relation": "enseingant.IdSituation = situationfamilliale.id",
+    "tables": ["enseingant", "situationfamilliale"],
+    "join_column": "id",
+    "description": "`IdSituation` référence `situationfamilliale.id`."
+  },
+  {
+    "relation": "etablissement.CODEGOUV = gouvernorat.id",
+    "tables": ["etablissement", "gouvernorat"],
+    "join_column": "id",
+    "description": "`CODEGOUV` référence `gouvernorat.id`."
+  },
+  {
+    "relation": "etablissement.CODEDRE = dre.id",
+    "tables": ["etablissement", "dre"],
+    "join_column": "id",
+    "description": "`CODEDRE` référence `dre.id`."
+  },
+  {
+    "relation": "etablissement.CODETYPEETAB = typeetablissement.id",
+    "tables": ["etablissement", "typeetablissement"],
+    "join_column": "id",
+    "description": "`CODETYPEETAB` référence `typeetablissement.id`."
+  },
+  {
+    "relation": "fichierpreinscriptionpreinscription.preinscription = preinscriptionpreinscription.id",
+    "tables": ["fichierpreinscriptionpreinscription", "preinscriptionpreinscription"],
+    "join_column": "id",
+    "description": "`preinscription` référence `preinscriptionpreinscription.id`."
+  },
+  {
+    "relation": "fonctionaliteprivelge.idRubrique = rubrique.id",
+    "tables": ["fonctionaliteprivelge", "rubrique"],
+    "join_column": "id",
+    "description": "`idRubrique` référence `rubrique.id`."
+  },
+  {
+    "relation": "inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "tables": ["inscriptioneleve", "anneescolaire"],
+    "join_column": "id",
+    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+  },
+  {
+    "relation": "inscriptioneleve.Personne = personne.id",
+    "tables": ["inscriptioneleve", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "jourfr.idannee = anneescolaire.id",
+    "tables": ["jourfr", "anneescolaire"],
+    "join_column": "id",
+    "description": "`idannee` référence `anneescolaire.id`."
+  },
+  {
+    "relation": "modalitetranche.Modalite = modalite.id",
+    "tables": ["modalitetranche", "modalite"],
+    "join_column": "id",
+    "description": "`Modalite` référence `modalite.id`."
+  },
+  {
+    "relation": "modalitetranche.AnneeScolaire = anneescolaire.id",
+    "tables": ["modalitetranche", "anneescolaire"],
+    "join_column": "id",
+    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+  },
+  {
+    "relation": "paiement.MotifPaiement = paiementmotif.id",
+    "tables": ["paiement", "paiementmotif"],
+    "join_column": "id",
+    "description": "`MotifPaiement` référence `paiementmotif.id`."
+  },
+  {
+    "relation": "paiement.Inscription = inscriptioneleve.id",
+    "tables": ["paiement", "inscriptioneleve"],
+    "join_column": "id",
+    "description": "`Inscription` référence `inscriptioneleve.id`."
+  },
+  {
+    "relation": "paiementdetailscourete.IdPaiement = paiementcourete.id",
+    "tables": ["paiementdetailscourete", "paiementcourete"],
+    "join_column": "id",
+    "description": "`IdPaiement` référence `paiementcourete.id`."
+  },
+  {
+    "relation": "paiementextra.Inscription = inscriptioneleve.id",
+    "tables": ["paiementextra", "inscriptioneleve"],
+    "join_column": "id",
+    "description": "`Inscription` référence `inscriptioneleve.id`."
+  },
+  {
+    "relation": "paiementextra.paiementmotif = paiementmotif.id",
+    "tables": ["paiementextra", "paiementmotif"],
+    "join_column": "id",
+    "description": "`paiementmotif` référence `paiementmotif.id`."
+  },
+  {
+    "relation": "paiementextra.Personne = personne.id",
+    "tables": ["paiementextra", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "paiementextra.AnneeScolaire = anneescolaire.id",
+    "tables": ["paiementextra", "anneescolaire"],
+    "join_column": "id",
+    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+  },
+  {
+    "relation": "paiementextra.Classe = classe.id",
+    "tables": ["paiementextra", "classe"],
+    "join_column": "id",
+    "description": "`Classe` référence `classe.id`."
+  },
+  {
+    "relation": "paiementextra.Modalite = modalite.id",
+    "tables": ["paiementextra", "modalite"],
+    "join_column": "id",
+    "description": "`Modalite` référence `modalite.id`."
+  },
+  {
+    "relation": "paiementextradetails.PaiementExtras = paiementextra.id",
+    "tables": ["paiementextradetails", "paiementextra"],
+    "join_column": "id",
+    "description": "`PaiementExtras` référence `paiementextra.id`."
+  },
+  {
+    "relation": "parent.Personne = personne.id",
+    "tables": ["parent", "personne"],
+    "join_column": "id",
+    "description": "Chaque parent pointe vers sa personne via `parent.Personne = personne.id`. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans `personne`."
+  },
+  {
+    "relation": "parenteleve.Eleve = eleve.id",
+    "tables": ["parenteleve", "eleve"],
+    "join_column": "id",
+    "description": "`parenteleve.Eleve` référence `eleve.id` (FK vers l'élève)."
+  },
+  {
+    "relation": "parenteleve.Parent = parent.id",
+    "tables": ["parenteleve", "parent"],
+    "join_column": "id",
+    "description": "`parenteleve.Parent` référence `parent.id` (FK vers le parent)."
+  },
+
+  {
+    "relation": "personne.Nationalite = nationalite.id",
+    "tables": ["personne", "nationalite"],
+    "join_column": "id",
+    "description": "`Nationalite` référence `nationalite.id`."
+  },
+  {
+    "relation": "personne.Localite = localite.IDLOCALITE",
+    "tables": ["personne", "localite"],
+    "join_column": "IDLOCALITE",
+    "description": "`Localite` référence `localite.IDLOCALITE`."
+  },
+  {
+    "relation": "personne.Civilite = civilite.idCivilite",
+    "tables": ["personne", "civilite"],
+    "join_column": "idCivilite",
+    "description": "`Civilite` référence `civilite.idCivilite`."
+  },
+  {
+    "relation": "personnepreinscription.Localite = localite.IDLOCALITE",
+    "tables": ["personnepreinscription", "localite"],
+    "join_column": "IDLOCALITE",
+    "description": "`Localite` référence `localite.IDLOCALITE`."
+  },
+  {
+    "relation": "personnepreinscription.Civilite = civilite.idCivilite",
+    "tables": ["personnepreinscription", "civilite"],
+    "join_column": "idCivilite",
+    "description": "`Civilite` référence `civilite.idCivilite`."
+  },
+  {
+    "relation": "preinscription.Niveau = niveau.id",
+    "tables": ["preinscription", "niveau"],
+    "join_column": "id",
+    "description": "`Niveau` référence `niveau.id`."
+  },
+  {
+    "relation": "preinscription.NiveauPrecedent = niveau.id",
+    "tables": ["preinscription", "niveau"],
+    "join_column": "id",
+    "description": "`NiveauPrecedent` référence `niveau.id`."
+  },
+  {
+    "relation": "preinscription.Section = section.id",
+    "tables": ["preinscription", "section"],
+    "join_column": "id",
+    "description": "`Section` référence `section.id`."
+  },
+  {
+    "relation": "preinscription.SectionPrecedent = section.id",
+    "tables": ["preinscription", "section"],
+    "join_column": "id",
+    "description": "`SectionPrecedent` référence `section.id`."
+  },
+  {
+    "relation": "preinscription.Personne = personne.id",
+    "tables": ["preinscription", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "preinscription.Eleve = eleve.id",
+    "tables": ["preinscription", "eleve"],
+    "join_column": "id",
+    "description": "`Eleve` référence `eleve.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.Niveau = niveau.id",
+    "tables": ["preinscriptionpreinscription", "niveau"],
+    "join_column": "id",
+    "description": "`Niveau` référence `niveau.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.NiveauPrecedent = niveau.id",
+    "tables": ["preinscriptionpreinscription", "niveau"],
+    "join_column": "id",
+    "description": "`NiveauPrecedent` référence `niveau.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.Section = section.id",
+    "tables": ["preinscriptionpreinscription", "section"],
+    "join_column": "id",
+    "description": "`Section` référence `section.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.SectionPrecedent = section.id",
+    "tables": ["preinscriptionpreinscription", "section"],
+    "join_column": "id",
+    "description": "`SectionPrecedent` référence `section.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.Personne = personnepreinscription.id",
+    "tables": ["preinscriptionpreinscription", "personnepreinscription"],
+    "join_column": "id",
+    "description": "`Personne` référence `personnepreinscription.id`."
+  },
+  {
+    "relation": "preinscriptionpreinscription.Eleve = elevepreinscription.id",
+    "tables": ["preinscriptionpreinscription", "elevepreinscription"],
+    "join_column": "id",
+    "description": "`Eleve` référence `elevepreinscription.id`."
+  },
+  {
+    "relation": "reglementeleve.ModeReglement = modereglement.id",
+    "tables": ["reglementeleve", "modereglement"],
+    "join_column": "id",
+    "description": "`ModeReglement` référence `modereglement.id`."
+  },
+  {
+    "relation": "reglementeleve.IdExtra = paiementextradetails.id",
+    "tables": ["reglementeleve", "paiementextradetails"],
+    "join_column": "id",
+    "description": "`IdExtra` référence `paiementextradetails.id`."
+  },
+  {
+    "relation": "reglementeleve.Personne = personne.id",
+    "tables": ["reglementeleve", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "reglementeleve.IdInscription = paiement.id",
+    "tables": ["reglementeleve", "paiement"],
+    "join_column": "id",
+    "description": "`IdInscription` référence `paiement.id`."
+  },
+  {
+    "relation": "reglementeleve.Utilisateur = utilisateur.id",
+    "tables": ["reglementeleve", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "reglementeleve.IdUniformCommande = uniformcommande.id",
+    "tables": ["reglementeleve", "uniformcommande"],
+    "join_column": "id",
+    "description": "`IdUniformCommande` référence `uniformcommande.id`."
+  },
+  {
+    "relation": "reglementeleve_echeancier.IdUniformCommande = uniformcommande.id",
+    "tables": ["reglementeleve_echeancier", "uniformcommande"],
+    "join_column": "id",
+    "description": "`IdUniformCommande` référence `uniformcommande.id`."
+  },
+  {
+    "relation": "reglementeleve_echeancier.ModeReglement = modereglement.id",
+    "tables": ["reglementeleve_echeancier", "modereglement"],
+    "join_column": "id",
+    "description": "`ModeReglement` référence `modereglement.id`."
+  },
+  {
+    "relation": "reglementeleve_echeancier.IdExtra = paiementextradetails.id",
+    "tables": ["reglementeleve_echeancier", "paiementextradetails"],
+    "join_column": "id",
+    "description": "`IdExtra` référence `paiementextradetails.id`."
+  },
+  {
+    "relation": "reglementeleve_echeancier.Personne = personne.id",
+    "tables": ["reglementeleve_echeancier", "personne"],
+    "join_column": "id",
+    "description": "`Personne` référence `personne.id`."
+  },
+  {
+    "relation": "reglementeleve_echeancier.Utilisateur = utilisateur.id",
+    "tables": ["reglementeleve_echeancier", "utilisateur"],
+    "join_column": "id",
+    "description": "`Utilisateur` référence `utilisateur.id`."
+  },
+  {
+    "relation": "renseignementmedicaux.idPersonne = personne.id",
+    "tables": ["renseignementmedicaux", "personne"],
+    "join_column": "id",
+    "description": "`idPersonne` référence `personne.id`."
+  },
+  {
+    "relation": "renseignementmedicaux.idEleve = eleve.id",
+    "tables": ["renseignementmedicaux", "eleve"],
+    "join_column": "id",
+    "description": "`idEleve` référence `eleve.id`."
+  },
+  {
+    "relation": "section.IdNiv = niveau.id",
+    "tables": ["section", "niveau"],
+    "join_column": "id",
+    "description": "`IdNiv` référence `niveau.id`."
+  },
+  {
+    "relation": "surveillant.idPersonne = personne.id",
+    "tables": ["surveillant", "personne"],
+    "join_column": "id",
+    "description": "`idPersonne` référence `personne.id`."
+  },
+  {
+    "relation": "surveillant.idSituation = situationfamilliale.id",
+    "tables": ["surveillant", "situationfamilliale"],
+    "join_column": "id",
+    "description": "`idSituation` référence `situationfamilliale.id`."
+  },
+  {
+    "relation": "surveillant.idDip = diplome.id",
+    "tables": ["surveillant", "diplome"],
+    "join_column": "id",
+    "description": "`idDip` référence `diplome.id`."
+  },
+  {
+    "relation": "surveillant.idModPaiement = modalitepaiement.id",
+    "tables": ["surveillant", "modalitepaiement"],
+    "join_column": "id",
+    "description": "`idModPaiement` référence `modalitepaiement.id`."
+  },
+  {
+    "relation": "surveillant.idQualite = qualite.id",
+    "tables": ["surveillant", "qualite"],
+    "join_column": "id",
+    "description": "`idQualite` référence `qualite.id`."
+  },
+  {
+    "relation": "uniformcommandedetails.UniformCommande = uniformcommande.id",
+    "tables": ["uniformcommandedetails", "uniformcommande"],
+    "join_column": "id",
+    "description": "`UniformCommande` référence `uniformcommande.id`."
+  },
+  {
+    "relation": "uniformcommandedetails.Model = uniformmodel.id",
+    "tables": ["uniformcommandedetails", "uniformmodel"],
+    "join_column": "id",
+    "description": "`Model` référence `uniformmodel.id`."
+  },
+  {
+    "relation": "uniformcommandedetails.Taille = uniformtaille.id",
+    "tables": ["uniformcommandedetails", "uniformtaille"],
+    "join_column": "id",
+    "description": "`Taille` référence `uniformtaille.id`."
+  },
+  {
+    "relation": "uniformcommandedetails.Couleur = uniformcouleur.id",
+    "tables": ["uniformcommandedetails", "uniformcouleur"],
+    "join_column": "id",
+    "description": "`Couleur` référence `uniformcouleur.id`."
+  },
+  {
+    "relation": "uniformmodel.Genre = uniformgenre.id",
+    "tables": ["uniformmodel", "uniformgenre"],
+    "join_column": "id",
+    "description": "`Genre` référence `uniformgenre.id`."
+  },
+  {
+    "relation": "utilisateur.grade = grade.id",
+    "tables": ["utilisateur", "grade"],
+    "join_column": "id",
+    "description": "`grade` référence `grade.id`."
+  },
+  {
+    "relation": "edumoymati.idenelev = edueleve.id",
+    "tables": ["edumoymati", "edueleve"],
+    "join_column": "id",
+    "description": "`idenelev` référence `edueleve.id`."
+  },
+  {
+    "relation": "CHEMIN CONTACTS PARENT (canonique)",
+    "tables": ["personne (eleve_p)", "eleve (e)", "parenteleve (pe)", "parent (pa)", "personne (parent_p)"],
+    "description": "Filtrer le nom/prénom de l'élève UNIQUEMENT sur `personne` alias `eleve_p`. Jointures: `e.IdPersonne = eleve_p.id` → `pe.Eleve = e.id` → `pa.id = pe.Parent` → `parent_p.id = pa.Personne`. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans `personne` alias `parent_p`."
+  },
+
+  {
+    "relation": "RÈGLES À NE PAS FAIRE (contacts parent)",
+    "description": "NE PAS utiliser `edueleve` pour identifier un élève par nom/prénom. NE PAS filtrer sur `eleve.NomFr`/`eleve.PrenomFr` (colonnes inexistantes). NE PAS inventer de colonnes (ex: `parent.id_eleve`). NE PAS écrire des noms qualifiés de table inexistants (ex: utiliser `parent.Personne` comme table)."
+  },
+  {
+    "relation": "RÈGLE ALIAS (sécurité)",
+    "description": "Éviter les alias ambigus/dupliqués. Toujours utiliser des alias distincts: `personne` élève = `eleve_p`, `eleve` = `e`, `parenteleve` = `pe`, `parent` = `pa`, `personne` parent = `parent_p`."
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "page_content": "[TABLE: PERSONNE] [TYPE: CONTACT]\nTable `personne` — Coordonnées et informations personnelles :\nContient les informations de contact de toutes les personnes déjà enregistrées dans l’établissement (élèves, parents, enseignants, personnel). Sert pour contacter ou identifier un membre actif de l’école.\n\nColonnes clés pour contacter une personne :\n- `Tel1` : Premier numéro de téléphone pour joindre, contacter ou appeler la personne\n- `Tel2` : Deuxième numéro de téléphone\n- `Tel3` : Troisième numéro de téléphone\n- `Email` : Adresse email pour joindre, contacter ou envoyer qqch à la personne\n- `AdresseFr` : Adresse de résidence en alphabet latin\n- `AdresseAr` : Adresse de résidence en arabe\n\nColonne Tel1 VARCHAR(20)  Premier numéro de téléphone pour joindre, contacter ou appeler la personne\nColonne Tel2 VARCHAR(20)  Deuxième numéro de téléphone pour joindre, contacter ou appeler la personne\nColonne Tel3 VARCHAR(20)  Troisième numéro de téléphone pour joindre, contacter ou appeler la personne\nColonne Email VARCHAR(100)  Adresse email pour joindre, contacter ou envoyer qqch à la personne\nColonne AdresseFr VARCHAR(100)  Adresse de résidence de la personne, rédigée en alphabet latin. Par exemple: '19 avenue Casablanca'.\nColonne AdresseAr VARCHAR(100)  Adresse de résidence de la personne, rédigée en arabe. Par exemple: 'شارع دار البيضاء'",
+    "metadata": {
+      "source": "schema_description::personne::contact",
+      "table": "personne",
+      "group": "contact",
+      "columns": ["Tel1", "Tel2", "Tel3", "Email", "AdresseFr", "AdresseAr"]
+    }
+  },
+  {
+    "page_content": "[TABLE: PERSONNE] [TYPE: IDENTIFICATION]\nColonnes d’identification :\n- `NomFr`, `PrenomFr` : Nom et prénom en lettres latines (ex. 'Abdelbasset Laataoui')\n- `NomAr`, `PrenomAr` : Nom et prénom en arabe (ex. 'عبدالباسط العطاوي')\n- `Cin`, `CinLiv` : Carte d'identité nationale et lieu de délivrance\n\nColonne NomFr VARCHAR(100)  La colonne `NomFr` contient le nom de la personne écrit en alphabet latin, par exemple : 'Laataoui'\nColonne PrenomFr VARCHAR(100)  La colonne `PrenomFr` contient le prénom de la personne écrit en alphabet latin, par exemple : 'Abdelbasset'\nColonne NomAr VARCHAR(100)  La colonne `NomAr` contient le nom de la personne écrit en caractères arabes, par exemple : 'العطاوي'\nColonne PrenomAr VARCHAR(100)  La colonne `PrenomAr` contient le prénom de la personne écrit en caractères arabes, par exemple : 'عبدالباسط'\nColonne Cin VARCHAR(100)  Numéro de la carte d'identité nationale\nColonne CinLiv VARCHAR(100)  Lieu de délivrance de la carte d'identité",
+    "metadata": {
+      "source": "schema_description::personne::identification",
+      "table": "personne",
+      "group": "identification",
+      "columns": ["NomFr", "PrenomFr", "NomAr", "PrenomAr", "Cin", "CinLiv"]
+    }
+  },
+  {
+    "page_content": "[TABLE: PERSONNE] [TYPE: AUTH]\nColonne Login VARCHAR(100)  Nom d'utilisateur pour la connexion\nColonne Pwd VARCHAR(100)  Mot de passe pour la connexion",
+    "metadata": {
+      "source": "schema_description::personne::auth",
+      "table": "personne",
+      "group": "auth",
+      "columns": ["Login", "Pwd"]
+    }
+  },
+  {
+    "page_content": "[TABLE: PERSONNE] [TYPE: GEO]\nColonne Nationalite INT UNSIGNED  Identifiant de la nationalité (clé étrangère vers la table nationalite)\nColonne Localite INT UNSIGNED  Identifiant de la localité (clé étrangère vers la table localite)\nColonne Civilite INT UNSIGNED  Identifiant de la civilité (clé étrangère vers table civilite, ex. : 1 = Garçon, 2 = fille)\nColonne codepostal VARCHAR(200)  Code postal associé à la localité\nColonne nationaliteAutre VARCHAR(100)  Nom d'une nationalité saisie manuellement si elle n'existe pas dans la liste\nColonne localiteAutre VARCHAR(100)  Nom d'une localité saisie manuellement si elle n'existe pas dans la liste",
+    "metadata": {
+      "source": "schema_description::personne::geo",
+      "table": "personne",
+      "group": "geo",
+      "columns": ["Nationalite", "Localite", "Civilite", "codepostal", "nationaliteAutre", "localiteAutre"]
+    }
+  },
+  {
+    "page_content": "[TABLE: PERSONNE] [TYPE: AUTRES]\nColonne id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY  Identifiant unique de la personne\nColonne type VARCHAR(45)  Type de la personne (ex. : élève, enseignant, parent, etc.)\nColonne SoldeCantineParJour INT UNSIGNED  Montant du solde cantine par jour pour la personne",
+    "metadata": {
+      "source": "schema_description::personne::autres",
+      "table": "personne",
+      "group": "autres",
+      "columns": ["id", "type", "SoldeCantineParJour"]
+    }
+  }
+]
+
