@@ -1,629 +1,929 @@
 [
   {
     "relation": "absence.Inscription = inscriptioneleve.id",
-    "tables": ["absence", "inscriptioneleve"],
+    "tables": [
+      "absence",
+      "inscriptioneleve"
+    ],
     "join_column": "id",
-    "description": "La colonne `Inscription` de `absence` référence `inscriptioneleve.id`."
+    "description": "La colonne `Inscription` de la table `absence` est une clé étrangère qui fait référence à la colonne `id` de la table `inscriptioneleve`."
   },
   {
     "relation": "actionfonctionalitepriv.idFonctionalite = fonctionaliteprivelge.id",
-    "tables": ["actionfonctionalitepriv", "fonctionaliteprivelge"],
+    "tables": [
+      "actionfonctionalitepriv",
+      "fonctionaliteprivelge"
+    ],
     "join_column": "id",
-    "description": "La colonne `idFonctionalite` de `actionfonctionalitepriv` référence `fonctionaliteprivelge.id`."
+    "description": "La colonne `idFonctionalite` de la table `actionfonctionalitepriv` est une clé étrangère qui fait référence à la colonne `id` de la table `fonctionaliteprivelge`."
   },
   {
     "relation": "avertissement.Inscription = inscriptioneleve.id",
-    "tables": ["avertissement", "inscriptioneleve"],
+    "tables": [
+      "avertissement",
+      "inscriptioneleve"
+    ],
     "join_column": "id",
-    "description": "La colonne `Inscription` de `avertissement` référence `inscriptioneleve.id`."
+    "description": "La colonne `Inscription` de la table `avertissement` est une clé étrangère qui fait référence à la colonne `id` de la table `inscriptioneleve`."
   },
   {
     "relation": "banque.idLocalite = localite.IDLOCALITE",
-    "tables": ["banque", "localite"],
+    "tables": [
+      "banque",
+      "localite"
+    ],
     "join_column": "IDLOCALITE",
-    "description": "La colonne `idLocalite` de `banque` référence `localite.IDLOCALITE`."
+    "description": "La colonne `idLocalite` de la table `banque` est une clé étrangère qui fait référence à la colonne `IDLOCALITE` de la table `localite`."
   },
   {
     "relation": "banque.idPersonne = personne.id",
-    "tables": ["banque", "personne"],
+    "tables": [
+      "banque",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "La colonne `idPersonne` de `banque` référence `personne.id`."
+    "description": "La colonne `idPersonne` de la table `banque` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "banquebordereaudetails.BanqueBordereau = banquebordereau.id",
-    "tables": ["banquebordereaudetails", "banquebordereau"],
+    "tables": [
+      "banquebordereaudetails",
+      "banquebordereau"
+    ],
     "join_column": "id",
-    "description": "`BanqueBordereau` référence `banquebordereau.id`."
+    "description": "La colonne `BanqueBordereau` de la table `banquebordereaudetails` est une clé étrangère qui fait référence à la colonne `id` de la table `banquebordereau`."
   },
   {
     "relation": "banquebordereaudetails.Reglement = reglementeleve.id",
-    "tables": ["banquebordereaudetails", "reglementeleve"],
+    "tables": [
+      "banquebordereaudetails",
+      "reglementeleve"
+    ],
     "join_column": "id",
-    "description": "`Reglement` référence `reglementeleve.id`."
+    "description": "La colonne `Reglement` de la table `banquebordereaudetails` est une clé étrangère qui fait référence à la colonne `id` de la table `reglementeleve`."
   },
   {
     "relation": "banqueversement.Bordereau = banquebordereau.id",
-    "tables": ["banqueversement", "banquebordereau"],
+    "tables": [
+      "banqueversement",
+      "banquebordereau"
+    ],
     "join_column": "id",
-    "description": "`Bordereau` référence `banquebordereau.id`."
+    "description": "La colonne `Bordereau` de la table `banqueversement` est une clé étrangère qui fait référence à la colonne `id` de la table `banquebordereau`."
   },
   {
     "relation": "blame.Inscription = inscriptioneleve.id",
-    "tables": ["blame", "inscriptioneleve"],
+    "tables": [
+      "blame",
+      "inscriptioneleve"
+    ],
     "join_column": "id",
-    "description": "`Inscription` référence `inscriptioneleve.id`."
+    "description": "La colonne `Inscription` de la table `blame` est une clé étrangère qui fait référence à la colonne `id` de la table `inscriptioneleve`."
   },
   {
     "relation": "caisse.Utilisateur = utilisateur.id",
-    "tables": ["caisse", "utilisateur"],
+    "tables": [
+      "caisse",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `caisse` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "caisse_log.Personne = personne.id",
-    "tables": ["caisse_log", "personne"],
+    "tables": [
+      "caisse_log",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `caisse_log` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "caisse_log.Utilisateur = utilisateur.id",
-    "tables": ["caisse_log", "utilisateur"],
+    "tables": [
+      "caisse_log",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `caisse_log` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "caissedetails.Caisse = caisse.id",
-    "tables": ["caissedetails", "caisse"],
+    "tables": [
+      "caissedetails",
+      "caisse"
+    ],
     "join_column": "id",
-    "description": "`Caisse` référence `caisse.id`."
+    "description": "La colonne `Caisse` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `caisse`."
   },
   {
     "relation": "caissedetails.Utilisateur = utilisateur.id",
-    "tables": ["caissedetails", "utilisateur"],
+    "tables": [
+      "caissedetails",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "caissedetails.Personne = personne.id",
-    "tables": ["caissedetails", "personne"],
+    "tables": [
+      "caissedetails",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "caissedetails.IdVersement = banqueversement.id",
-    "tables": ["caissedetails", "banqueversement"],
+    "tables": [
+      "caissedetails",
+      "banqueversement"
+    ],
     "join_column": "id",
-    "description": "`IdVersement` référence `banqueversement.id`."
+    "description": "La colonne `IdVersement` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `banqueversement`."
   },
   {
     "relation": "caissedetails.Reglement = reglementeleve.id",
-    "tables": ["caissedetails", "reglementeleve"],
+    "tables": [
+      "caissedetails",
+      "reglementeleve"
+    ],
     "join_column": "id",
-    "description": "`Reglement` référence `reglementeleve.id`."
+    "description": "La colonne `Reglement` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `reglementeleve`."
   },
   {
     "relation": "caissedetails.CantineParJour = cantineparjour.id",
-    "tables": ["caissedetails", "cantineparjour"],
+    "tables": [
+      "caissedetails",
+      "cantineparjour"
+    ],
     "join_column": "id",
-    "description": "`CantineParJour` référence `cantineparjour.id`."
+    "description": "La colonne `CantineParJour` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `cantineparjour`."
   },
   {
     "relation": "caissedetails.CourEteId = paiementdetailscourete.id",
-    "tables": ["caissedetails", "paiementdetailscourete"],
+    "tables": [
+      "caissedetails",
+      "paiementdetailscourete"
+    ],
     "join_column": "id",
-    "description": "`CourEteId` référence `paiementdetailscourete.id`."
+    "description": "La colonne `CourEteId` de la table `caissedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementdetailscourete`."
   },
   {
     "relation": "cantineparjour.Utilisateur = utilisateur.id",
-    "tables": ["cantineparjour", "utilisateur"],
+    "tables": [
+      "cantineparjour",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `cantineparjour` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "cantineparjourenseignant.Utilisateur = utilisateur.id",
-    "tables": ["cantineparjourenseignant", "utilisateur"],
+    "tables": [
+      "cantineparjourenseignant",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `cantineparjourenseignant` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "classe.CODEETAB = etablissement.id",
-    "tables": ["classe", "etablissement"],
+    "tables": [
+      "classe",
+      "etablissement"
+    ],
     "join_column": "id",
-    "description": "`CODEETAB` référence `etablissement.id`."
+    "description": "La colonne `CODEETAB` de la table `classe` est une clé étrangère qui fait référence à la colonne `id` de la table `etablissement`."
   },
   {
     "relation": "classe.IDNIV = niveau.id",
-    "tables": ["classe", "niveau"],
+    "tables": [
+      "classe",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`IDNIV` référence `niveau.id`."
+    "description": "La colonne `IDNIV` de la table `classe` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "delegation.CODEGOUV = gouvernorat.id",
-    "tables": ["delegation", "gouvernorat"],
+    "tables": [
+      "delegation",
+      "gouvernorat"
+    ],
     "join_column": "id",
-    "description": "`CODEGOUV` référence `gouvernorat.id`."
+    "description": "La colonne `CODEGOUV` de la table `delegation` est une clé étrangère qui fait référence à la colonne `id` de la table `gouvernorat`."
   },
   {
     "relation": "disponibiliteenseignant.idEnseignant = enseingant.id",
-    "tables": ["disponibiliteenseignant", "enseingant"],
+    "tables": [
+      "disponibiliteenseignant",
+      "enseingant"
+    ],
     "join_column": "id",
-    "description": "`idEnseignant` référence `enseingant.id`."
+    "description": "La colonne `idEnseignant` de la table `disponibiliteenseignant` est une clé étrangère qui fait référence à la colonne `id` de la table `enseingant`."
   },
   {
     "relation": "disponibiliteenseignant.idJour = jour.id",
-    "tables": ["disponibiliteenseignant", "jour"],
+    "tables": [
+      "disponibiliteenseignant",
+      "jour"
+    ],
     "join_column": "id",
-    "description": "`idJour` référence `jour.id`."
+    "description": "La colonne `idJour` de la table `disponibiliteenseignant` est une clé étrangère qui fait référence à la colonne `id` de la table `jour`."
   },
   {
     "relation": "dre.CODEGOUV = gouvernorat.id",
-    "tables": ["dre", "gouvernorat"],
+    "tables": [
+      "dre",
+      "gouvernorat"
+    ],
     "join_column": "id",
-    "description": "`CODEGOUV` référence `gouvernorat.id`."
+    "description": "La colonne `CODEGOUV` de la table `dre` est une clé étrangère qui fait référence à la colonne `id` de la table `gouvernorat`."
   },
   {
     "relation": "eleve.IdPersonne = personne.id",
-    "tables": ["eleve", "personne"],
+    "tables": [
+      "eleve",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "Les noms/prénoms (NomFr, PrenomFr, NomAr, PrenomAr) sont dans `personne`, PAS dans `eleve`. Pour identifier un élève par nom/prénom, joindre `eleve.IdPersonne = personne.id` et filtrer sur `personne.Nom*/Prenom*`."
+    "description": "Les noms/prénoms (NomFr, PrenomFr, NomAr, PrenomAr) sont dans `personne`, PAS dans `eleve`. Pour identifier un élève par nom/prénom, on JOINT `eleve.IdPersonne` sur `personne.id` et on filtre sur `personne.NomFr/PrenomFr` (ou Ar)."
   },
   {
     "relation": "enseigantmatiere.idPersonne = personne.id",
-    "tables": ["enseigantmatiere", "personne"],
+    "tables": [
+      "enseigantmatiere",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`idPersonne` référence `personne.id`."
+    "description": "La colonne `idPersonne` de la table `enseigantmatiere` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "enseigantmatiere.idMatiere = matiere.id",
-    "tables": ["enseigantmatiere", "matiere"],
+    "tables": [
+      "enseigantmatiere",
+      "matiere"
+    ],
     "join_column": "id",
-    "description": "`idMatiere` référence `matiere.id`."
+    "description": "La colonne `idMatiere` de la table `enseigantmatiere` est une clé étrangère qui fait référence à la colonne `id` de la table `matiere`."
   },
   {
     "relation": "enseigantmatiere.anneeSco = anneescolaire.id",
-    "tables": ["enseigantmatiere", "anneescolaire"],
+    "tables": [
+      "enseigantmatiere",
+      "anneescolaire"
+    ],
     "join_column": "id",
-    "description": "`anneeSco` référence `anneescolaire.id`."
+    "description": "La colonne `anneeSco` de la table `enseigantmatiere` est une clé étrangère qui fait référence à la colonne `id` de la table `anneescolaire`."
   },
   {
     "relation": "enseingant.IdDip = diplome.id",
-    "tables": ["enseingant", "diplome"],
+    "tables": [
+      "enseingant",
+      "diplome"
+    ],
     "join_column": "id",
-    "description": "`IdDip` référence `diplome.id`."
+    "description": "La colonne `IdDip` de la table `enseingant` est une clé étrangère qui fait référence à la colonne `id` de la table `diplome`."
   },
   {
     "relation": "enseingant.IdModPaiement = modalitepaiement.id",
-    "tables": ["enseingant", "modalitepaiement"],
+    "tables": [
+      "enseingant",
+      "modalitepaiement"
+    ],
     "join_column": "id",
-    "description": "`IdModPaiement` référence `modalitepaiement.id`."
+    "description": "La colonne `IdModPaiement` de la table `enseingant` est une clé étrangère qui fait référence à la colonne `id` de la table `modalitepaiement`."
   },
   {
     "relation": "enseingant.idPersonne = personne.id",
-    "tables": ["enseingant", "personne"],
+    "tables": [
+      "enseingant",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`idPersonne` référence `personne.id`."
+    "description": "La colonne `idPersonne` de la table `enseingant` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "enseingant.IdQualite = qualite.id",
-    "tables": ["enseingant", "qualite"],
+    "tables": [
+      "enseingant",
+      "qualite"
+    ],
     "join_column": "id",
-    "description": "`IdQualite` référence `qualite.id`."
+    "description": "La colonne `IdQualite` de la table `enseingant` est une clé étrangère qui fait référence à la colonne `id` de la table `qualite`."
   },
   {
     "relation": "enseingant.IdSituation = situationfamilliale.id",
-    "tables": ["enseingant", "situationfamilliale"],
+    "tables": [
+      "enseingant",
+      "situationfamilliale"
+    ],
     "join_column": "id",
-    "description": "`IdSituation` référence `situationfamilliale.id`."
+    "description": "La colonne `IdSituation` de la table `enseingant` est une clé étrangère qui fait référence à la colonne `id` de la table `situationfamilliale`."
   },
   {
     "relation": "etablissement.CODEGOUV = gouvernorat.id",
-    "tables": ["etablissement", "gouvernorat"],
+    "tables": [
+      "etablissement",
+      "gouvernorat"
+    ],
     "join_column": "id",
-    "description": "`CODEGOUV` référence `gouvernorat.id`."
+    "description": "La colonne `CODEGOUV` de la table `etablissement` est une clé étrangère qui fait référence à la colonne `id` de la table `gouvernorat`."
   },
   {
     "relation": "etablissement.CODEDRE = dre.id",
-    "tables": ["etablissement", "dre"],
+    "tables": [
+      "etablissement",
+      "dre"
+    ],
     "join_column": "id",
-    "description": "`CODEDRE` référence `dre.id`."
+    "description": "La colonne `CODEDRE` de la table `etablissement` est une clé étrangère qui fait référence à la colonne `id` de la table `dre`."
   },
   {
     "relation": "etablissement.CODETYPEETAB = typeetablissement.id",
-    "tables": ["etablissement", "typeetablissement"],
+    "tables": [
+      "etablissement",
+      "typeetablissement"
+    ],
     "join_column": "id",
-    "description": "`CODETYPEETAB` référence `typeetablissement.id`."
+    "description": "La colonne `CODETYPEETAB` de la table `etablissement` est une clé étrangère qui fait référence à la colonne `id` de la table `typeetablissement`."
   },
   {
     "relation": "fichierpreinscriptionpreinscription.preinscription = preinscriptionpreinscription.id",
-    "tables": ["fichierpreinscriptionpreinscription", "preinscriptionpreinscription"],
+    "tables": [
+      "fichierpreinscriptionpreinscription",
+      "preinscriptionpreinscription"
+    ],
     "join_column": "id",
-    "description": "`preinscription` référence `preinscriptionpreinscription.id`."
+    "description": "La colonne `preinscription` de la table `fichierpreinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `preinscriptionpreinscription`."
   },
   {
     "relation": "fonctionaliteprivelge.idRubrique = rubrique.id",
-    "tables": ["fonctionaliteprivelge", "rubrique"],
+    "tables": [
+      "fonctionaliteprivelge",
+      "rubrique"
+    ],
     "join_column": "id",
-    "description": "`idRubrique` référence `rubrique.id`."
+    "description": "La colonne `idRubrique` de la table `fonctionaliteprivelge` est une clé étrangère qui fait référence à la colonne `id` de la table `rubrique`."
   },
   {
     "relation": "inscriptioneleve.AnneeScolaire = anneescolaire.id",
-    "tables": ["inscriptioneleve", "anneescolaire"],
+    "tables": [
+      "inscriptioneleve",
+      "anneescolaire"
+    ],
     "join_column": "id",
-    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+    "description": "La colonne `AnneeScolaire` de la table `inscriptioneleve` est une clé étrangère qui fait référence à la colonne `id` de la table `anneescolaire`."
   },
   {
     "relation": "inscriptioneleve.Personne = personne.id",
-    "tables": ["inscriptioneleve", "personne"],
+    "tables": [
+      "inscriptioneleve",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `inscriptioneleve` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "jourfr.idannee = anneescolaire.id",
-    "tables": ["jourfr", "anneescolaire"],
+    "tables": [
+      "jourfr",
+      "anneescolaire"
+    ],
     "join_column": "id",
-    "description": "`idannee` référence `anneescolaire.id`."
+    "description": "La colonne `idannee` de la table `jourfr` est une clé étrangère qui fait référence à la colonne `id` de la table `anneescolaire`."
   },
   {
     "relation": "modalitetranche.Modalite = modalite.id",
-    "tables": ["modalitetranche", "modalite"],
+    "tables": [
+      "modalitetranche",
+      "modalite"
+    ],
     "join_column": "id",
-    "description": "`Modalite` référence `modalite.id`."
+    "description": "La colonne `Modalite` de la table `modalitetranche` est une clé étrangère qui fait référence à la colonne `id` de la table `modalite`."
   },
   {
     "relation": "modalitetranche.AnneeScolaire = anneescolaire.id",
-    "tables": ["modalitetranche", "anneescolaire"],
+    "tables": [
+      "modalitetranche",
+      "anneescolaire"
+    ],
     "join_column": "id",
-    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+    "description": "La colonne `AnneeScolaire` de la table `modalitetranche` est une clé étrangère qui fait référence à la colonne `id` de la table `anneescolaire`."
   },
   {
     "relation": "paiement.MotifPaiement = paiementmotif.id",
-    "tables": ["paiement", "paiementmotif"],
+    "tables": [
+      "paiement",
+      "paiementmotif"
+    ],
     "join_column": "id",
-    "description": "`MotifPaiement` référence `paiementmotif.id`."
+    "description": "La colonne `MotifPaiement` de la table `paiement` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementmotif`."
   },
   {
     "relation": "paiement.Inscription = inscriptioneleve.id",
-    "tables": ["paiement", "inscriptioneleve"],
+    "tables": [
+      "paiement",
+      "inscriptioneleve"
+    ],
     "join_column": "id",
-    "description": "`Inscription` référence `inscriptioneleve.id`."
+    "description": "La colonne `Inscription` de la table `paiement` est une clé étrangère qui fait référence à la colonne `id` de la table `inscriptioneleve`."
   },
   {
     "relation": "paiementdetailscourete.IdPaiement = paiementcourete.id",
-    "tables": ["paiementdetailscourete", "paiementcourete"],
+    "tables": [
+      "paiementdetailscourete",
+      "paiementcourete"
+    ],
     "join_column": "id",
-    "description": "`IdPaiement` référence `paiementcourete.id`."
+    "description": "La colonne `IdPaiement` de la table `paiementdetailscourete` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementcourete`."
   },
   {
     "relation": "paiementextra.Inscription = inscriptioneleve.id",
-    "tables": ["paiementextra", "inscriptioneleve"],
+    "tables": [
+      "paiementextra",
+      "inscriptioneleve"
+    ],
     "join_column": "id",
-    "description": "`Inscription` référence `inscriptioneleve.id`."
+    "description": "La colonne `Inscription` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `inscriptioneleve`."
   },
   {
     "relation": "paiementextra.paiementmotif = paiementmotif.id",
-    "tables": ["paiementextra", "paiementmotif"],
+    "tables": [
+      "paiementextra",
+      "paiementmotif"
+    ],
     "join_column": "id",
-    "description": "`paiementmotif` référence `paiementmotif.id`."
+    "description": "La colonne `paiementmotif` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementmotif`."
   },
   {
     "relation": "paiementextra.Personne = personne.id",
-    "tables": ["paiementextra", "personne"],
+    "tables": [
+      "paiementextra",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "paiementextra.AnneeScolaire = anneescolaire.id",
-    "tables": ["paiementextra", "anneescolaire"],
+    "tables": [
+      "paiementextra",
+      "anneescolaire"
+    ],
     "join_column": "id",
-    "description": "`AnneeScolaire` référence `anneescolaire.id`."
+    "description": "La colonne `AnneeScolaire` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `anneescolaire`."
   },
   {
     "relation": "paiementextra.Classe = classe.id",
-    "tables": ["paiementextra", "classe"],
+    "tables": [
+      "paiementextra",
+      "classe"
+    ],
     "join_column": "id",
-    "description": "`Classe` référence `classe.id`."
+    "description": "La colonne `Classe` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `classe`."
   },
   {
     "relation": "paiementextra.Modalite = modalite.id",
-    "tables": ["paiementextra", "modalite"],
+    "tables": [
+      "paiementextra",
+      "modalite"
+    ],
     "join_column": "id",
-    "description": "`Modalite` référence `modalite.id`."
+    "description": "La colonne `Modalite` de la table `paiementextra` est une clé étrangère qui fait référence à la colonne `id` de la table `modalite`."
   },
   {
     "relation": "paiementextradetails.PaiementExtras = paiementextra.id",
-    "tables": ["paiementextradetails", "paiementextra"],
+    "tables": [
+      "paiementextradetails",
+      "paiementextra"
+    ],
     "join_column": "id",
-    "description": "`PaiementExtras` référence `paiementextra.id`."
+    "description": "La colonne `PaiementExtras` de la table `paiementextradetails` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementextra`."
   },
   {
     "relation": "parent.Personne = personne.id",
-    "tables": ["parent", "personne"],
+    "tables": [
+      "parent",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "Chaque parent pointe vers sa personne via `parent.Personne = personne.id`. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans `personne`."
+    "description": "Les coordonnées des parents (Tel1, Tel2, Tel3, Email) sont dans `personne`. On récupère `personne` du parent via `parent.Personne = personne.id`."
   },
   {
-    "relation": "parenteleve.Eleve = eleve.id",
-    "tables": ["parenteleve", "eleve"],
-    "join_column": "id",
-    "description": "`parenteleve.Eleve` référence `eleve.id` (FK vers l'élève)."
+  "relation": "parenteleve.Parent = parent.id, parenteleve.Eleve = eleve.id",
+  "tables": ["parenteleve", "parent", "eleve"],
+  "join_column": "Parent / Eleve",
+  "description": "La table `parenteleve` fait le lien entre un élève et ses parents. Elle contient deux colonnes : `Parent` (référence vers `parent.id`) et `Eleve` (référence vers `eleve.id`). La clé étrangère vers l’élève passe par eleve.id (PAS personne.id).C’est une table de relation many-to-many, utile pour retrouver les parents d’un élève donné ou inversement."
   },
-  {
-    "relation": "parenteleve.Parent = parent.id",
-    "tables": ["parenteleve", "parent"],
-    "join_column": "id",
-    "description": "`parenteleve.Parent` référence `parent.id` (FK vers le parent)."
-  },
-
   {
     "relation": "personne.Nationalite = nationalite.id",
-    "tables": ["personne", "nationalite"],
+    "tables": [
+      "personne",
+      "nationalite"
+    ],
     "join_column": "id",
-    "description": "`Nationalite` référence `nationalite.id`."
+    "description": "La colonne `Nationalite` de la table `personne` est une clé étrangère qui fait référence à la colonne `id` de la table `nationalite`."
   },
   {
     "relation": "personne.Localite = localite.IDLOCALITE",
-    "tables": ["personne", "localite"],
+    "tables": [
+      "personne",
+      "localite"
+    ],
     "join_column": "IDLOCALITE",
-    "description": "`Localite` référence `localite.IDLOCALITE`."
+    "description": "La colonne `Localite` de la table `personne` est une clé étrangère qui fait référence à la colonne `IDLOCALITE` de la table `localite`."
   },
   {
     "relation": "personne.Civilite = civilite.idCivilite",
-    "tables": ["personne", "civilite"],
+    "tables": [
+      "personne",
+      "civilite"
+    ],
     "join_column": "idCivilite",
-    "description": "`Civilite` référence `civilite.idCivilite`."
+    "description": "La colonne `Civilite` de la table `personne` est une clé étrangère qui fait référence à la colonne `idCivilite` de la table `civilite`."
   },
   {
     "relation": "personnepreinscription.Localite = localite.IDLOCALITE",
-    "tables": ["personnepreinscription", "localite"],
+    "tables": [
+      "personnepreinscription",
+      "localite"
+    ],
     "join_column": "IDLOCALITE",
-    "description": "`Localite` référence `localite.IDLOCALITE`."
+    "description": "La colonne `Localite` de la table `personnepreinscription` est une clé étrangère qui fait référence à la colonne `IDLOCALITE` de la table `localite`."
   },
   {
     "relation": "personnepreinscription.Civilite = civilite.idCivilite",
-    "tables": ["personnepreinscription", "civilite"],
+    "tables": [
+      "personnepreinscription",
+      "civilite"
+    ],
     "join_column": "idCivilite",
-    "description": "`Civilite` référence `civilite.idCivilite`."
+    "description": "La colonne `Civilite` de la table `personnepreinscription` est une clé étrangère qui fait référence à la colonne `idCivilite` de la table `civilite`."
   },
   {
     "relation": "preinscription.Niveau = niveau.id",
-    "tables": ["preinscription", "niveau"],
+    "tables": [
+      "preinscription",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`Niveau` référence `niveau.id`."
+    "description": "La colonne `Niveau` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "preinscription.NiveauPrecedent = niveau.id",
-    "tables": ["preinscription", "niveau"],
+    "tables": [
+      "preinscription",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`NiveauPrecedent` référence `niveau.id`."
+    "description": "La colonne `NiveauPrecedent` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "preinscription.Section = section.id",
-    "tables": ["preinscription", "section"],
+    "tables": [
+      "preinscription",
+      "section"
+    ],
     "join_column": "id",
-    "description": "`Section` référence `section.id`."
+    "description": "La colonne `Section` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `section`."
   },
   {
     "relation": "preinscription.SectionPrecedent = section.id",
-    "tables": ["preinscription", "section"],
+    "tables": [
+      "preinscription",
+      "section"
+    ],
     "join_column": "id",
-    "description": "`SectionPrecedent` référence `section.id`."
+    "description": "La colonne `SectionPrecedent` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `section`."
   },
   {
     "relation": "preinscription.Personne = personne.id",
-    "tables": ["preinscription", "personne"],
+    "tables": [
+      "preinscription",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "preinscription.Eleve = eleve.id",
-    "tables": ["preinscription", "eleve"],
+    "tables": [
+      "preinscription",
+      "eleve"
+    ],
     "join_column": "id",
-    "description": "`Eleve` référence `eleve.id`."
+    "description": "La colonne `Eleve` de la table `preinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `eleve`."
   },
   {
     "relation": "preinscriptionpreinscription.Niveau = niveau.id",
-    "tables": ["preinscriptionpreinscription", "niveau"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`Niveau` référence `niveau.id`."
+    "description": "La colonne `Niveau` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "preinscriptionpreinscription.NiveauPrecedent = niveau.id",
-    "tables": ["preinscriptionpreinscription", "niveau"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`NiveauPrecedent` référence `niveau.id`."
+    "description": "La colonne `NiveauPrecedent` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "preinscriptionpreinscription.Section = section.id",
-    "tables": ["preinscriptionpreinscription", "section"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "section"
+    ],
     "join_column": "id",
-    "description": "`Section` référence `section.id`."
+    "description": "La colonne `Section` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `section`."
   },
   {
     "relation": "preinscriptionpreinscription.SectionPrecedent = section.id",
-    "tables": ["preinscriptionpreinscription", "section"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "section"
+    ],
     "join_column": "id",
-    "description": "`SectionPrecedent` référence `section.id`."
+    "description": "La colonne `SectionPrecedent` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `section`."
   },
   {
     "relation": "preinscriptionpreinscription.Personne = personnepreinscription.id",
-    "tables": ["preinscriptionpreinscription", "personnepreinscription"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "personnepreinscription"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personnepreinscription.id`."
+    "description": "La colonne `Personne` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `personnepreinscription`."
   },
   {
     "relation": "preinscriptionpreinscription.Eleve = elevepreinscription.id",
-    "tables": ["preinscriptionpreinscription", "elevepreinscription"],
+    "tables": [
+      "preinscriptionpreinscription",
+      "elevepreinscription"
+    ],
     "join_column": "id",
-    "description": "`Eleve` référence `elevepreinscription.id`."
+    "description": "La colonne `Eleve` de la table `preinscriptionpreinscription` est une clé étrangère qui fait référence à la colonne `id` de la table `elevepreinscription`."
   },
   {
     "relation": "reglementeleve.ModeReglement = modereglement.id",
-    "tables": ["reglementeleve", "modereglement"],
+    "tables": [
+      "reglementeleve",
+      "modereglement"
+    ],
     "join_column": "id",
-    "description": "`ModeReglement` référence `modereglement.id`."
+    "description": "La colonne `ModeReglement` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `modereglement`."
   },
   {
     "relation": "reglementeleve.IdExtra = paiementextradetails.id",
-    "tables": ["reglementeleve", "paiementextradetails"],
+    "tables": [
+      "reglementeleve",
+      "paiementextradetails"
+    ],
     "join_column": "id",
-    "description": "`IdExtra` référence `paiementextradetails.id`."
+    "description": "La colonne `IdExtra` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementextradetails`."
   },
   {
     "relation": "reglementeleve.Personne = personne.id",
-    "tables": ["reglementeleve", "personne"],
+    "tables": [
+      "reglementeleve",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "reglementeleve.IdInscription = paiement.id",
-    "tables": ["reglementeleve", "paiement"],
+    "tables": [
+      "reglementeleve",
+      "paiement"
+    ],
     "join_column": "id",
-    "description": "`IdInscription` référence `paiement.id`."
+    "description": "La colonne `IdInscription` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `paiement`."
   },
   {
     "relation": "reglementeleve.Utilisateur = utilisateur.id",
-    "tables": ["reglementeleve", "utilisateur"],
+    "tables": [
+      "reglementeleve",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "reglementeleve.IdUniformCommande = uniformcommande.id",
-    "tables": ["reglementeleve", "uniformcommande"],
+    "tables": [
+      "reglementeleve",
+      "uniformcommande"
+    ],
     "join_column": "id",
-    "description": "`IdUniformCommande` référence `uniformcommande.id`."
+    "description": "La colonne `IdUniformCommande` de la table `reglementeleve` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformcommande`."
   },
   {
     "relation": "reglementeleve_echeancier.IdUniformCommande = uniformcommande.id",
-    "tables": ["reglementeleve_echeancier", "uniformcommande"],
+    "tables": [
+      "reglementeleve_echeancier",
+      "uniformcommande"
+    ],
     "join_column": "id",
-    "description": "`IdUniformCommande` référence `uniformcommande.id`."
+    "description": "La colonne `IdUniformCommande` de la table `reglementeleve_echeancier` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformcommande`."
   },
   {
     "relation": "reglementeleve_echeancier.ModeReglement = modereglement.id",
-    "tables": ["reglementeleve_echeancier", "modereglement"],
+    "tables": [
+      "reglementeleve_echeancier",
+      "modereglement"
+    ],
     "join_column": "id",
-    "description": "`ModeReglement` référence `modereglement.id`."
+    "description": "La colonne `ModeReglement` de la table `reglementeleve_echeancier` est une clé étrangère qui fait référence à la colonne `id` de la table `modereglement`."
   },
   {
     "relation": "reglementeleve_echeancier.IdExtra = paiementextradetails.id",
-    "tables": ["reglementeleve_echeancier", "paiementextradetails"],
+    "tables": [
+      "reglementeleve_echeancier",
+      "paiementextradetails"
+    ],
     "join_column": "id",
-    "description": "`IdExtra` référence `paiementextradetails.id`."
+    "description": "La colonne `IdExtra` de la table `reglementeleve_echeancier` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementextradetails`."
   },
   {
     "relation": "reglementeleve_echeancier.Personne = personne.id",
-    "tables": ["reglementeleve_echeancier", "personne"],
+    "tables": [
+      "reglementeleve_echeancier",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`Personne` référence `personne.id`."
+    "description": "La colonne `Personne` de la table `reglementeleve_echeancier` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "reglementeleve_echeancier.Utilisateur = utilisateur.id",
-    "tables": ["reglementeleve_echeancier", "utilisateur"],
+    "tables": [
+      "reglementeleve_echeancier",
+      "utilisateur"
+    ],
     "join_column": "id",
-    "description": "`Utilisateur` référence `utilisateur.id`."
+    "description": "La colonne `Utilisateur` de la table `reglementeleve_echeancier` est une clé étrangère qui fait référence à la colonne `id` de la table `utilisateur`."
   },
   {
     "relation": "renseignementmedicaux.idPersonne = personne.id",
-    "tables": ["renseignementmedicaux", "personne"],
+    "tables": [
+      "renseignementmedicaux",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`idPersonne` référence `personne.id`."
+    "description": "La colonne `idPersonne` de la table `renseignementmedicaux` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "renseignementmedicaux.idEleve = eleve.id",
-    "tables": ["renseignementmedicaux", "eleve"],
+    "tables": [
+      "renseignementmedicaux",
+      "eleve"
+    ],
     "join_column": "id",
-    "description": "`idEleve` référence `eleve.id`."
+    "description": "La colonne `idEleve` de la table `renseignementmedicaux` est une clé étrangère qui fait référence à la colonne `id` de la table `eleve`."
   },
   {
     "relation": "section.IdNiv = niveau.id",
-    "tables": ["section", "niveau"],
+    "tables": [
+      "section",
+      "niveau"
+    ],
     "join_column": "id",
-    "description": "`IdNiv` référence `niveau.id`."
+    "description": "La colonne `IdNiv` de la table `section` est une clé étrangère qui fait référence à la colonne `id` de la table `niveau`."
   },
   {
     "relation": "surveillant.idPersonne = personne.id",
-    "tables": ["surveillant", "personne"],
+    "tables": [
+      "surveillant",
+      "personne"
+    ],
     "join_column": "id",
-    "description": "`idPersonne` référence `personne.id`."
+    "description": "La colonne `idPersonne` de la table `surveillant` est une clé étrangère qui fait référence à la colonne `id` de la table `personne`."
   },
   {
     "relation": "surveillant.idSituation = situationfamilliale.id",
-    "tables": ["surveillant", "situationfamilliale"],
+    "tables": [
+      "surveillant",
+      "situationfamilliale"
+    ],
     "join_column": "id",
-    "description": "`idSituation` référence `situationfamilliale.id`."
+    "description": "La colonne `idSituation` de la table `surveillant` est une clé étrangère qui fait référence à la colonne `id` de la table `situationfamilliale`."
   },
   {
     "relation": "surveillant.idDip = diplome.id",
-    "tables": ["surveillant", "diplome"],
+    "tables": [
+      "surveillant",
+      "diplome"
+    ],
     "join_column": "id",
-    "description": "`idDip` référence `diplome.id`."
+    "description": "La colonne `idDip` de la table `surveillant` est une clé étrangère qui fait référence à la colonne `id` de la table `diplome`."
   },
   {
     "relation": "surveillant.idModPaiement = modalitepaiement.id",
-    "tables": ["surveillant", "modalitepaiement"],
+    "tables": [
+      "surveillant",
+      "modalitepaiement"
+    ],
     "join_column": "id",
-    "description": "`idModPaiement` référence `modalitepaiement.id`."
+    "description": "La colonne `idModPaiement` de la table `surveillant` est une clé étrangère qui fait référence à la colonne `id` de la table `modalitepaiement`."
   },
   {
     "relation": "surveillant.idQualite = qualite.id",
-    "tables": ["surveillant", "qualite"],
+    "tables": [
+      "surveillant",
+      "qualite"
+    ],
     "join_column": "id",
-    "description": "`idQualite` référence `qualite.id`."
+    "description": "La colonne `idQualite` de la table `surveillant` est une clé étrangère qui fait référence à la colonne `id` de la table `qualite`."
   },
   {
     "relation": "uniformcommandedetails.UniformCommande = uniformcommande.id",
-    "tables": ["uniformcommandedetails", "uniformcommande"],
+    "tables": [
+      "uniformcommandedetails",
+      "uniformcommande"
+    ],
     "join_column": "id",
-    "description": "`UniformCommande` référence `uniformcommande.id`."
+    "description": "La colonne `UniformCommande` de la table `uniformcommandedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformcommande`."
   },
   {
     "relation": "uniformcommandedetails.Model = uniformmodel.id",
-    "tables": ["uniformcommandedetails", "uniformmodel"],
+    "tables": [
+      "uniformcommandedetails",
+      "uniformmodel"
+    ],
     "join_column": "id",
-    "description": "`Model` référence `uniformmodel.id`."
+    "description": "La colonne `Model` de la table `uniformcommandedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformmodel`."
   },
   {
     "relation": "uniformcommandedetails.Taille = uniformtaille.id",
-    "tables": ["uniformcommandedetails", "uniformtaille"],
+    "tables": [
+      "uniformcommandedetails",
+      "uniformtaille"
+    ],
     "join_column": "id",
-    "description": "`Taille` référence `uniformtaille.id`."
+    "description": "La colonne `Taille` de la table `uniformcommandedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformtaille`."
   },
   {
     "relation": "uniformcommandedetails.Couleur = uniformcouleur.id",
-    "tables": ["uniformcommandedetails", "uniformcouleur"],
+    "tables": [
+      "uniformcommandedetails",
+      "uniformcouleur"
+    ],
     "join_column": "id",
-    "description": "`Couleur` référence `uniformcouleur.id`."
+    "description": "La colonne `Couleur` de la table `uniformcommandedetails` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformcouleur`."
   },
   {
     "relation": "uniformmodel.Genre = uniformgenre.id",
-    "tables": ["uniformmodel", "uniformgenre"],
+    "tables": [
+      "uniformmodel",
+      "uniformgenre"
+    ],
     "join_column": "id",
-    "description": "`Genre` référence `uniformgenre.id`."
+    "description": "La colonne `Genre` de la table `uniformmodel` est une clé étrangère qui fait référence à la colonne `id` de la table `uniformgenre`."
   },
   {
     "relation": "utilisateur.grade = grade.id",
-    "tables": ["utilisateur", "grade"],
+    "tables": [
+      "utilisateur",
+      "grade"
+    ],
     "join_column": "id",
-    "description": "`grade` référence `grade.id`."
+    "description": "La colonne `grade` de la table `utilisateur` est une clé étrangère qui fait référence à la colonne `id` de la table `grade`."
   },
   {
     "relation": "edumoymati.idenelev = edueleve.id",
-    "tables": ["edumoymati", "edueleve"],
+    "tables": [
+      "edumoymati",
+      "edueleve"
+    ],
     "join_column": "id",
-    "description": "`idenelev` référence `edueleve.id`."
+    "description": "La colonne `idenelev` de la table `edumoymati` est une clé étrangère qui fait référence à la colonne `id` de la table `edueleve`."
   },
   {
-    "relation": "CHEMIN CONTACTS PARENT (canonique)",
-    "tables": ["personne (eleve_p)", "eleve (e)", "parenteleve (pe)", "parent (pa)", "personne (parent_p)"],
-    "description": "Filtrer le nom/prénom de l'élève UNIQUEMENT sur `personne` alias `eleve_p`. Jointures: `e.IdPersonne = eleve_p.id` → `pe.Eleve = e.id` → `pa.id = pe.Parent` → `parent_p.id = pa.Personne`. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans `personne` alias `parent_p`."
-  },
-
-  {
-    "relation": "RÈGLES À NE PAS FAIRE (contacts parent)",
-    "description": "NE PAS utiliser `edueleve` pour identifier un élève par nom/prénom. NE PAS filtrer sur `eleve.NomFr`/`eleve.PrenomFr` (colonnes inexistantes). NE PAS inventer de colonnes (ex: `parent.id_eleve`). NE PAS écrire des noms qualifiés de table inexistants (ex: utiliser `parent.Personne` comme table)."
+  "relation": "personne (élève) → eleve → parenteleve → parent → personne (parent)",
+  "tables": ["personne", "eleve", "parenteleve", "parent"],
+  "join_column": "id",
+  "description": "Les noms et prénoms d’élèves se trouvent dans `personne`, et sont liés à la table `eleve` via `eleve.IdPersonne = personne.id`. L’élève est ensuite lié à la table `parenteleve` via `parenteleve.IdEleve = eleve.Id`. Celle-ci relie à `parent` via `parenteleve.IdParent = parent.id`. Enfin, chaque parent est lié à sa propre personne via `parent.Personne = personne.id`. Les informations de contact à retourner (`Tel1`, `Tel2`, `Tel3`, `Email`) sont dans cette dernière table `personne`, alias `parent_p`."
   },
   {
-    "relation": "RÈGLE ALIAS (sécurité)",
-    "description": "Éviter les alias ambigus/dupliqués. Toujours utiliser des alias distincts: `personne` élève = `eleve_p`, `eleve` = `e`, `parenteleve` = `pe`, `parent` = `pa`, `personne` parent = `parent_p`."
+  "relation": "Alias multiples à éviter entre eleve et personne",
+  "tables": ["eleve", "personne"],
+  "join_column": "IdPersonne",
+  "description": "Lorsqu'on relie la table `eleve` à `personne`, il ne faut pas utiliser `personne AS eleve`, car cela crée un conflit d'alias avec la vraie table `eleve`. Il faut donner des noms d’alias explicites comme `p_eleve` ou `p_parent` pour les tables `personne`."
+  },
+  {
+  "relation": "CHEMIN CONTACTS PARENTS (canonique)",
+  "tables": ["personne (eleve_p)", "eleve (e)", "parenteleve (pe)", "parent (pa)", "personne (parent_p)"],
+  "description": "Filtrer le nom/prénom de l'élève UNIQUEMENT sur personne (alias eleve_p). Jointures: e.IdPersonne = eleve_p.id → pe.Eleve = e.id → pa.id = pe.Parent → parent_p.id = pa.Personne. Les coordonnées (Tel1, Tel2, Tel3, Email) sont dans personne (alias parent_p)."
+  },
+  {
+  "relation": "RÈGLES À NE PAS FAIRE (contacts parents)",
+  "description": "NE PAS utiliser edueleve pour identifier un élève par nom/prénom; NE PAS filtrer sur e.NomFr/e.PrenomFr (ces colonnes n'existent pas dans eleve); NE PAS inventer de colonnes (ex: parent.id_eleve). Toujours: personne(eleve_p) → eleve(e) → parenteleve(pe) → parent(pa) → personne(parent_p)."
   }
 ]

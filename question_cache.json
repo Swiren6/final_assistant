@@ -1,6 +1,1 @@
-{
-  "donne moi le contact des parents de Zeineb Bouharb": {
-    "sql": "SELECT `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Tel3`, `parent_p`.`Email` FROM `edueleve` AS `e` JOIN `parent` AS `pa` ON `e`.`id` = `pa`.`Eleve` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE `e`.`NomFr` = 'Bouharb' AND `e`.`PrenomFr` = 'Zeineb' UNION SELECT `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Tel3`, `parent_p`.`Email` FROM `edueleve` AS `e` JOIN `parent` AS `pa` ON `e`.`id` = `pa`.`Eleve` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE `e`.`NomFr` = 'Zeineb' AND `e`.`PrenomFr` = 'Bouharb';",
-    "response": "\u274c Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'e.NomFr' in 'where clause'\n[SQL: SELECT `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Tel3`, `parent_p`.`Email` FROM `edueleve` AS `e` JOIN `parent` AS `pa` ON `e`.`id` = `pa`.`Eleve` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE `e`.`NomFr` = 'Bouharb' AND `e`.`PrenomFr` = 'Zeineb' UNION SELECT `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Tel3`, `parent_p`.`Email` FROM `edueleve` AS `e` JOIN `parent` AS `pa` ON `e`.`id` = `pa`.`Eleve` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE `e`.`NomFr` = 'Zeineb' AND `e`.`PrenomFr` = 'Bouharb';]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
-  }
-}
+{}
