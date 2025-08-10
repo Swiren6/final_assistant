@@ -17,7 +17,6 @@ assistant_scolaire/
 │   │   ├── auth_service.py       # Service d'authentification
 |   ├──agent/
 │   │   ├──assistant.py
-│   │   ├──sql_agent.py //a supprimer
 │   │   ├──cache_manager.py
 │   │   ├──cache_manager1.py
 │   │   ├──llm_utils.py

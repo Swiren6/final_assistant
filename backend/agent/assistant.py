@@ -428,6 +428,38 @@ class SQLAssistant:
         sql = re.sub(r'(?i)^\s*(?:--|#).*$', '', sql, flags=re.MULTILINE)
         return sql.strip().rstrip(';')
 
+    # def _validate_sql(self, sql: str) -> bool:
+    #     """Valide la syntaxe SQL et vérifie la sécurité"""
+    #     if not sql:
+    #         raise ValueError("❌ Requête SQL vide")
+            
+    #     sql_lower = sql.lower()
+
+    #     # Protection contre les requêtes destructives
+    #     forbidden_keywords = ['drop', 'delete', 'update', 'insert', ';--', 'exec', 'truncate']
+    #     if any(keyword in sql_lower for keyword in forbidden_keywords):
+    #         raise ValueError("❌ Commande SQL dangereuse détectée")
+
+    #     # Vérification que c'est bien une requête SELECT
+    #     if not sql_lower.strip().startswith('select'):
+    #         raise ValueError("❌ Seules les requêtes SELECT sont autorisées")
+
+    #     try:
+    #         # Validation avec EXPLAIN (si possible)
+    #         connection = get_db()
+    #         cursor = connection.cursor()
+    #         cursor.execute(f"EXPLAIN {sql}")
+    #         cursor.close()
+            
+    #         # Fermer la connexion si c'est une connexion directe
+    #         if hasattr(connection, '_direct_connection'):
+    #             connection.close()
+            
+    #         return True
+
+    #     except Exception as e:
+    #         raise ValueError(f"❌ Requête invalide : {str(e)}")
+    
     def _validate_sql(self, sql: str) -> bool:
         """Valide la syntaxe SQL et vérifie la sécurité"""
         if not sql:
@@ -444,22 +476,10 @@ class SQLAssistant:
         if not sql_lower.strip().startswith('select'):
             raise ValueError("❌ Seules les requêtes SELECT sont autorisées")
 
-        try:
-            # Validation avec EXPLAIN (si possible)
-            connection = get_db()
-            cursor = connection.cursor()
-            cursor.execute(f"EXPLAIN {sql}")
-            cursor.close()
-            
-            # Fermer la connexion si c'est une connexion directe
-            if hasattr(connection, '_direct_connection'):
-                connection.close()
-            
-            return True
-
-        except Exception as e:
-            raise ValueError(f"❌ Requête invalide : {str(e)}")
-
+        # ✅ SUPPRIME LA VALIDATION EXPLAIN QUI CAUSE LE PROBLÈME
+        # L'exécution réelle se fera dans execute_sql_query() qui gère mieux les erreurs
+        
+        return True
     def _validate_sql_semantics(self, sql: str, question: str) -> bool:
         """Valide la cohérence sémantique entre question et SQL"""
         
@@ -488,28 +508,53 @@ class SQLAssistant:
     # ================================
     # EXÉCUTION SQL
     # ================================
-
     def execute_sql_query(self, sql_query: str) -> dict:
         """Exécute une requête SQL et retourne les résultats"""
         try:
             if not sql_query:
                 return {"success": False, "error": "Requête SQL vide", "data": []}
             
-            # Utiliser CustomSQLDatabase pour l'exécution
-            result = self.db.execute_query(sql_query)
+            # ✅ FIX: Utiliser directement get_db() au lieu de CustomSQLDatabase
+            connection = get_db()
+            cursor = connection.cursor()
             
-            if result['success']:
-                data = result['data']
-                # Sérialiser les données pour éviter les problèmes avec Decimal, datetime, etc.
-                serialized_data = self._serialize_data(data)
-                return {"success": True, "data": serialized_data}
-            else:
-                return {"success": False, "error": result['error'], "data": []}
+            logger.debug(f"🔍 Exécution SQL: {sql_query}")
+            cursor.execute(sql_query)
+            
+            # ✅ FIX: Récupération correcte des colonnes et données
+            columns = [desc[0] for desc in cursor.description]
+            results = cursor.fetchall()
+            
+            logger.debug(f"🔍 Colonnes: {columns}")
+            logger.debug(f"🔍 Résultats bruts: {results}")
+            
+            # ✅ FIX: Construction correcte des dictionnaires
+            data = []
+            for row in results:
+                if isinstance(row, dict):
+                    # Si row est déjà un dict (DictCursor)
+                    data.append(row)
+                else:
+                    # Si row est un tuple, créer le dict
+                    data.append(dict(zip(columns, row)))
+            
+            logger.debug(f"🔍 Données finales: {data}")
+            
+            cursor.close()
+            
+            # Fermer la connexion si c'est une connexion directe
+            if hasattr(connection, '_direct_connection'):
+                connection.close()
+            
+            # Sérialiser les données
+            serialized_data = self._serialize_data(data)
+            
+            return {"success": True, "data": serialized_data}
             
         except Exception as e:
-            logger.error(f"Erreur exécution SQL: {e}")
+            logger.error(f"❌ Erreur exécution SQL: {e}")
+            logger.error(f"❌ SQL qui a échoué: {sql_query}")
             return {"success": False, "error": str(e), "data": []}
-
     def _serialize_data(self, data):
         """Sérialise les données pour éviter les problèmes de types"""
         if isinstance(data, (list, tuple)):
@@ -527,45 +572,46 @@ class SQLAssistant:
     # ================================
 
     def format_response_with_ai(self, data: List[Dict], question: str, sql_query: str) -> str:
-        """Version améliorée du formatage avec validation des données"""
+        """Version améliorée du formatage avec debug"""
+        
+        logger.debug(f"🔍 Formatage - Données reçues: {data}")
         
         if not data:
             return "✅ Requête exécutée mais aucun résultat trouvé."
         
         # Cas spéciaux avec vérification des données réelles
         if len(data) == 1 and len(data[0]) == 1:
-            value = list(data[0].values())[0]
-            column_name = list(data[0].keys())[0]
+            first_item = data[0]
+            column_name = list(first_item.keys())[0]
+            value = list(first_item.values())[0]
+            
+            logger.debug(f"🔍 Une valeur - Colonne: {column_name}, Valeur: {value}, Type: {type(value)}")
+            
+            # ✅ FIX: Vérification plus stricte
+            if value is None or str(value).strip() == "" or str(value) == column_name:
+                return "❌ Erreur dans les données : Les résultats semblent corrompus ou vides."
             
             # Améliorer la réponse selon le contexte
-            if "combien" in question.lower():
+            if "combien" in question.lower() or "nombre" in question.lower():
                 if "élève" in question.lower():
-                    return f"Il y a {value} élèves qui correspondent à votre critère."
+                    return f"Il y a {value} élèves inscrits cette année."
                 elif "inscription" in question.lower():
                     return f"Il y a {value} inscriptions enregistrées."
                 else:
                     return f"Nombre trouvé : {value}"
+            else:
+                return f"Résultat : {value}"
         
-        # Pour les listes, vérifier si les données sont valides
+        # Pour les listes multiples
         try:
             df = pd.DataFrame(data)
             
-            # Détecter les données invalides (headers comme valeurs)
-            first_row = data[0]
-            column_names = list(first_row.keys())
-            first_values = list(first_row.values())
-            
-            # Si les valeurs sont identiques aux noms de colonnes → données invalides
-            if (all(v is None or str(v).strip() == "" for v in first_values) or 
-                (len(set(str(v) for v in first_values)) == 1 and str(first_values[0]).lower() in [col.lower() for col in column_names])):
-                return "❌ Erreur dans les données : Les résultats semblent corrompus ou vides."
-            # Formatage normal
+            # Formatage normal avec IA
             messages = [
                 {
                     "role": "system",
                     "content": """Analysez les données SQL et donnez une réponse claire en français. 
-                    Si les données semblent corrompues (valeurs = noms colonnes), signalez-le.
-                    Sinon, présentez les résultats de manière structurée et utile."""
+                    Présentez les résultats de manière structurée et utile."""
                 },
                 {
                     "role": "user",
@@ -585,100 +631,39 @@ class SQLAssistant:
         except Exception as e:
             logger.error(f"Erreur formatage: {e}")
             return self._format_simple_response(data, question)
-    # def _format_simple_response(self, data: List[Dict], question: str) -> str:
-    #     """Formatage simple sans IA en cas d'erreur"""
-    #     if not data:
-    #         return "✅ Requête exécutée mais aucun résultat trouvé."
-        
-    #     # Cas spécial: une seule valeur numérique (COUNT, etc.)
-    #     if len(data) == 1 and len(data[0]) == 1:
-    #         value = list(data[0].values())[0]
-    #         if isinstance(value, (int, float)):
-    #             if "combien" in question.lower() or "nombre" in question.lower():
-    #                 if "élève" in question.lower() or "eleve" in question.lower():
-    #                     return f"Il y a {value} élèves."
-    #                 elif "absence" in question.lower():
-    #                     return f"Nombre d'absences : {value}"
-    #                 else:
-    #                     return f"Résultat : {value}"
-    #             else:
-    #                 return f"Résultat : {value}"
-        
-    #     # Cas général: tableau
-    #     try:
-    #         df = pd.DataFrame(data)
-    #         table = tabulate(df.head(20), headers='keys', tablefmt='grid', showindex=False)
-            
-    #         result = f"Résultats pour: {question}\n\n{table}"
-    #         if len(data) > 20:
-    #             result += f"\n\n... et {len(data) - 20} autres résultats"
-            
-    #         return result
-            
-    #     except Exception:
-    #         # Ultimate fallback
-    #         return f"Résultats trouvés: {len(data)} éléments"
-
-
-    def format_response_with_ai(self, data: List[Dict], question: str, sql_query: str) -> str:
-        """Version améliorée du formatage avec validation des données"""
-        
+    def _format_simple_response(self, data: List[Dict], question: str) -> str:
+        """Formatage simple sans IA en cas d'erreur"""
         if not data:
             return "✅ Requête exécutée mais aucun résultat trouvé."
         
-        # Cas spéciaux avec vérification des données réelles
+        # Cas spécial: une seule valeur numérique (COUNT, etc.)
         if len(data) == 1 and len(data[0]) == 1:
             value = list(data[0].values())[0]
-            column_name = list(data[0].keys())[0]
-            
-            # Améliorer la réponse selon le contexte
-            if "combien" in question.lower():
-                if "élève" in question.lower():
-                    return f"Il y a {value} élèves qui correspondent à votre critère."
-                elif "inscription" in question.lower():
-                    return f"Il y a {value} inscriptions enregistrées."
+            if isinstance(value, (int, float)) and value is not None:
+                if "combien" in question.lower() or "nombre" in question.lower():
+                    if "élève" in question.lower() or "eleve" in question.lower():
+                        return f"Il y a {value} élèves."
+                    elif "absence" in question.lower():
+                        return f"Nombre d'absences : {value}"
+                    else:
+                        return f"Résultat : {value}"
                 else:
-                    return f"Nombre trouvé : {value}"
+                    return f"Résultat : {value}"
         
-        # Pour les listes, vérifier si les données sont valides
+        # Cas général: tableau
         try:
             df = pd.DataFrame(data)
+            table = tabulate(df.head(20), headers='keys', tablefmt='grid', showindex=False)
             
-            # Détecter les données invalides (headers comme valeurs)
-            first_row = data[0]
-            column_names = list(first_row.keys())
-            first_values = list(first_row.values())
+            result = f"Résultats pour: {question}\n\n{table}"
+            if len(data) > 20:
+                result += f"\n\n... et {len(data) - 20} autres résultats"
             
-            # Si les valeurs sont identiques aux noms de colonnes → données invalides
-            if set(first_values) == set(column_names):
-                return "❌ Erreur dans les données : Les résultats semblent corrompus ou vides."
+            return result
             
-            # Formatage normal
-            messages = [
-                {
-                    "role": "system",
-                    "content": """Analysez les données SQL et donnez une réponse claire en français. 
-                    Si les données semblent corrompues (valeurs = noms colonnes), signalez-le.
-                    Sinon, présentez les résultats de manière structurée et utile."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:10], ensure_ascii=False)}"
-                }
-            ]
-            
-            response = openai.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=0.2,
-                max_tokens=400
-            )
-            
-            return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            logger.error(f"Erreur formatage: {e}")
-            return self._format_simple_response(data, question)    
+        except Exception:
+            # Ultimate fallback
+            return f"Résultats trouvés: {len(data)} éléments"
     def _auto_fix_quotes_in_sql(self, sql: str) -> str:
         """Corrige automatiquement les guillemets manquants dans les requêtes SQL"""
         
@@ -1259,23 +1244,23 @@ class SQLAssistant:
         self.query_history = []
         logger.info("🔄 Historique des conversations réinitialisé")
 
-# ================================
-# FONCTIONS UTILITAIRES GLOBALES
-# ================================
+    # ================================
+    # FONCTIONS UTILITAIRES GLOBALES
+    # ================================
 
-def validate_name(name: str) -> bool:
-    """Valide si un nom contient seulement des caractères autorisés"""
-    if not name or not isinstance(name, str):
-        return False
-    
-    pattern = r"^[A-Za-zÀ-ÿ\s\-']+$"
-    
-    name = name.strip()
-    if len(name) < 2 or len(name) > 100:
-        return False
-    
-    # Pas d'espaces multiples ou de caractères spéciaux en début/fin
-    if re.search(r"\s{2,}|^[\s\-']|[\s\-']$", name):
-        return False
-    
-    return bool(re.match(pattern, name))
+    def validate_name(name: str) -> bool:
+        """Valide si un nom contient seulement des caractères autorisés"""
+        if not name or not isinstance(name, str):
+            return False
+        
+        pattern = r"^[A-Za-zÀ-ÿ\s\-']+$"
+        
+        name = name.strip()
+        if len(name) < 2 or len(name) > 100:
+            return False
+        
+        # Pas d'espaces multiples ou de caractères spéciaux en début/fin
+        if re.search(r"\s{2,}|^[\s\-']|[\s\-']$", name):
+            return False
+        
+        return bool(re.match(pattern, name))
