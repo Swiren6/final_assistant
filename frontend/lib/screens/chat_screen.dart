@@ -122,41 +122,39 @@ class _ChatScreenState extends State<ChatScreen> {
   void _handleSuccessfulResponse(Map<String, dynamic> response) {
     debugPrint('📥 Réponse complète du backend: $response');
     
-    // Extraire la réponse principale
+    // 🎯 EXTRACTION AMÉLIORÉE des données de la réponse
     String responseText = response['response'] ?? 'Aucune réponse reçue';
-    String? sqlQuery = response['sql_query'] as String?;
+    
+    // ❌ PAS D'AFFICHAGE DU SQL - on l'ignore complètement
+    String? sqlQuery = response['sql_query'] as String?; // Gardé pour debug mais pas affiché
+    
+    // 🎯 EXTRACTION DU GRAPHIQUE depuis le backend
     String? graphBase64;
-
-    // Le backend peut renvoyer le graphique de plusieurs façons :
-    // 1. Intégré dans le texte de réponse (data:image/png;base64,...)
-    // 2. Dans un champ séparé (si implémenté plus tard)
     
-    // Extraire le graphique du texte s'il est intégré
-    final graphRegex = RegExp(r"data:image/png;base64,([A-Za-z0-9+/=]+)");
-    final match = graphRegex.firstMatch(responseText);
-    
-    if (match != null) {
-      graphBase64 = match.group(0); // Récupérer le data:image complet
-      debugPrint('🖼️ Graphique détecté dans la réponse, taille: ${graphBase64?.length}');
+    // Le backend renvoie le graphique dans response['graph']
+    if (response['graph'] != null && response['graph'].toString().isNotEmpty) {
+      graphBase64 = response['graph'] as String?;
+      debugPrint('🖼️ Graphique trouvé dans response["graph"], taille: ${graphBase64?.length}');
     }
-
-    // Vérifier aussi si le graphique est dans un autre champ de la réponse
-    if (graphBase64 == null) {
-      if (response['graph'] != null && response['graph'].toString().isNotEmpty) {
-        graphBase64 = response['graph'] as String?;
-        debugPrint('🖼️ Graphique trouvé dans response["graph"]');
-      } else if (response['data'] != null && response['data']['graph'] != null) {
+    
+    // Alternative: vérifier has_graph
+    bool hasGraph = response['has_graph'] == true;
+    if (hasGraph && graphBase64 == null) {
+      // Essayer d'autres emplacements pour le graphique
+      if (response['data'] != null && response['data']['graph'] != null) {
         graphBase64 = response['data']['graph'] as String?;
-        debugPrint('🖼️ Graphique trouvé dans response["data"]["graph"]');
       }
     }
+
+    // 🎯 NETTOYAGE du texte de réponse - supprimer les références au SQL
+    responseText = _cleanResponseText(responseText);
 
     setState(() {
       _messages.removeLast(); // Retirer le message "typing..."
       _messages.add(
         Message.assistant(
           text: responseText,
-          sqlQuery: sqlQuery,
+          sqlQuery: null, // ❌ Ne pas passer le SQL pour éviter l'affichage
           graphBase64: graphBase64,
         ),
       );
@@ -164,6 +162,19 @@ class _ChatScreenState extends State<ChatScreen> {
     
     debugPrint('✅ Message ajouté avec graphique: ${graphBase64 != null}');
     _scrollToBottom();
+  }
+
+  String _cleanResponseText(String text) {
+    // Supprimer les références au SQL et nettoyer le texte
+    text = text.replaceAll(RegExp(r'SQL\s*:\s*[^\\n]*', caseSensitive: false), '');
+    text = text.replaceAll(RegExp(r'Requête\s*:\s*[^\\n]*', caseSensitive: false), '');
+    text = text.replaceAll(RegExp(r'Query\s*:\s*[^\\n]*', caseSensitive: false), '');
+    
+    // Nettoyer les sauts de ligne multiples
+    text = text.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
+    text = text.trim();
+    
+    return text;
   }
 
   void _handleErrorResponse(dynamic error) {

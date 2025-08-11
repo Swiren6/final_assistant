@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter/services.dart';
 import '../models/message_model.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -71,48 +72,12 @@ class MessageBubble extends StatelessWidget {
         if (message.type == MessageType.notification)
           _buildNotificationHeader(),
 
-        // Traiter le texte pour extraire le graphique intégré
         _buildTextContent(context),
 
-        // Afficher le graphique séparé s'il existe
         if (message.graphBase64 != null && message.graphBase64!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 12),
             child: _buildGraphWidget(context, message.graphBase64!),
-          ),
-
-        // Afficher la requête SQL pour debug (seulement pour les admins)
-        if (message.sqlQuery != null && 
-            message.sqlQuery!.isNotEmpty && 
-            message.type != MessageType.notification)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.code, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'SQL: ${message.sqlQuery}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                        color: Colors.grey[700],
-                        fontSize: 11,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
       ],
     );
@@ -122,41 +87,48 @@ class MessageBubble extends StatelessWidget {
     String textToDisplay = message.text;
     String? extractedGraphBase64;
 
-    // Extraire le graphique du texte si présent
-    final graphRegex = RegExp(r"<img src='(data:image/[^']+)");
-    final match = graphRegex.firstMatch(textToDisplay);
-    
-    if (match != null) {
-      extractedGraphBase64 = match.group(1);
-      // Nettoyer le texte en supprimant la balise img
-      textToDisplay = textToDisplay.replaceAll(
-        RegExp(r"📊 Graphique généré: <img[^>]*>"), 
-        "\n📊 **Graphique généré :**"
-      );
+    final graphRegexPatterns = [
+      RegExp(r"<img src='(data:image/[^']+)"),
+      RegExp(r"📊 Graphique généré: <img[^>]*>"),
+      RegExp(r"data:image/[^,\s]+,[A-Za-z0-9+/=]+"),
+      RegExp(r"<img[^>]*data:image[^>]*>"),
+    ];
+
+    for (var pattern in graphRegexPatterns) {
+      final match = pattern.firstMatch(textToDisplay);
+      if (match != null && extractedGraphBase64 == null) {
+        extractedGraphBase64 = match.group(1) ?? match.group(0);
+      }
+      textToDisplay = textToDisplay.replaceAll(pattern, '');
     }
+
+    textToDisplay = textToDisplay.replaceAll(
+      RegExp(r"📊\s*\*\*Graphique généré\s*:\*\*"), 
+      ""
+    );
+    textToDisplay = textToDisplay.replaceAll(
+      RegExp(r"📊\s*Graphique généré\s*:"), 
+      ""
+    );
+    
+    textToDisplay = textToDisplay.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
+    textToDisplay = textToDisplay.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Texte principal
-        _isMarkdown(textToDisplay)
-            ? MarkdownBody(
-                data: textToDisplay,
-                styleSheet: MarkdownStyleSheet(
-                  p: Theme.of(context).textTheme.bodyMedium,
-                  strong: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+        if (textToDisplay.isNotEmpty)
+          _isMarkdown(textToDisplay)
+              ? MarkdownBody(
+                  data: textToDisplay,
+                  styleSheet: MarkdownStyleSheet(
+                    p: Theme.of(context).textTheme.bodyMedium,
+                    strong: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              )
-            : Text(textToDisplay, style: _getTextStyle(context)),
-
-        // Graphique extrait du texte
-        if (extractedGraphBase64 != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: _buildGraphWidget(context, extractedGraphBase64),
-          ),
+                )
+              : Text(textToDisplay, style: _getTextStyle(context)),
       ],
     );
   }
@@ -258,10 +230,9 @@ class MessageBubble extends StatelessWidget {
             ),
             child: Column(
               children: [
-                // En-tête du graphique
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: const BorderRadius.vertical(
@@ -272,38 +243,57 @@ class MessageBubble extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.bar_chart,
-                        size: 16,
+                        size: 18,
                         color: Theme.of(context).primaryColor,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Graphique',
+                        '📊 Graphique généré',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.fullscreen,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () => _showFullscreenGraph(context, snapshot.data!),
+                        tooltip: 'Voir en plein écran',
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                        padding: EdgeInsets.zero,
+                      ),
                     ],
                   ),
                 ),
                 
-                // Graphique interactif
                 Expanded(
-                  child: InteractiveViewer(
-                    panEnabled: true,
-                    scaleEnabled: true,
-                    boundaryMargin: const EdgeInsets.all(20),
-                    minScale: 0.5,
-                    maxScale: 3.0,
-                    child: Center(
-                      child: Image.memory(
-                        snapshot.data!,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        errorBuilder: (ctx, error, stack) {
-                          debugPrint('Erreur affichage image: $error');
-                          return _buildErrorWidget('Impossible d\'afficher le graphique');
-                        },
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(8),
+                    ),
+                    child: InteractiveViewer(
+                      panEnabled: true,
+                      scaleEnabled: true,
+                      boundaryMargin: const EdgeInsets.all(20),
+                      minScale: 0.5,
+                      maxScale: 4.0,
+                      child: Center(
+                        child: Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                          errorBuilder: (ctx, error, stack) {
+                            debugPrint('Erreur affichage image: $error');
+                            return _buildErrorWidget('Impossible d\'afficher le graphique');
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -322,13 +312,10 @@ class MessageBubble extends StatelessWidget {
   Future<Uint8List> _decodeBase64Image(String base64String) async {
     try {
       final bytes = base64.decode(base64String);
-      
-      // Vérifier que c'est une image valide
       final image = img.decodeImage(bytes);
       if (image == null) {
         throw Exception('Format d\'image invalide');
       }
-      
       return bytes;
     } catch (e) {
       debugPrint('Erreur décodage base64: $e');
@@ -338,12 +325,9 @@ class MessageBubble extends StatelessWidget {
 
   String _cleanBase64String(String base64Image) {
     if (base64Image.isEmpty) return '';
-    
-    // Retirer le préfixe data:image si présent
     if (base64Image.contains(',')) {
       return base64Image.split(',').last;
     }
-    
     return base64Image;
   }
 
@@ -370,6 +354,83 @@ class MessageBubble extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _copyImageToClipboard(BuildContext context, Uint8List imageData) async {
+    try {
+      await Clipboard.setData(ClipboardData(
+        text: 'data:image/png;base64,${base64Encode(imageData)}'
+      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image copiée dans le presse-papier'))
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la copie: $e'))
+      );
+    }
+  }
+
+  void _showFullscreenGraph(BuildContext context, Uint8List imageData) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(10),
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  scaleEnabled: true,
+                  minScale: 0.3,
+                  maxScale: 5.0,
+                  child: Image.memory(
+                    imageData,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Pincer pour zoomer • Faire glisser pour naviguer • Toucher pour fermer',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
