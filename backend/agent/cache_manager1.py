@@ -263,16 +263,16 @@ class CacheManager1:
         # Patterns pour remplacer les IDs spécifiques par des variables
         patterns_to_replace = [
             # WHERE clauses avec IdPersonne (un seul ID)
-            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({r',\s*'.join(children_ids_str)})\s*\)", 
-     r'\1 IN ({id_personne})'),
+            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s*=\s*({'|'.join(children_ids_str)})\b", 
+            r'\1 = {id_personne}'),
             
             # WHERE clauses avec IN (un seul ID)
             (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({'|'.join(children_ids_str)})\s*\)", 
             r'\1 IN ({id_personne})'),
             
             # WHERE clauses avec IN (plusieurs IDs)
-            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({r',\s*'.join(children_ids_str)})\s*\)", 
-     r'\1 IN ({id_personne})'),
+            (rf"\b(IdPersonne|e\.IdPersonne|eleve\.IdPersonne)\s+IN\s*\(\s*({',\s*'.join(children_ids_str)})\s*\)", 
+            r'\1 IN ({id_personne})'),
         ]
         
         for pattern, replacement in patterns_to_replace:
@@ -383,7 +383,7 @@ class CacheManager1:
         normalized = re.sub(r'\s+', ' ', normalized).lower().strip()
         return normalized
 
-    def find_similar_template(self, question: str, threshold: float = 0.9) -> Tuple[Optional[Dict], float]:
+    def find_similar_template(self, question: str, threshold: float = 0.85) -> Tuple[Optional[Dict], float]:
         """Trouve un template similaire en utilisant TF-IDF et cosine similarity"""
         if not self.cache:
             return None, 0.0
@@ -734,4 +734,5 @@ class CacheManager1:
             logger.info("✅ Cache nettoyé et sauvegardé")
         else:
             logger.info("ℹ️ Aucune double accolade trouvée dans le cache")
+
 

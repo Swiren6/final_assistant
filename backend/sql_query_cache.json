@@ -2,5 +2,9 @@
   "1cf65ecb41a6dd5f987a1204f1c38fe3": {
     "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} des élèves ?",
     "sql_template": "SELECT DISTINCT LieuNaissance FROM eleve"
+  },
+  "2ee4f3083236850d2cdfac9933538406": {
+    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} d'evolution d'inscriptions",
+    "sql_template": "SELECT COUNT(*) as nombre_inscriptions, YEAR(Date) as annee FROM inscriptioneleve GROUP BY YEAR(Date) ORDER BY YEAR(Date)"
   }
 }
