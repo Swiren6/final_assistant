@@ -30,5 +30,9 @@
   "a2bcfe4bfc5e04b21afe0e3c76da4919": {
     "question_template": "donne moi le nombre des absences de {family_relation}",
     "sql_template": "SELECT COUNT(*) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}));"
+  },
+  "232a2cb3f0dbd19c0577f70c787a5176": {
+    "question_template": "donnez moi les discipline de {family_relation}",
+    "sql_template": "SELECT \n    d.nomDisciplineFr \nFROM \n    discipline d \nJOIN \n    eleve e ON e.IdPersonne IN ({id_personne}) \nJOIN \n    inscriptioneleve ie ON ie.Eleve = e.id \nJOIN \n    classe c ON c.id = ie.Classe \nJOIN \n    matiere m ON m.id = d.id \nWHERE \n    e.IdPersonne IN ({id_personne})"
   }
 }

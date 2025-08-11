@@ -53,14 +53,12 @@ class MessageBubble extends StatelessWidget {
     }
 
     return BoxDecoration(
-      color: isMe 
+      color: isMe
           ? Theme.of(context).primaryColor.withOpacity(0.1)
           : Colors.grey[100],
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
-        color: isMe 
-            ? Theme.of(context).primaryColor
-            : Colors.grey[300]!,
+        color: isMe ? Theme.of(context).primaryColor : Colors.grey[300]!,
       ),
     );
   }
@@ -71,9 +69,7 @@ class MessageBubble extends StatelessWidget {
       children: [
         if (message.type == MessageType.notification)
           _buildNotificationHeader(),
-
         _buildTextContent(context),
-
         if (message.graphBase64 != null && message.graphBase64!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 12),
@@ -87,6 +83,7 @@ class MessageBubble extends StatelessWidget {
     String textToDisplay = message.text;
     String? extractedGraphBase64;
 
+    // Patterns pour détecter et extraire les graphiques du texte
     final graphRegexPatterns = [
       RegExp(r"<img src='(data:image/[^']+)"),
       RegExp(r"📊 Graphique généré: <img[^>]*>"),
@@ -94,6 +91,7 @@ class MessageBubble extends StatelessWidget {
       RegExp(r"<img[^>]*data:image[^>]*>"),
     ];
 
+    // Extraire et nettoyer les graphiques du texte
     for (var pattern in graphRegexPatterns) {
       final match = pattern.firstMatch(textToDisplay);
       if (match != null && extractedGraphBase64 == null) {
@@ -102,15 +100,13 @@ class MessageBubble extends StatelessWidget {
       textToDisplay = textToDisplay.replaceAll(pattern, '');
     }
 
+    // Nettoyer les références aux graphiques
     textToDisplay = textToDisplay.replaceAll(
-      RegExp(r"📊\s*\*\*Graphique généré\s*:\*\*"), 
-      ""
-    );
-    textToDisplay = textToDisplay.replaceAll(
-      RegExp(r"📊\s*Graphique généré\s*:"), 
-      ""
-    );
-    
+        RegExp(r"📊\s*\*\*Graphique généré\s*:\*\*"), "");
+    textToDisplay =
+        textToDisplay.replaceAll(RegExp(r"📊\s*Graphique généré\s*:"), "");
+
+    // Nettoyer les sauts de ligne multiples
     textToDisplay = textToDisplay.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
     textToDisplay = textToDisplay.trim();
 
@@ -124,8 +120,8 @@ class MessageBubble extends StatelessWidget {
                   styleSheet: MarkdownStyleSheet(
                     p: Theme.of(context).textTheme.bodyMedium,
                     strong: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 )
               : Text(textToDisplay, style: _getTextStyle(context)),
@@ -134,12 +130,12 @@ class MessageBubble extends StatelessWidget {
   }
 
   bool _isMarkdown(String text) {
-    return text.contains('**') || 
-           text.contains('```') || 
-           text.contains('|') ||
-           text.contains('###') ||
-           text.contains('##') ||
-           text.contains('#');
+    return text.contains('**') ||
+        text.contains('```') ||
+        text.contains('|') ||
+        text.contains('###') ||
+        text.contains('##') ||
+        text.contains('#');
   }
 
   Widget _buildNotificationHeader() {
@@ -164,8 +160,8 @@ class MessageBubble extends StatelessWidget {
   TextStyle? _getTextStyle(BuildContext context) {
     if (message.type == MessageType.notification) {
       return Theme.of(context).textTheme.bodyMedium?.copyWith(
-        color: Colors.blue[900],
-      );
+            color: Colors.blue[900],
+          );
     }
     return Theme.of(context).textTheme.bodyMedium;
   }
@@ -173,7 +169,7 @@ class MessageBubble extends StatelessWidget {
   Widget _buildGraphWidget(BuildContext context, String base64Image) {
     try {
       final cleanedBase64 = _cleanBase64String(base64Image);
-      
+
       if (cleanedBase64.isEmpty) {
         return _buildErrorWidget('Données graphique vides');
       }
@@ -232,7 +228,8 @@ class MessageBubble extends StatelessWidget {
               children: [
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: const BorderRadius.vertical(
@@ -250,9 +247,9 @@ class MessageBubble extends StatelessWidget {
                       Text(
                         '📊 Graphique généré',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
                       ),
                       const Spacer(),
                       IconButton(
@@ -261,7 +258,8 @@ class MessageBubble extends StatelessWidget {
                           size: 16,
                           color: Colors.grey[600],
                         ),
-                        onPressed: () => _showFullscreenGraph(context, snapshot.data!),
+                        onPressed: () =>
+                            _showFullscreenGraph(context, snapshot.data!),
                         tooltip: 'Voir en plein écran',
                         constraints: const BoxConstraints(
                           minWidth: 32,
@@ -272,7 +270,6 @@ class MessageBubble extends StatelessWidget {
                     ],
                   ),
                 ),
-                
                 Expanded(
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(
@@ -291,7 +288,8 @@ class MessageBubble extends StatelessWidget {
                           filterQuality: FilterQuality.high,
                           errorBuilder: (ctx, error, stack) {
                             debugPrint('Erreur affichage image: $error');
-                            return _buildErrorWidget('Impossible d\'afficher le graphique');
+                            return _buildErrorWidget(
+                                'Impossible d\'afficher le graphique');
                           },
                         ),
                       ),
@@ -357,18 +355,16 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Future<void> _copyImageToClipboard(BuildContext context, Uint8List imageData) async {
+  Future<void> _copyImageToClipboard(
+      BuildContext context, Uint8List imageData) async {
     try {
       await Clipboard.setData(ClipboardData(
-        text: 'data:image/png;base64,${base64Encode(imageData)}'
-      ));
+          text: 'data:image/png;base64,${base64Encode(imageData)}'));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image copiée dans le presse-papier'))
-      );
+          const SnackBar(content: Text('Image copiée dans le presse-papier')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la copie: $e'))
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Erreur lors de la copie: $e')));
     }
   }
 
@@ -412,7 +408,8 @@ class MessageBubble extends StatelessWidget {
                 left: 20,
                 right: 20,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(20),

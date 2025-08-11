@@ -10,6 +10,7 @@ import '../models/message_model.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../utils/constants.dart';
+import '../screens/login_screen.dart'; // Ajout de l'import manquant
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -119,34 +120,13 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void _handleSuccessfulResponse(Map<String, dynamic> response) {
-    debugPrint('📥 Réponse complète du backend: $response');
+  void _handleSuccessfulResponse(ApiResponse response) {
+    debugPrint('📥 Réponse complète du backend: ${response.response}');
     
-    // 🎯 EXTRACTION AMÉLIORÉE des données de la réponse
-    String responseText = response['response'] ?? 'Aucune réponse reçue';
-    
-    // ❌ PAS D'AFFICHAGE DU SQL - on l'ignore complètement
-    String? sqlQuery = response['sql_query'] as String?; // Gardé pour debug mais pas affiché
-    
-    // 🎯 EXTRACTION DU GRAPHIQUE depuis le backend
-    String? graphBase64;
-    
-    // Le backend renvoie le graphique dans response['graph']
-    if (response['graph'] != null && response['graph'].toString().isNotEmpty) {
-      graphBase64 = response['graph'] as String?;
-      debugPrint('🖼️ Graphique trouvé dans response["graph"], taille: ${graphBase64?.length}');
-    }
-    
-    // Alternative: vérifier has_graph
-    bool hasGraph = response['has_graph'] == true;
-    if (hasGraph && graphBase64 == null) {
-      // Essayer d'autres emplacements pour le graphique
-      if (response['data'] != null && response['data']['graph'] != null) {
-        graphBase64 = response['data']['graph'] as String?;
-      }
-    }
+    String responseText = response.response;
+    String? graphBase64 = response.graphBase64;
+    bool hasGraph = response.hasGraph;
 
-    // 🎯 NETTOYAGE du texte de réponse - supprimer les références au SQL
     responseText = _cleanResponseText(responseText);
 
     setState(() {
@@ -154,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add(
         Message.assistant(
           text: responseText,
-          sqlQuery: null, // ❌ Ne pas passer le SQL pour éviter l'affichage
+          sqlQuery: null,
           graphBase64: graphBase64,
         ),
       );
@@ -164,13 +144,29 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollToBottom();
   }
 
+  void _logout() async {
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      authService.logout();
+      
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la déconnexion: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   String _cleanResponseText(String text) {
-    // Supprimer les références au SQL et nettoyer le texte
     text = text.replaceAll(RegExp(r'SQL\s*:\s*[^\\n]*', caseSensitive: false), '');
     text = text.replaceAll(RegExp(r'Requête\s*:\s*[^\\n]*', caseSensitive: false), '');
     text = text.replaceAll(RegExp(r'Query\s*:\s*[^\\n]*', caseSensitive: false), '');
-    
-    // Nettoyer les sauts de ligne multiples
     text = text.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
     text = text.trim();
     
@@ -258,6 +254,11 @@ class _ChatScreenState extends State<ChatScreen> {
         title: 'Assistant Scolaire',
         actions: [
           IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Déconnexion',
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _clearChat,
             tooltip: 'Nouvelle conversation',
@@ -313,7 +314,6 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 
-                // Ne pas afficher le message "typing..."
                 if (message.type == MessageType.system && 
                     message.text == 'typing...') {
                   return Container(
