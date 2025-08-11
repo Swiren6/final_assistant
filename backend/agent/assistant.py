@@ -93,7 +93,7 @@ class SQLAssistant:
     def _safe_load_relations(self) -> str:
         """Charge les relations avec gestion d'erreurs"""
         try:
-            relations_path = Path(__file__).parent / 'agent' / 'prompts' / 'relations.txt'
+            relations_path = Path(__file__).parent  / 'prompts' / 'relations.txt'
             if relations_path.exists():
                 return relations_path.read_text(encoding='utf-8')
             logger.warning("⚠️ Fichier relations.txt non trouvé")
@@ -105,7 +105,7 @@ class SQLAssistant:
     def _safe_load_domain_descriptions(self) -> dict:
         """Charge les descriptions de domaine avec gestion d'erreurs"""
         try:
-            domain_path = Path(__file__).parent / 'agent' / 'prompts' / 'domain_descriptions.json'
+            domain_path = Path(__file__).parent  / 'prompts' / 'domain_descriptions.json'
             if domain_path.exists():
                 with open(domain_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
@@ -118,7 +118,7 @@ class SQLAssistant:
     def _safe_load_domain_to_tables_mapping(self) -> dict:
         """Charge le mapping domaine-tables avec gestion d'erreurs"""
         try:
-            mapping_path = Path(__file__).parent / 'agent'  / 'prompts' / 'domain_tables_mapping.json'
+            mapping_path = Path(__file__).parent   / 'prompts' / 'domain_tables_mapping.json'
             if mapping_path.exists():
                 with open(mapping_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
@@ -131,7 +131,7 @@ class SQLAssistant:
     def _safe_load_templates(self) -> list:
         """Charge les templates de questions avec gestion d'erreurs"""
         try:
-            templates_path = Path(__file__).parent / 'agent' / 'templates_questions.json'
+            templates_path = Path(__file__).parent/ 'templates_questions.json'
             
             if not templates_path.exists():
                 logger.info(f"⚠️ Fichier non trouvé, création: {templates_path}")
@@ -177,10 +177,41 @@ class SQLAssistant:
     # MÉTHODES PRINCIPALES D'INTERACTION
     # ================================
 
-    def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str]:
+    # def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str]:
+    #     """
+    #     Point d'entrée principal pour poser une question
+    #     Retourne (sql_query, formatted_response)
+    #     """
+    #     if user_id is None:
+    #         user_id = 0
+    #     if roles is None:
+    #         roles = []
+
+    #     # Validation des rôles
+    #     if not roles:
+    #         return "", "❌ Accès refusé : Aucun rôle fourni"
+        
+    #     valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
+    #     has_valid_role = any(role in valid_roles for role in roles)
+        
+    #     if not has_valid_role:
+    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}"
+
+    #     # Traitement par rôle
+    #     try:
+    #         if 'ROLE_SUPER_ADMIN' in roles:
+    #             return self._process_super_admin_question(question)
+    #         elif 'ROLE_PARENT' in roles:
+    #             return self._process_parent_question(question, user_id)
+    #     except Exception as e:
+    #         logger.error(f"Erreur dans ask_question: {e}")
+    #         return "", f"❌ Erreur : {str(e)}"
+
+    
+    def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
         """
         Point d'entrée principal pour poser une question
-        Retourne (sql_query, formatted_response)
+        Retourne (sql_query, formatted_response, graph_data)
         """
         if user_id is None:
             user_id = 0
@@ -189,26 +220,25 @@ class SQLAssistant:
 
         # Validation des rôles
         if not roles:
-            return "", "❌ Accès refusé : Aucun rôle fourni"
+            return "", "❌ Accès refusé : Aucun rôle fourni", None
         
         valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
         has_valid_role = any(role in valid_roles for role in roles)
         
         if not has_valid_role:
-            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}"
+            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None
 
         # Traitement par rôle
         try:
             if 'ROLE_SUPER_ADMIN' in roles:
-                return self._process_super_admin_question(question)
+                return self._process_super_admin_question(question)  # Retourne 3 valeurs
             elif 'ROLE_PARENT' in roles:
-                return self._process_parent_question(question, user_id)
+                return self._process_parent_question(question, user_id)  # Retourne 3 valeurs
         except Exception as e:
             logger.error(f"Erreur dans ask_question: {e}")
-            return "", f"❌ Erreur : {str(e)}"
-
-    def _process_super_admin_question(self, question: str) -> tuple[str, str]:
-        """Traite une question avec accès admin complet"""
+            return "", f"❌ Erreur : {str(e)}", None
+    def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str]]:
+        """Traite une question avec accès admin complet - CORRIGÉ POUR RETOURNER 3 VALEURS"""
         
         # 1. Vérifier le cache
         cached = self.cache.get_cached_query(question)
@@ -222,12 +252,14 @@ class SQLAssistant:
             try:
                 result = self.execute_sql_query(sql_query)
                 if result['success']:
+                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
+                    graph_data = self.generate_graph_if_relevant(result['data'], question)
                     formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result
+                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
                 else:
-                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}"
+                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
             except Exception as db_error:
-                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}"
+                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
         
         # 2. Vérifier les templates existants
         template_match = self.find_matching_template(question)
@@ -240,44 +272,49 @@ class SQLAssistant:
             try:
                 result = self.execute_sql_query(sql_query)
                 if result['success']:
+                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR TEMPLATE
+                    graph_data = self.generate_graph_if_relevant(result['data'], question)
                     formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result
+                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
                 else:
-                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}"
+                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
             except Exception as db_error:
-                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}"
+                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
         
         # 3. Génération AI + exécution + formatage
         try:
-            logger.info("🤖 Génération via IA pour admin")
+            # 🎯 GÉNÉRATION SQL MANQUANTE - AJOUT ICI
             sql_query = self.generate_sql_with_ai(question)
             
             if not sql_query:
-                return "", "❌ La requête générée est vide."
-
+                return "", "❌ La requête générée est vide.", None
+                
             result = self.execute_sql_query(sql_query)
-            
             if result['success']:
+                # 🎯 GÉNÉRATION DE GRAPHIQUE
+                graph_data = self.generate_graph_if_relevant(result['data'], question)
+                
                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
                 self.cache.cache_query(question, sql_query)
-                return sql_query, formatted_result
+                
+                return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
             else:
                 # Tentative de correction automatique
                 corrected_sql = self._auto_correct_sql(sql_query, result['error'])
                 if corrected_sql:
                     retry_result = self.execute_sql_query(corrected_sql)
                     if retry_result['success']:
+                        graph_data = self.generate_graph_if_relevant(retry_result['data'], question)
                         formatted_result = self.format_response_with_ai(retry_result['data'], question, corrected_sql)
-                        return corrected_sql, formatted_result
+                        return corrected_sql, formatted_result, graph_data  # 🎯 3 VALEURS
                 
-                return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}"
-                
+                return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
+            
         except Exception as e:
             logger.error(f"Erreur dans _process_super_admin_question: {e}")
-            return "", f"❌ Erreur de traitement : {str(e)}"
-
-    def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str]:
-        """Traite une question avec restrictions parent"""
+            return "", f"❌ Erreur de traitement : {str(e)}", None    
+    def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
+        """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
         
         # Nettoyage du cache
         self.cache1.clean_double_braces_in_cache()
@@ -294,12 +331,14 @@ class SQLAssistant:
             try:
                 result = self.execute_sql_query(sql_query)
                 if result['success']:
+                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
+                    graph_data = self.generate_graph_if_relevant(result['data'], question)
                     formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result
+                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
                 else:
-                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}"
+                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
             except Exception as db_error:
-                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}"
+                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
 
         # Récupération des données enfants
         children_ids, children_prenoms = self.get_user_children_data(user_id)
@@ -307,7 +346,7 @@ class SQLAssistant:
         children_names_str = ", ".join(children_prenoms)
         
         if not children_ids:
-            return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès."
+            return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès.", None
         
         logger.info(f"🔒 Restriction parent - Enfants autorisés: {children_ids}")
 
@@ -315,19 +354,19 @@ class SQLAssistant:
         detected_names = self.detect_names_in_question(question, children_prenoms)
         if detected_names["unauthorized_names"]:
             unauthorized_list = ", ".join(detected_names["unauthorized_names"])
-            return "", f"❌ Accès interdit: Vous n'avez pas le droit de consulter les données de {unauthorized_list}"
+            return "", f"❌ Accès interdit: Vous n'avez pas le droit de consulter les données de {unauthorized_list}", None
         
         # Génération SQL avec template parent
         try:
             sql_query = self.generate_sql_parent(question, user_id, children_ids_str, children_names_str)
             
             if not sql_query:
-                return "", "❌ La requête générée est vide."
+                return "", "❌ La requête générée est vide.", None
 
             # Validation de sécurité (sauf pour infos publiques)
             if not self._is_public_info_query(question, sql_query):
                 if not self.validate_parent_access(sql_query, children_ids):
-                    return "", "❌ Accès refusé: La requête ne respecte pas les restrictions parent."
+                    return "", "❌ Accès refusé: La requête ne respecte pas les restrictions parent.", None
             else:
                 logger.info("ℹ️ Question sur information publique - validation bypassée")
 
@@ -335,16 +374,18 @@ class SQLAssistant:
             result = self.execute_sql_query(sql_query)
             
             if result['success']:
+                # 🎯 GÉNÉRATION DE GRAPHIQUE
+                graph_data = self.generate_graph_if_relevant(result['data'], question)
                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
                 self.cache1.cache_query(question, sql_query)
-                return sql_query, formatted_result
+                return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
             else:
-                return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}"
+                return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
                 
         except Exception as e:
             logger.error(f"Erreur dans _process_parent_question: {e}")
-            return "", f"❌ Erreur de traitement : {str(e)}"
-
+            return "", f"❌ Erreur de traitement : {str(e)}", None
+    
     # ================================
     # GÉNÉRATION SQL
     # ================================
@@ -706,28 +747,47 @@ class SQLAssistant:
         return None
 
     def detect_graph_type(self, user_query: str, df_columns: List[str]) -> Optional[str]:
-        """Détecte le type de graphique approprié"""
+        """Détecte le type de graphique approprié - VERSION AMÉLIORÉE"""
         user_query = user_query.lower()
         columns = [col.lower() for col in df_columns]
         
-        # Détection basée sur la requête et les colonnes
-        if any(k in user_query for k in ["évolution", "progress", "tendance", "historique"]):
-            return "line"
-        elif any(k in user_query for k in ["répartition", "pourcentage", "ratio", "proportion"]):
-            return "pie"
-        elif any(k in user_query for k in ["comparaison", "nombre", "count", "somme", "total"]):
-            if any(k in columns for k in ["date", "année", "mois", "jour", "semaine"]):
+        # 🎯 DÉTECTION SPÉCIFIQUE pour évolution/courbe
+        evolution_keywords = ["évolution", "evolution", "courbe", "tendance", "historique", 
+                            "progression", "croissance", "développement", "trend"]
+        
+        if any(keyword in user_query for keyword in evolution_keywords):
+            # Vérifier si on a une colonne temporelle
+            temporal_cols = [col for col in columns if any(t in col for t in ["annee", "année", "year", "date", "mois", "month"])]
+            if temporal_cols:
                 return "line"
-            elif any(k in columns for k in ["délégation", "localité", "région", "ville", "classe"]):
+        
+        # Détection répartition/pie
+        if any(k in user_query for k in ["répartition", "repartition", "pourcentage", "ratio", "proportion"]):
+            return "pie"
+        
+        # Détection comparaison/bar
+        if any(k in user_query for k in ["comparaison", "comparer", "nombre", "count", "somme", "total"]):
+            # Si c'est temporel, préférer line
+            temporal_cols = [col for col in columns if any(t in col for t in ["annee", "année", "year", "date"])]
+            if temporal_cols and any(k in user_query for k in ["évolution", "evolution", "courbe", "tendance"]):
+                return "line"
+            else:
                 return "bar"
+        
+        # Détection automatique basée sur les données
+        numeric_cols = len([col for col in df_columns if any(num in col.lower() for num in ["count", "nombre", "total", "somme"])])
+        if numeric_cols >= 1:
+            temporal_cols = [col for col in columns if any(t in col for t in ["annee", "année", "year", "date"])]
+            if temporal_cols:
+                return "line"
             else:
                 return "bar"
         
         return None
-
     def generate_auto_graph(self, df: pd.DataFrame, graph_type: str = None) -> Optional[str]:
-        """Génère automatiquement un graphique"""
+        """Génère automatiquement un graphique - VERSION AMÉLIORÉE"""
         if df.empty or len(df) < 2:
+            logger.debug("❌ DataFrame vide ou insuffisant")
             return None
             
         try:
@@ -735,92 +795,161 @@ class SQLAssistant:
             df = df.dropna()
             
             if len(df) < 2:
+                logger.debug("❌ Données insuffisantes après nettoyage")
                 return None
             
-            # Détection automatique si aucun type spécifié
-            if not graph_type:
-                numeric_cols = df.select_dtypes(include='number').columns
-                categorical_cols = df.select_dtypes(exclude='number').columns
-                
-                if len(numeric_cols) >= 1 and len(categorical_cols) >= 1:
-                    if len(df) <= 7:
-                        graph_type = "pie"
-                    elif any("date" in col.lower() or "année" in col.lower() for col in categorical_cols):
-                        graph_type = "line"
-                    else:
-                        graph_type = "bar"
-                else:
-                    return None  # Pas assez de colonnes appropriées
+            logger.debug(f"🔍 Génération graphique - Type: {graph_type}")
+            logger.debug(f"🔍 Colonnes DataFrame: {df.columns.tolist()}")
+            logger.debug(f"🔍 Premières lignes:\n{df.head()}")
             
-            # Génération du graphique
-            plt.figure(figsize=(10, 6))
+            # 🎯 DÉTECTION AMÉLIORÉE du type de graphique
+            if not graph_type:
+                # Identifier colonnes temporelles et numériques
+                temporal_cols = [col for col in df.columns if any(t in col.lower() for t in ["annee", "année", "year", "date", "mois", "month"])]
+                numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+                
+                logger.debug(f"🔍 Auto-détection - Temporel: {temporal_cols}, Numérique: {numeric_cols}")
+                
+                if temporal_cols and numeric_cols:
+                    graph_type = "line"  # Privilégier ligne pour données temporelles
+                elif len(df) <= 7 and len(numeric_cols) >= 1:
+                    graph_type = "pie"
+                else:
+                    graph_type = "bar"
+            
+            # Configuration du graphique
+            plt.figure(figsize=(12, 7))
             plt.style.use('default')
             
-            if graph_type == "pie" and len(df.columns) >= 2:
+            # 🎯 AMÉLIORATION : Graphique en ligne pour évolution
+            if graph_type == "line" and len(df.columns) >= 2:
+                # Identifier les colonnes
+                temporal_col = None
+                numeric_col = None
+                
+                # 🎯 AMÉLIORATION : Chercher colonne temporelle avec plus de flexibilité
+                for col in df.columns:
+                    col_lower = col.lower()
+                    if any(t in col_lower for t in ["annee", "année", "year", "date", "an"]) or col_lower in ["annee", "année"]:
+                        temporal_col = col
+                        break
+                
+                # Chercher colonne numérique
+                numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+                if numeric_cols:
+                    # Prioriser les colonnes avec des mots-clés pertinents
+                    priority_keywords = ["inscription", "total", "count", "nombre", "somme"]
+                    for keyword in priority_keywords:
+                        matching_cols = [col for col in numeric_cols if keyword in col.lower()]
+                        if matching_cols:
+                            numeric_col = matching_cols[0]
+                            break
+                    
+                    if not numeric_col:
+                        numeric_col = numeric_cols[0]
+                
+                # Si pas de colonne temporelle trouvée, prendre la première
+                if not temporal_col:
+                    temporal_col = df.columns[0]
+                if not numeric_col:
+                    numeric_col = df.columns[1]
+                
+                logger.debug(f"🎯 Colonnes sélectionnées - Temporel: {temporal_col}, Numérique: {numeric_col}")
+                
+                # Trier par ordre temporel
+                df_sorted = df.sort_values(by=temporal_col)
+                
+                # 🎯 VÉRIFICATION des données
+                x_data = df_sorted[temporal_col]
+                y_data = df_sorted[numeric_col]
+                
+                logger.debug(f"🎯 Données X: {x_data.tolist()}")
+                logger.debug(f"🎯 Données Y: {y_data.tolist()}")
+                
+                # Créer le graphique
+                plt.plot(x_data, y_data, 
+                        marker='o', linewidth=3, markersize=8, 
+                        color='#2E86AB', markerfacecolor='#A23B72')
+                
+                plt.title(f"Évolution des {numeric_col} par {temporal_col}", fontsize=16, fontweight='bold', pad=20)
+                plt.xlabel(temporal_col, fontsize=12, fontweight='bold')
+                plt.ylabel(numeric_col, fontsize=12, fontweight='bold')
+                plt.xticks(rotation=45, fontsize=10)
+                plt.yticks(fontsize=10)
+                plt.grid(True, alpha=0.3, linestyle='--')
+                
+                # Ajouter les valeurs sur les points
+                for i, (x, y) in enumerate(zip(x_data, y_data)):
+                    plt.annotate(f'{y}', (x, y), textcoords="offset points", 
+                            xytext=(0,10), ha='center', fontsize=9, fontweight='bold')
+            
+            # 🎯 AUTRES TYPES DE GRAPHIQUES (pie, bar) - garder le code existant
+            elif graph_type == "pie" and len(df.columns) >= 2:
                 x_col = df.columns[0]
                 y_col = df.columns[1]
                 
-                # Assurer que y_col est numérique
                 if not pd.api.types.is_numeric_dtype(df[y_col]):
+                    logger.debug(f"❌ Colonne {y_col} n'est pas numérique")
                     return None
                     
-                df_pie = df.nlargest(8, y_col)  # Top 8 pour éviter l'encombrement
-                plt.pie(df_pie[y_col], labels=df_pie[x_col], autopct='%1.1f%%', startangle=90)
-                plt.title(f"Répartition par {x_col}")
+                df_pie = df.nlargest(8, y_col)
+                colors = plt.cm.Set3(range(len(df_pie)))
                 
-            elif graph_type == "line" and len(df.columns) >= 2:
-                x_col = df.columns[0]
-                y_col = df.columns[1]
-                
-                plt.plot(df[x_col], df[y_col], marker='o', linewidth=2, markersize=6)
-                plt.title(f"Évolution de {y_col} par {x_col}")
-                plt.xlabel(x_col)
-                plt.ylabel(y_col)
-                plt.xticks(rotation=45)
-                plt.grid(True, alpha=0.3)
+                plt.pie(df_pie[y_col], labels=df_pie[x_col], autopct='%1.1f%%', 
+                    startangle=90, colors=colors, textprops={'fontsize': 10})
+                plt.title(f"Répartition par {x_col}", fontsize=16, fontweight='bold')
                 
             elif graph_type == "bar" and len(df.columns) >= 2:
                 x_col = df.columns[0]
                 y_cols = [col for col in df.columns[1:] if pd.api.types.is_numeric_dtype(df[col])]
                 
                 if not y_cols:
+                    logger.debug("❌ Aucune colonne numérique pour bar chart")
                     return None
                 
-                # Limiter à 15 barres pour la lisibilité
                 df_bar = df.nlargest(15, y_cols[0]) if len(df) > 15 else df
                 
                 if len(y_cols) == 1:
-                    plt.bar(df_bar[x_col], df_bar[y_cols[0]], color='steelblue', alpha=0.7)
-                    plt.title(f"Comparaison de {y_cols[0]} par {x_col}")
-                else:
-                    df_bar.plot.bar(x=x_col, y=y_cols, alpha=0.7)
-                    plt.title(f"Comparaison de {', '.join(y_cols)} par {x_col}")
+                    bars = plt.bar(df_bar[x_col], df_bar[y_cols[0]], 
+                                color='#2E86AB', alpha=0.8, edgecolor='white', linewidth=1)
+                    plt.title(f"Comparaison de {y_cols[0]} par {x_col}", fontsize=16, fontweight='bold')
                     
-                plt.xlabel(x_col)
-                plt.ylabel('Valeurs')
-                plt.xticks(rotation=45)
-                plt.grid(True, alpha=0.3, axis='y')
-                
+                    # Ajouter valeurs sur les barres
+                    for bar in bars:
+                        height = bar.get_height()
+                        plt.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
+                                f'{int(height)}', ha='center', va='bottom', fontweight='bold')
+                else:
+                    df_bar.plot.bar(x=x_col, y=y_cols, alpha=0.8, ax=plt.gca())
+                    plt.title(f"Comparaison par {x_col}", fontsize=16, fontweight='bold')
+                    
+                plt.xlabel(x_col, fontsize=12, fontweight='bold')
+                plt.ylabel('Valeurs', fontsize=12, fontweight='bold')
+                plt.xticks(rotation=45, fontsize=10)
+                plt.grid(True, alpha=0.3, axis='y', linestyle='--')
+            
             else:
+                logger.debug(f"❌ Type de graphique non supporté ou données insuffisantes: {graph_type}")
                 return None
             
             plt.tight_layout()
             
-            # Conversion en base64
+            # 🎯 AMÉLIORATION : Meilleure qualité d'image
             img = io.BytesIO()
-            plt.savefig(img, format='png', bbox_inches='tight', dpi=100, 
-                       facecolor='white', edgecolor='none')
+            plt.savefig(img, format='png', bbox_inches='tight', dpi=150, 
+                    facecolor='white', edgecolor='none')
             img.seek(0)
             encoded = base64.b64encode(img.getvalue()).decode('utf-8')
             plt.close()
             
+            logger.info(f"📊 Graphique {graph_type} généré avec succès")
             return f"data:image/png;base64,{encoded}"
             
         except Exception as e:
             logger.error(f"Erreur génération graphique: {str(e)}")
-            plt.close('all')  # Fermer toutes les figures en cas d'erreur
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            plt.close('all')
             return None
-
     # ================================
     # CORRECTION AUTOMATIQUE SQL
     # ================================

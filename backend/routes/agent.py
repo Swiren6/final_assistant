@@ -143,7 +143,15 @@ def ask_sql():
 
         # 🤖 Traitement IA principal avec l'assistant unifié
         try:
-            sql_query, ai_response = unified_assistant.ask_question(question, user_id, roles)
+            # 🎯 MODIFICATION : Récupération de 3 valeurs (sql, response, graph)
+            sql_query, ai_response, graph_data = unified_assistant.ask_question(question, user_id, roles)
+            
+            if not sql_query:
+                return jsonify({
+                    "error": "La requête générée est vide",
+                    "question": question,
+                    "status": "error"
+                }), 422
             
             # Création de la réponse enrichie
             result = {
@@ -153,6 +161,14 @@ def ask_sql():
                 "question": question,
                 "timestamp": pd.Timestamp.now().isoformat()
             }
+            
+            # 🎯 AJOUT : Inclure le graphique si généré
+            if graph_data:
+                result["graph"] = graph_data
+                result["has_graph"] = True
+                logger.info("📊 Graphique généré automatiquement")
+            else:
+                result["has_graph"] = False
 
             # Ajouter les informations utilisateur si authentifié
             if jwt_valid:
@@ -185,7 +201,6 @@ def ask_sql():
             "details": str(e),
             "status": "error"
         }), 500
-
 def handle_attestation_request(question: str):
     """Gère les demandes d'attestation de présence"""
     try:

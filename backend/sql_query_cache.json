@@ -6,5 +6,13 @@
   "2ee4f3083236850d2cdfac9933538406": {
     "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} d'evolution d'inscriptions",
     "sql_template": "SELECT COUNT(*) as nombre_inscriptions, YEAR(Date) as annee FROM inscriptioneleve GROUP BY YEAR(Date) ORDER BY YEAR(Date)"
+  },
+  "7a133fc114f6da10cee7d0c2ec7698d3": {
+    "question_template": "donne moi la courbe d'evolution d'inscriptions",
+    "sql_template": "SELECT YEAR(Date) AS annee, COUNT(*) AS total_inscriptions \nFROM inscriptioneleve \nGROUP BY YEAR(Date) \nORDER BY annee"
+  },
+  "c3f9720a4d8c90741554cb760cb91949": {
+    "question_template": "donne moi le nombre des enseingants",
+    "sql_template": "SELECT COUNT(*) as nombre_enseignants FROM enseingant"
   }
 }
