@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppConstants {
   // Configuration API
-  static const String apiBaseUrl = 'http://localhost:5001/api';
+  static const String apiBaseUrl = 'http://localhost:5000/api';
   // Alternative pour les tests réseau
   // static const String apiBaseUrl = 'http://192.168.56.1:5001/api';
 

@@ -32,6 +32,15 @@
     "question_template": "donnez moi les discipline de {family_relation}",
     "sql_template": "SELECT \n    d.nomDisciplineFr \nFROM \n    discipline d \nJOIN \n    eleve e ON e.IdPersonne IN ({id_personne}) \nJOIN \n    inscriptioneleve ie ON ie.Eleve = e.id \nJOIN \n    classe c ON c.id = ie.Classe \nJOIN \n    matiere m ON m.id = d.id \nWHERE \n    e.IdPersonne IN ({id_personne})"
   },
+
+  "d3dcf3964084f0886a5ba547636a8c5e": {
+    "question_template": "donne moi les coordonnée de {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom,\n    p.PrenomFr AS prenom,\n    p.Cin AS cin,\n    p.AdresseFr AS adresse,\n    p.Tel1 AS telephone\nFROM \n    personne p\nJOIN \n    eleve e ON p.id = e.IdPersonne\nWHERE \n    e.IdPersonne IN ({id_personne})"
+  },
+  "4c5bc30cadabd73ef7b720a82a418d43": {
+    "question_template": "donne moi la classe de {family_relation}",
+    "sql_template": "SELECT c.CODECLASSEFR \nFROM classe c \nJOIN inscriptioneleve ie ON c.id = ie.Classe \nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))"
+  },
   "8d321f217f38802021dafe0c14b0827e": {
     "question_template": "donner moi le nombre d'abscence de {family_relation}",
     "sql_template": "SELECT COUNT(*) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nWHERE e.IdPersonne IN (7012, 7716) AND e.IdPersonne = (SELECT id FROM personne WHERE PrenomFr = 'Ghazal')"
@@ -59,5 +68,6 @@
   "43f16bbcbd4776a45f8fb281fec78b95": {
     "question_template": "donne moi les enseingants de {family_relation}",
     "sql_template": "SELECT \n    p.NomFr AS nom_enseignant,\n    p.PrenomFr AS prenom_enseignant\nFROM \n    enseingant en\nJOIN \n    personne p ON en.idPersonne = p.id\nJOIN \n    enseigantmatiere em ON en.id = em.idPersonne\nJOIN \n    inscriptioneleve ie ON em.anneeSco = (SELECT id FROM anneescolaire WHERE AnneeScolaire = (SELECT DISTINCT AnneeScolaire FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne = 7716)))\nWHERE \n    ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN (7012, 7716))"
+
   }
 }

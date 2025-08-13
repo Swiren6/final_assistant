@@ -81,10 +81,13 @@ def create_app():
     from routes.auth import auth_bp
     from routes.agent import agent_bp
     from routes.notifications import notifications_bp
+    from routes.api_routes_history import history_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(agent_bp, url_prefix='/api')
     app.register_blueprint(notifications_bp, url_prefix='/api')
+    app.register_blueprint(history_bp, url_prefix='/api')
+
 
     
     @app.route('/api/test-mysql')
@@ -183,13 +186,13 @@ def main():
     app = create_app()
     
     logger.info("🚀 Assistant Scolaire - Backend démarré")
-    logger.info(f"📍 URL: http://localhost:5001")
-    logger.info(f"🏥 Health: http://localhost:5001/api/health")
-    logger.info(f"🧪 Test DB: http://localhost:5001/api/test-db")
+    logger.info(f"📍 URL: http://localhost:5000")
+    logger.info(f"🏥 Health: http://localhost:5000/api/health")
+    logger.info(f"🧪 Test DB: http://localhost:5000/api/test-db")
     
     # Démarrage du serveur
     try:
-        app.run(host='0.0.0.0', port=5001, debug=True)
+        app.run(host='0.0.0.0', port=5000, debug=True)
     except KeyboardInterrupt:
         logger.info("👋 Serveur arrêté")
 

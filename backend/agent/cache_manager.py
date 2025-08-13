@@ -106,7 +106,7 @@ class CacheManager:
         normalized = re.sub(r'\s+', ' ', normalized).lower().strip()
         return normalized
 
-    def find_similar_template(self, question: str, threshold: float = 0.8) -> Tuple[Optional[Dict], float]:
+    def find_similar_template(self, question: str, threshold: float = 0.9) -> Tuple[Optional[Dict], float]:
         """Trouve un template similaire en utilisant TF-IDF et cosine similarity"""
         if not self.cache:
             return None, 0.0

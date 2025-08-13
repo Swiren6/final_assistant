@@ -77,7 +77,7 @@ class PDFGenerator:
     
     def __init__(self):
         # Chemin exact que vous avez fourni
-        self.font_dir = Path(r"C:\Users\HP\Desktop\assistant_ISE - Copie\backend\agent\pdf_utils\fonts\Amiri")
+        self.font_dir = Path(r"C:\Users\zeineb7\OneDrive\Bureau\zeinebv21\agent_ise1\final_assistant\backend\agent\pdf_utils\fonts\Amiri")
         self.base_dir = Path(__file__).parent.parent.parent  # Racine du projet
         self._validate_fonts()
 

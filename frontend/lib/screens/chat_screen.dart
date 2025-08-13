@@ -6,11 +6,13 @@ import 'package:http/http.dart' as http;
 import '../widgets/custom_appbar.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/sidebar_menu.dart';
+import '../widgets/history_sidebar.dart';
 import '../models/message_model.dart';
+import '../models/conversation_model.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../utils/constants.dart';
-import '../screens/login_screen.dart'; // Ajout de l'import manquant
+import '../screens/login_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -27,7 +29,9 @@ class _ChatScreenState extends State<ChatScreen> {
   final Set<int> _seenNotificationIds = {};
   
   bool _isLoading = false;
+  bool _showHistory = false;
   Timer? _notificationTimer;
+  int? _currentConversationId;
 
   @override
   void initState() {
@@ -89,6 +93,174 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  void _startNewConversation() {
+    setState(() {
+      _messages.clear();
+      _seenNotificationIds.clear();
+      _currentConversationId = null;
+    });
+    _addWelcomeMessage();
+    
+    if (_showHistory) {
+      setState(() => _showHistory = false);
+    }
+  }
+
+  Future<void> _loadConversation(List<Map<String, dynamic>> messages) async {
+    setState(() {
+      _messages.clear();
+      _isLoading = true;
+    });
+
+    try {
+      debugPrint('🔄 Chargement de ${messages.length} messages...');
+      
+      for (var messageData in messages) {
+        try {
+          final messageType = messageData['type'] as String? ?? 'system';
+          final content = messageData['content'] as String? ?? '';
+          
+          if (content.isEmpty) {
+            debugPrint('⚠️ Message avec contenu vide ignoré');
+            continue;
+          }
+          
+          switch (messageType) {
+            case 'user':
+              _messages.add(Message.user(text: content));
+              break;
+            case 'assistant':
+              _messages.add(Message.assistant(
+                text: content,
+                sqlQuery: messageData['sql_query'] as String?,
+                graphBase64: messageData['graph_data'] as String?,
+              ));
+              break;
+            case 'system':
+              _messages.add(Message.system(text: content));
+              break;
+            default:
+              debugPrint('⚠️ Type de message non reconnu: $messageType');
+              _messages.add(Message.system(text: content));
+          }
+        } catch (e) {
+          debugPrint('❌ Erreur traitement message: $e');
+          debugPrint('📄 Data: $messageData');
+        }
+      }
+      
+      setState(() => _showHistory = false);
+      _scrollToBottom();
+      debugPrint('✅ Conversation chargée avec ${_messages.length} messages');
+      
+    } catch (e) {
+      debugPrint('❌ Erreur chargement conversation: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur chargement: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _saveMessageToHistory(String messageType, String content, {
+    String? sqlQuery,
+    String? graphData,
+  }) async {
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      
+      // Validation de base
+      if (authService.token == null || authService.token!.isEmpty) {
+        debugPrint('⚠️ Token manquant pour sauvegarde historique');
+        return;
+      }
+      
+      // Si pas de conversation courante, en créer une
+      if (_currentConversationId == null) {
+        debugPrint('🔄 Création nouvelle conversation...');
+        
+        try {
+          final createResponse = await http.post(
+            Uri.parse('${AppConstants.apiBaseUrl}/conversations/create'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${authService.token}',
+            },
+            body: jsonEncode({'first_message': content}),
+          );
+          
+          debugPrint('🌐 POST ${AppConstants.apiBaseUrl}/conversations/create');
+          debugPrint('📤 Payload: ${jsonEncode({'first_message': content})}');
+          debugPrint('↪️ Réponse ${createResponse.statusCode} | ${createResponse.request?.url}');
+          debugPrint('📦 Taille réponse: ${createResponse.body.length} chars');
+          
+          if (createResponse.statusCode == 201) {
+            final responseData = jsonDecode(createResponse.body);
+            debugPrint('✅ Réponse décodée avec succès');
+            debugPrint('🔍 Clés disponibles: ${responseData.keys.toList()}');
+            
+            if (responseData['success'] == true && responseData['conversation_id'] != null) {
+              _currentConversationId = responseData['conversation_id'] as int;
+              debugPrint('✅ Conversation créée avec ID: $_currentConversationId');
+            } else {
+              debugPrint('❌ Réponse de création invalide: $responseData');
+              return;
+            }
+          } else {
+            debugPrint('❌ Erreur création conversation: ${createResponse.statusCode}');
+            debugPrint('📄 Body: ${createResponse.body}');
+            return;
+          }
+        } catch (e) {
+          debugPrint('❌ Exception création conversation: $e');
+          return;
+        }
+      }
+      
+      // Sauvegarder le message
+      if (_currentConversationId != null) {
+        final messageData = {
+          'message_type': messageType,
+          'content': content,
+          'sql_query': sqlQuery,
+          'graph_data': graphData,
+        };
+        
+        debugPrint('🌐 POST ${AppConstants.apiBaseUrl}/conversations/$_currentConversationId/messages');
+        debugPrint('📤 Payload: ${jsonEncode(messageData)}');
+        
+        try {
+          final messageResponse = await http.post(
+            Uri.parse('${AppConstants.apiBaseUrl}/conversations/$_currentConversationId/messages'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${authService.token}',
+            },
+            body: jsonEncode(messageData),
+          );
+          
+          debugPrint('↪️ Réponse ${messageResponse.statusCode} | ${messageResponse.request?.url}');
+          debugPrint('📦 Taille réponse: ${messageResponse.body.length} chars');
+          
+          if (messageResponse.statusCode == 201) {
+            debugPrint('✅ Message sauvegardé avec succès');
+          } else {
+            debugPrint('❌ Erreur sauvegarde message: ${messageResponse.statusCode}');
+            debugPrint('📄 Body: ${messageResponse.body}');
+          }
+        } catch (e) {
+          debugPrint('❌ Exception sauvegarde message: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Erreur générale sauvegarde: $e');
+    }
+  }
+
   Future<void> _sendMessage() async {
     final userMessage = _messageController.text.trim();
     if (userMessage.isEmpty || _isLoading) return;
@@ -105,6 +277,10 @@ class _ChatScreenState extends State<ChatScreen> {
       _isLoading = true;
     });
     _scrollToBottom();
+    
+    _saveMessageToHistory('user', message).catchError((error) {
+      debugPrint('Erreur sauvegarde message utilisateur: $error');
+    });
   }
 
   Future<void> _processBotResponse(String userMessage) async {
@@ -121,11 +297,11 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSuccessfulResponse(ApiResponse response) {
-    debugPrint('📥 Réponse complète du backend: ${response.response}');
+    debugPrint('🔥 Réponse complète du backend: ${response.response}');
     
     String responseText = response.response;
     String? graphBase64 = response.graphBase64;
-    bool hasGraph = response.hasGraph;
+    String? sqlQuery = response.sqlQuery;
 
     responseText = _cleanResponseText(responseText);
 
@@ -134,10 +310,19 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add(
         Message.assistant(
           text: responseText,
-          sqlQuery: null,
+          sqlQuery: sqlQuery,
           graphBase64: graphBase64,
         ),
       );
+    });
+
+    _saveMessageToHistory(
+      'assistant', 
+      responseText, 
+      sqlQuery: sqlQuery,
+      graphData: graphBase64,
+    ).catchError((error) {
+      debugPrint('Erreur sauvegarde message assistant: $error');
     });
     
     debugPrint('✅ Message ajouté avec graphique: ${graphBase64 != null}');
@@ -234,11 +419,7 @@ class _ChatScreenState extends State<ChatScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              setState(() {
-                _messages.clear();
-                _seenNotificationIds.clear();
-              });
-              _addWelcomeMessage();
+              _startNewConversation();
             },
             child: const Text('Effacer'),
           ),
@@ -253,6 +434,14 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: CustomAppBar(
         title: 'Assistant Scolaire',
         actions: [
+          IconButton(
+            icon: Icon(
+              _showHistory ? Icons.history : Icons.history_outlined,
+              color: _showHistory ? AppConstants.primaryColor : null,
+            ),
+            onPressed: () => setState(() => _showHistory = !_showHistory),
+            tooltip: 'Historique des conversations',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,
@@ -272,11 +461,22 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       drawer: const SidebarMenu(),
       body: SafeArea(
-        child: Column(
+        child: Row(
           children: [
-            if (_isLoading) _buildLoadingIndicator(),
-            Expanded(child: _buildMessageList()),
-            _buildMessageInput(),
+            if (_showHistory)
+              HistorySidebar(
+                onConversationSelected: _loadConversation,
+                onNewConversation: _startNewConversation,
+              ),
+            Expanded(
+              child: Column(
+                children: [
+                  if (_isLoading) _buildLoadingIndicator(),
+                  Expanded(child: _buildMessageList()),
+                  _buildMessageInput(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -387,6 +587,18 @@ class _ChatScreenState extends State<ChatScreen> {
               'Statistiques',
             ].map((text) => _buildSuggestionChip(text)).toList(),
           ),
+          if (!_showHistory) ...[
+            const SizedBox(height: AppConstants.paddingLarge),
+            OutlinedButton.icon(
+              onPressed: () => setState(() => _showHistory = true),
+              icon: const Icon(Icons.history),
+              label: const Text('Voir l\'historique'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppConstants.primaryColor,
+                side: BorderSide(color: AppConstants.primaryColor),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -618,6 +830,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   const Text('• Génération automatique de graphiques'),
                   const Text('• Statistiques et analyses'),
                   const Text('• Export de documents PDF'),
+                  const Text('• 🆕 Historique des conversations'),
                 ],
               ),
             ),

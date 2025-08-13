@@ -1,12 +1,4 @@
 {
-  "1cf65ecb41a6dd5f987a1204f1c38fe3": {
-    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} {nomfr} {prenomfr} des élèves ?",
-    "sql_template": "SELECT DISTINCT LieuNaissance FROM eleve"
-  },
-  "2ee4f3083236850d2cdfac9933538406": {
-    "question_template": "{nomfr} {prenomfr} {nomfr} {prenomfr} d'evolution d'inscriptions",
-    "sql_template": "SELECT COUNT(*) as nombre_inscriptions, YEAR(Date) as annee FROM inscriptioneleve GROUP BY YEAR(Date) ORDER BY YEAR(Date)"
-  },
   "7a133fc114f6da10cee7d0c2ec7698d3": {
     "question_template": "donne moi la courbe d'evolution d'inscriptions",
     "sql_template": "SELECT YEAR(Date) AS annee, COUNT(*) AS total_inscriptions \nFROM inscriptioneleve \nGROUP BY YEAR(Date) \nORDER BY annee"
@@ -15,8 +7,38 @@
     "question_template": "donne moi le nombre des enseingants",
     "sql_template": "SELECT COUNT(*) as nombre_enseignants FROM enseingant"
   },
+
+  "5528ecb91dab2a31a6f6605682f3dcde": {
+    "question_template": "donne moi le nombre des eleves inscris pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM inscriptioneleve ie WHERE ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  },
+  "3d3b234a761f79f6c521a224dd082359": {
+    "question_template": "enseignants",
+    "sql_template": "SELECT * FROM viewenseignant"
+  },
+  "95028ee3a6482e29a3d505b97cf5f888": {
+    "question_template": "nombre d eleves",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM eleve"
+  },
+  "fefc83db0665109dc6c86ea1bf044527": {
+    "question_template": "le nombre des réinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_reinscriptions FROM inscriptioneleve ie WHERE ie.TypeInscri = 'R' AND ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  },
+  "270603fff1a5aeefe5b23cb0b88c6c18": {
+    "question_template": "donne moi le nombre des classes",
+    "sql_template": "SELECT COUNT(*) as nombre_classes FROM classe"
+  },
+  "94df1df882950eced16e9d7cd15ac041": {
+    "question_template": "donne moi le nombre des eleves",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM eleve"
+  },
+  "b13cffa80ec07043dd94832d412b9431": {
+    "question_template": "donne moi le nombre des inscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as total_inscriptions FROM inscriptioneleve WHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  },
   "620c0c8066b87beff9618de7abcb5f61": {
     "question_template": "donne moi nombre des nouvelles inscriptions",
     "sql_template": "SELECT COUNT(*) as nombre_nouvelles_inscriptions FROM inscriptioneleve WHERE TypeInscri = 'N'"
+
   }
 }
