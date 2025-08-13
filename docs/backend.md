@@ -162,7 +162,7 @@ def ask_sql():
     question = request.json.get('question')
     
     # 3. Traitement avec assistant unifié
-    sql_query, ai_response, graph_data = unified_assistant.ask_question(
+    sql_query, ai_response, graph_data = assistant.ask_question(
         question, user_id, roles
     )
     

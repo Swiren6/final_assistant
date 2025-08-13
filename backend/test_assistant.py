@@ -14,7 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_unified_assistant():
+def test_assistant():
     """Test de base de l'assistant unifié"""
     print("🧪 Test de l'Assistant Unifié")
     print("=" * 50)
@@ -130,7 +130,7 @@ def test_graph_generation():
 if __name__ == "__main__":
     print("🚀 Lancement des tests de l'Assistant Unifié")
     
-    success = test_unified_assistant()
+    success = test_assistant()
     
     if success:
         test_graph_generation()

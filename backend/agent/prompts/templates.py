@@ -457,22 +457,7 @@ WHERE n.id_inscription = (
     )
 );
 
-🎯 EXEMPLE NOTES POUR PLUSIEURS ENFANTS (children_ids = "7012,7716"):
-SELECT 
-    pe.PrenomFr AS enfant,
-    m.NomMatiereFr AS nom_matiere,
-    n.orale,
-    n.TP,
-    n.ExamenEcrit,
-    n.DS,
-    n.DC1,
-    n.DC2
-FROM noteeleveparmatiere n
-JOIN matiere m ON n.id_matiere = m.id
-JOIN inscriptioneleve ie ON n.id_inscription = ie.id
-JOIN eleve e ON ie.Eleve = e.id
-JOIN personne pe ON e.IdPersonne = pe.id
-WHERE e.IdPersonne IN (7012,7716);
+
 
 Voici la structure détaillée des tables pertinentes pour votre tâche (nom des tables, colonnes et leurs types) :
 {{table_info}}

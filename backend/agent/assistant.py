@@ -574,6 +574,7 @@ class SQLAssistant:
             'mon fils': 'M',
             'mon garçon': 'M',
             'mon garcon': 'M'
+            
         }
         
         detected_genre = None
@@ -880,7 +881,7 @@ class SQLAssistant:
         for child in children_data:
             genre_text = "garçon" if child.get('genre') == 'M' else "fille" if child.get('genre') == 'F' else ""
             classe_text = f"en classe {child.get('classe')}" if child.get('classe') else ""
-            info = f"**{child['prenom']}** ({genre_text}, {child.get('age', 'âge inconnu')} ans, {classe_text})"
+            info = f"{child['prenom']} ({genre_text}, {child.get('age', 'âge inconnu')} ans, {classe_text})"
             children_info.append(info)
         
         children_list = "\n".join(children_info)
@@ -891,10 +892,7 @@ class SQLAssistant:
 
     {children_list}
 
-    💡 Vous pouvez préciser en disant par exemple :
-    - "**{children_data[0]['prenom']}**" (nom spécifique)
-    - "mon fils" ou "ma fille" (genre)
-    - "mon grand" ou "mon petit" (âge)"""
+    """
         }
     
     

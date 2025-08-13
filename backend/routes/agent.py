@@ -42,14 +42,14 @@ agent_bp = Blueprint('agent_bp', __name__)
 logger = logging.getLogger(__name__)
 
 # Global assistant instance
-unified_assistant = None
+assistant = None
 
 def initialize_assistant():
     """Initialize the unified SQL assistant"""
-    global unified_assistant
+    global assistant
     try:
-        unified_assistant = SQLAssistant()
-        if unified_assistant and unified_assistant.db:
+        assistant = SQLAssistant()
+        if assistant and assistant.db:
             logger.info("✅ Assistant unifié initialisé avec succès")
             return True
         else:
@@ -57,7 +57,7 @@ def initialize_assistant():
             return False
     except Exception as e:
         logger.error(f"❌ Erreur initialisation assistant unifié: {e}")
-        unified_assistant = None
+        assistant = None
         return False
 
 # Initialize at import
@@ -130,7 +130,7 @@ def ask_sql():
         logger.debug(f"user_id: {user_id}, roles: {roles}")
 
         # Vérification de l'assistant
-        if not unified_assistant:
+        if not assistant:
             if not initialize_assistant():
                 return jsonify({
                     "error": "Assistant non disponible",
@@ -148,7 +148,7 @@ def ask_sql():
         # 🤖 Traitement IA principal avec l'assistant unifié
         try:
             # 🎯 MODIFICATION : Récupération de 3 valeurs (sql, response, graph)
-            sql_query, ai_response, graph_data = unified_assistant.ask_question(question, user_id, roles)
+            sql_query, ai_response, graph_data = assistant.ask_question(question, user_id, roles)
             
             # 🎯 NOUVELLE LOGIQUE : Vérifier si c'est une demande de clarification multi-enfants
             if not sql_query and ai_response and "plusieurs enfants" in ai_response:
@@ -194,8 +194,8 @@ def ask_sql():
                 }
 
             # Nettoyage périodique de l'historique des conversations
-            if hasattr(unified_assistant, 'cleanup_conversation_history'):
-                unified_assistant.cleanup_conversation_history()
+            if hasattr(assistant, 'cleanup_conversation_history'):
+                assistant.cleanup_conversation_history()
 
             logger.info(f"✅ Question traitée avec succès: {question[:50]}...")
             return jsonify(result), 200
@@ -247,7 +247,7 @@ def clarify_child_selection():
         
         # Retraiter avec la question clarifiée
         roles = ['ROLE_PARENT']  # Assumer parent pour cette route
-        sql_query, ai_response, graph_data = unified_assistant.ask_question(clarified_question, user_id, roles)
+        sql_query, ai_response, graph_data = assistant.ask_question(clarified_question, user_id, roles)
         
         if not sql_query:
             return jsonify({
@@ -352,13 +352,13 @@ def handle_attestation_request(question: str):
         logger.info(f"Recherche élève pour attestation : {full_name}")
 
         # Recherche de l'élève via l'assistant unifié
-        if not unified_assistant:
+        if not assistant:
             return jsonify({
                 "response": "Service temporairement indisponible.",
                 "status": "error"
             })
 
-        student_data = unified_assistant.get_student_info_by_name(full_name)
+        student_data = assistant.get_student_info_by_name(full_name)
 
         if not student_data:
             return jsonify({
@@ -418,13 +418,13 @@ def handle_bulletin_request(question: str):
             })
 
         # Recherche de l'élève
-        if not unified_assistant:
+        if not assistant:
             return jsonify({
                 "response": "Service temporairement indisponible.",
                 "status": "error"
             })
 
-        student_data = unified_assistant.get_student_info_by_name(full_name)
+        student_data = assistant.get_student_info_by_name(full_name)
         if not student_data:
             return jsonify({
                 "response": f"Aucun élève trouvé avec le nom '{full_name}'",
@@ -472,12 +472,12 @@ def reinitialize():
         
         # Ajouter des informations de diagnostic
         diagnostic_info = {}
-        if unified_assistant:
+        if assistant:
             diagnostic_info = {
-                "db_connected": unified_assistant.db is not None,
-                "schema_loaded": len(unified_assistant.schema) > 0,
-                "templates_loaded": len(unified_assistant.templates_questions),
-                "cache_available": unified_assistant.cache is not None
+                "db_connected": assistant.db is not None,
+                "schema_loaded": len(assistant.schema) > 0,
+                "templates_loaded": len(assistant.templates_questions),
+                "cache_available": assistant.cache is not None
             }
         
         return jsonify({
@@ -499,7 +499,7 @@ def reinitialize():
 def get_assistant_status():
     """Retourne le statut de l'assistant unifié"""
     try:
-        if not unified_assistant:
+        if not assistant:
             return jsonify({
                 "status": "not_initialized",
                 "message": "Assistant non initialisé"
@@ -507,20 +507,20 @@ def get_assistant_status():
         
         status_info = {
             "status": "active",
-            "db_connected": unified_assistant.db is not None,
-            "schema_tables": len(unified_assistant.schema),
-            "templates_count": len(unified_assistant.templates_questions),
-            "conversation_history_size": len(unified_assistant.conversation_history),
+            "db_connected": assistant.db is not None,
+            "schema_tables": len(assistant.schema),
+            "templates_count": len(assistant.templates_questions),
+            "conversation_history_size": len(assistant.conversation_history),
             "cache_available": {
-                "admin_cache": unified_assistant.cache is not None,
-                "parent_cache": unified_assistant.cache1 is not None
+                "admin_cache": assistant.cache is not None,
+                "parent_cache": assistant.cache1 is not None
             },
             "model_config": {
-                "model": unified_assistant.model,
-                "temperature": unified_assistant.temperature,
-                "max_tokens": unified_assistant.max_tokens
+                "model": assistant.model,
+                "temperature": assistant.temperature,
+                "max_tokens": assistant.max_tokens
             },
-            "last_sql": unified_assistant.last_generated_sql[:100] if unified_assistant.last_generated_sql else None,
+            "last_sql": assistant.last_generated_sql[:100] if assistant.last_generated_sql else None,
             "timestamp": pd.Timestamp.now().isoformat()
         }
         
@@ -538,15 +538,15 @@ def get_assistant_status():
 def clear_conversation_history():
     """Efface l'historique des conversations"""
     try:
-        if not unified_assistant:
+        if not assistant:
             return jsonify({
                 "success": False,
                 "message": "Assistant non initialisé"
             }), 503
         
         # Effacer l'historique
-        if hasattr(unified_assistant, 'reset_conversation'):
-            unified_assistant.reset_conversation()
+        if hasattr(assistant, 'reset_conversation'):
+            assistant.reset_conversation()
         
         return jsonify({
             "success": True,
@@ -585,7 +585,7 @@ def generate_graph_only():
         graph_type = data.get('graph_type', None)  # 'bar', 'line', 'pie'
         title = data.get('title', 'Graphique')
         
-        if not unified_assistant:
+        if not assistant:
             return jsonify({
                 "error": "Assistant non disponible"
             }), 503
@@ -601,7 +601,7 @@ def generate_graph_only():
             }), 422
         
         # Générer le graphique
-        graph_data = unified_assistant.generate_auto_graph(df, graph_type)
+        graph_data = assistant.generate_auto_graph(df, graph_type)
         
         if not graph_data:
             return jsonify({
@@ -634,26 +634,26 @@ def health_check():
             "status": "healthy",
             "timestamp": pd.Timestamp.now().isoformat(),
             "services": {
-                "assistant": unified_assistant is not None,
+                "assistant": assistant is not None,
                 "database": False,
                 "cache": False
             }
         }
         
         # Test de la base de données
-        if unified_assistant and unified_assistant.db:
+        if assistant and assistant.db:
             try:
                 # Test simple de connectivité
-                result = unified_assistant.execute_sql_query("SELECT 1")
+                result = assistant.execute_sql_query("SELECT 1")
                 health_status["services"]["database"] = result["success"]
             except:
                 health_status["services"]["database"] = False
         
         # Test du cache
-        if unified_assistant:
+        if assistant:
             health_status["services"]["cache"] = (
-                unified_assistant.cache is not None and 
-                unified_assistant.cache1 is not None
+                assistant.cache is not None and 
+                assistant.cache1 is not None
             )
         
         # Déterminer le statut global
