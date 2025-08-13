@@ -14,5 +14,9 @@
   "c3f9720a4d8c90741554cb760cb91949": {
     "question_template": "donne moi le nombre des enseingants",
     "sql_template": "SELECT COUNT(*) as nombre_enseignants FROM enseingant"
+  },
+  "620c0c8066b87beff9618de7abcb5f61": {
+    "question_template": "donne moi nombre des nouvelles inscriptions",
+    "sql_template": "SELECT COUNT(*) as nombre_nouvelles_inscriptions FROM inscriptioneleve WHERE TypeInscri = 'N'"
   }
 }

@@ -23,10 +23,7 @@
     "question_template": "donne moi l emploi du temps pour {family_relation} pour {jour}",
     "sql_template": "SELECT \n    p.NomFr AS nom_enseignant,\n    p.PrenomFr AS prenom_enseignant,\n    m.NomMatiereFr AS nom_matiere,\n    s.nomSalleFr AS nom_salle,\n    sc1.debut AS debut_seance,\n    sc2.fin AS fin_seance\nFROM\n    emploidutemps e\nJOIN\n    jour j ON e.Jour = j.id AND j.libelleJourFr = {jour}\nJOIN\n    semaine sm ON e.Semaine = sm.id AND sm.id = 1\nJOIN\n    salle s ON e.Salle = s.id\nJOIN\n    enseingant en ON e.Enseignant = en.id\nJOIN\n    personne p ON en.idPersonne = p.id\nJOIN\n    matiere m ON e.Matiere = m.id\nJOIN\n    seance sc1 ON e.SeanceDebut = sc1.id\nJOIN\n    seance sc2 ON e.SeanceFin = sc2.id\nWHERE\n    e.Classe IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))));"
   },
-  "ce5e7ac6161cdd1c0bbdb56c4d4dcb4d": {
-    "question_template": "donne moi les notes de {family_relation}",
-    "sql_template": "SELECT \n    m.NomMatiereFr AS nom_matiere,\n    n.orale,\n    n.TP,\n    n.ExamenEcrit,\n    n.DS,\n    n.DC1,\n    n.DC2\nFROM \n    noteeleveparmatiere n\nJOIN \n    matiere m ON n.id_matiere = m.id\nWHERE \n    n.id_inscription IN (SELECT id FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne})));"
-  },
+  
   "a2bcfe4bfc5e04b21afe0e3c76da4919": {
     "question_template": "donne moi le nombre des absences de {family_relation}",
     "sql_template": "SELECT COUNT(*) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}));"
@@ -34,5 +31,33 @@
   "232a2cb3f0dbd19c0577f70c787a5176": {
     "question_template": "donnez moi les discipline de {family_relation}",
     "sql_template": "SELECT \n    d.nomDisciplineFr \nFROM \n    discipline d \nJOIN \n    eleve e ON e.IdPersonne IN ({id_personne}) \nJOIN \n    inscriptioneleve ie ON ie.Eleve = e.id \nJOIN \n    classe c ON c.id = ie.Classe \nJOIN \n    matiere m ON m.id = d.id \nWHERE \n    e.IdPersonne IN ({id_personne})"
+  },
+  "8d321f217f38802021dafe0c14b0827e": {
+    "question_template": "donner moi le nombre d'abscence de {family_relation}",
+    "sql_template": "SELECT COUNT(*) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nWHERE e.IdPersonne IN (7012, 7716) AND e.IdPersonne = (SELECT id FROM personne WHERE PrenomFr = 'Ghazal')"
+  },
+  "6425a20cccac02858f89578a67fc7111": {
+    "question_template": "donne moi le nombre d'abscence de {family_relation}",
+    "sql_template": "SELECT COUNT(*) AS nombre_absences \nFROM absence a \nJOIN inscriptioneleve ie ON a.Inscription = ie.id \nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN (7012, 7716))"
+  },
+  "f0a0723347fae78cf8b2ae48a099d525": {
+    "question_template": "donne moi une comparaison des notes entre mes deux enfants",
+    "sql_template": "SELECT \n    p.NomFr AS nom_enfant,\n    p.PrenomFr AS prenom_enfant,\n    n.dc1 AS note_devoir_controle\nFROM \n    noteeleveparmatiere n\nJOIN \n    inscriptioneleve ie ON n.id_inscription = ie.id\nJOIN \n    eleve e ON ie.Eleve = e.id\nJOIN \n    personne p ON e.IdPersonne = p.id\nWHERE \n    e.IdPersonne IN (7012, 7716)\n    AND n.id_matiere = (SELECT id FROM matiere WHERE NomMatiereFr = 'Maths')"
+  },
+  "00827747241f8369328b4cf1e7171c26": {
+    "question_template": "dans quelle classe {family_relation} est inscrit",
+    "sql_template": "SELECT c.CODECLASSEFR AS classe\nFROM inscriptioneleve ie\nJOIN eleve e ON ie.Eleve = e.id\nJOIN classe c ON ie.Classe = c.id\nWHERE e.IdPersonne IN (7012, 7716) AND e.IdPersonne = (SELECT id FROM personne WHERE PrenomFr = 'Ghazal')"
+  },
+  "7e7704822ddddcccd381c7cc87164359": {
+    "question_template": "donnez moi des informations sur {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom_enfant,\n    p.PrenomFr AS prenom_enfant,\n    e.DateNaissance AS date_naissance,\n    e.LieuNaissance AS lieu_naissance,\n    e.Solde AS solde\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = p.id\nWHERE \n    e.IdPersonne IN (7012, 7716) AND p.PrenomFr = 'Ghazal'"
+  },
+  "fb516e4af0071d877a527ebb7bd497ec": {
+    "question_template": "donnez moi les enseingnats de {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom_enseignant,\n    p.PrenomFr AS prenom_enseignant\nFROM\n    enseingant en\nJOIN\n    personne p ON en.idPersonne = p.id\nJOIN\n    enseigantmatiere em ON en.id = em.idPersonne\nJOIN\n    anneescolaire a ON em.anneeSco = a.id\nJOIN\n    inscriptioneleve ie ON em.idMatiere = ie.Eleve\nWHERE\n    ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN (7012, 7716))\n    AND ie.Eleve = (SELECT id FROM eleve WHERE IdPersonne = 7012)"
+  },
+  "43f16bbcbd4776a45f8fb281fec78b95": {
+    "question_template": "donne moi les enseingants de {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom_enseignant,\n    p.PrenomFr AS prenom_enseignant\nFROM \n    enseingant en\nJOIN \n    personne p ON en.idPersonne = p.id\nJOIN \n    enseigantmatiere em ON en.id = em.idPersonne\nJOIN \n    inscriptioneleve ie ON em.anneeSco = (SELECT id FROM anneescolaire WHERE AnneeScolaire = (SELECT DISTINCT AnneeScolaire FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne = 7716)))\nWHERE \n    ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN (7012, 7716))"
   }
 }
