@@ -5,6 +5,7 @@ import json
 import io
 import base64
 import os
+import unicodedata
 from functools import lru_cache
 from decimal import Decimal
 from datetime import datetime
@@ -352,9 +353,84 @@ class SQLAssistant:
         except Exception as e:
             logger.error(f"Erreur dans _process_super_admin_question: {e}")
             return "", f"❌ Erreur de traitement : {str(e)}", None    
+
     
+
+    # def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
+    #     """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
+        
+    #     # Nettoyage du cache
+    #     self.cache1.clean_double_braces_in_cache()
+        
+    #     # Vérification cache parent
+    #     cached = self.cache1.get_cached_query(question, user_id)
+    #     if cached:
+    #         sql_template, variables = cached
+    #         sql_query = sql_template
+    #         for column, value in variables.items():
+    #             sql_query = sql_query.replace(f"{{{column}}}", value)
+            
+    #         logger.info("⚡ Requête parent récupérée depuis le cache")
+    #         try:
+    #             result = self.execute_sql_query(sql_query)
+    #             if result['success']:
+    #                 # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
+    #                 graph_data = self.generate_graph_if_relevant(result['data'], question)
+    #                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
+    #                 return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
+    #             else:
+    #                 return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
+    #         except Exception as db_error:
+    #             return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
+
+    #     # Récupération des données enfants
+    #     children_ids, children_prenoms = self.get_user_children_data(user_id)
+    #     children_ids_str = ", ".join(map(str, children_ids))
+    #     children_names_str = ", ".join(children_prenoms)
+        
+    #     if not children_ids:
+    #         return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès.", None
+        
+    #     logger.info(f"🔒 Restriction parent - Enfants autorisés: {children_ids}")
+
+    #     # Validation des noms dans la question
+    #     detected_names = self.detect_names_in_question(question, children_prenoms)
+    #     if detected_names["unauthorized_names"]:
+    #         unauthorized_list = ", ".join(detected_names["unauthorized_names"])
+    #         return "", f"❌ Accès interdit: Vous n'avez pas le droit de consulter les données de {unauthorized_list}", None
+        
+    #     # Génération SQL avec template parent
+    #     try:
+    #         sql_query = self.generate_sql_parent(question, user_id, children_ids_str, children_names_str)
+            
+    #         if not sql_query:
+    #             return "", "❌ La requête générée est vide.", None
+
+    #         # Validation de sécurité (sauf pour infos publiques)
+    #         if not self._is_public_info_query(question, sql_query):
+    #             if not self.validate_parent_access(sql_query, children_ids):
+    #                 return "", "❌ Accès refusé: La requête ne respecte pas les restrictions parent.", None
+    #         else:
+    #             logger.info("ℹ️ Question sur information publique - validation bypassée")
+
+    #         # Exécution
+    #         result = self.execute_sql_query(sql_query)
+            
+    #         if result['success']:
+    #             # 🎯 GÉNÉRATION DE GRAPHIQUE
+    #             graph_data = self.generate_graph_if_relevant(result['data'], question)
+    #             formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
+    #             self.cache1.cache_query(question, sql_query)
+    #             return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
+    #         else:
+    #             return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
+                
+    #     except Exception as e:
+    #         logger.error(f"Erreur dans _process_parent_question: {e}")
+    #         return "", f"❌ Erreur de traitement : {str(e)}", None
+
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
-        """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
+        """Traite une question avec restrictions parent - VERSION CORRIGÉE MULTI-ENFANTS"""
         
         # Nettoyage du cache
         self.cache1.clean_double_braces_in_cache()
@@ -371,24 +447,46 @@ class SQLAssistant:
             try:
                 result = self.execute_sql_query(sql_query)
                 if result['success']:
-                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
                     graph_data = self.generate_graph_if_relevant(result['data'], question)
                     formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
+                    return sql_query, formatted_result, graph_data
                 else:
                     return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
             except Exception as db_error:
                 return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
 
-        # Récupération des données enfants
-        children_ids, children_prenoms = self.get_user_children_data(user_id)
-        children_ids_str = ", ".join(map(str, children_ids))
-        children_names_str = ", ".join(children_prenoms)
+        # Récupération des données enfants avec informations détaillées
+        children_data = self.get_user_children_detailed_data(user_id)
         
-        if not children_ids:
+        if not children_data:
             return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès.", None
         
-        logger.info(f"🔒 Restriction parent - Enfants autorisés: {children_ids}")
+        # 🎯 NOUVELLE LOGIQUE : Gestion intelligente des questions multi-enfants
+        child_context = self.analyze_child_context_in_question(question, children_data)
+        
+        if child_context["action"] == "request_clarification":
+            # Retourner une demande de clarification
+            return "", child_context["message"], None
+        elif child_context["action"] == "process_specific":
+            # Traiter pour un enfant spécifique
+            target_child = child_context["target_child"]
+            children_ids = [target_child['id_enfant']]
+            children_prenoms = [target_child['prenom']]
+            children_ids_str = str(target_child['id_enfant'])
+            children_names_str = target_child['prenom']
+            
+            logger.info(f"🎯 Enfant spécifique identifié: {target_child['prenom']} (ID: {target_child['id_enfant']})")
+            
+        elif child_context["action"] == "process_all":
+            # Traiter pour tous les enfants (rare, seulement pour certaines questions générales)
+            children_ids = [child['id_enfant'] for child in children_data]
+            children_prenoms = [child['prenom'] for child in children_data]
+            children_ids_str = ", ".join(map(str, children_ids))
+            children_names_str = ", ".join(children_prenoms)
+            
+            logger.info(f"📊 Traitement pour tous les enfants: {children_names_str}")
+        else:
+            return "", "❌ Impossible de déterminer l'enfant concerné par votre question.", None
 
         # Validation des noms dans la question
         detected_names = self.detect_names_in_question(question, children_prenoms)
@@ -414,17 +512,434 @@ class SQLAssistant:
             result = self.execute_sql_query(sql_query)
             
             if result['success']:
-                # 🎯 GÉNÉRATION DE GRAPHIQUE
                 graph_data = self.generate_graph_if_relevant(result['data'], question)
                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
                 self.cache1.cache_query(question, sql_query)
-                return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
+                return sql_query, formatted_result, graph_data
             else:
                 return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
                 
         except Exception as e:
             logger.error(f"Erreur dans _process_parent_question: {e}")
             return "", f"❌ Erreur de traitement : {str(e)}", None
+    def get_user_children_detailed_data(self, user_id: int) -> List[Dict]:
+        """Récupère les données détaillées des enfants pour un parent"""
+        connection = None
+        cursor = None
+        children_data = []
+
+        try:
+            query = """
+            SELECT DISTINCT 
+                pe.id AS id_enfant, 
+                pe.PrenomFr AS prenom,
+                pe.NomFr AS nom,
+                e.DateNaissance AS date_naissance,
+                YEAR(CURDATE()) - YEAR(e.DateNaissance) AS age,
+                c.CODECLASSEFR AS classe,
+                n.NOMNIVAR AS niveau,
+                CASE 
+                    WHEN pe.Civilite = 1 THEN 'M'
+                    WHEN pe.Civilite = 2 THEN 'F'
+                    ELSE 'Inconnu'
+                END AS genre
+            FROM personne p
+            JOIN parent pa ON p.id = pa.Personne
+            JOIN parenteleve pev ON pa.id = pev.Parent
+            JOIN eleve e ON pev.Eleve = e.id
+            JOIN personne pe ON e.IdPersonne = pe.id
+            JOIN inscriptioneleve ie ON e.id = ie.Eleve
+            JOIN classe c ON ie.Classe = c.id
+            JOIN niveau n ON c.IDNIV = n.id
+            JOIN anneescolaire a ON ie.AnneeScolaire = a.id
+            WHERE p.id = %s AND a.AnneeScolaire = %s
+            ORDER BY e.DateNaissance ASC
+            """
+            
+            connection = get_db()
+            cursor = connection.cursor()
+            
+            current_year = "2024/2025"
+            cursor.execute(query, (user_id, current_year))
+            children_data = cursor.fetchall()
+            
+            if children_data:
+                logger.info(f"✅ Trouvé {len(children_data)} enfants pour le parent {user_id}")
+            
+            return children_data
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur get_user_children_detailed_data pour parent {user_id}: {str(e)}")
+            return []
+            
+        finally:
+            try:
+                if cursor:
+                    cursor.close()
+                    
+                if connection and hasattr(connection, '_direct_connection'):
+                    connection.close()
+                    logger.debug("🔌 Connexion MySQL directe fermée")
+            except Exception as close_error:
+                logger.warning(f"⚠️ Erreur lors du nettoyage: {str(close_error)}")
+    def handle_multiple_children_logic(self, question: str, children_data: List[Dict], user_id: int) -> Optional[str]:
+        """Gère la logique pour les parents avec plusieurs enfants"""
+        
+        if len(children_data) <= 1:
+            # Un seul enfant ou aucun, pas de gestion spéciale
+            return None
+        
+        question_lower = question.lower()
+        
+        # 🎯 DÉTECTION DES INDICES DANS LA QUESTION
+        
+        # 1. Vérifier si un prénom spécifique est mentionné
+        children_prenoms = [child['prenom'].lower() for child in children_data]
+        mentioned_child = None
+        
+        for child in children_data:
+            if child['prenom'].lower() in question_lower:
+                mentioned_child = child
+                break
+        
+        if mentioned_child:
+            # Un prénom spécifique est mentionné, pas besoin de clarification
+            logger.info(f"🎯 Enfant spécifique détecté: {mentioned_child['prenom']}")
+            return None
+        
+        # 2. Détecter les indicateurs de genre
+        genre_indicators = {
+            'garçon': 'M',
+            'garcon': 'M', 
+            'fils': 'M',
+            'fille': 'F',
+            'ma fille': 'F',
+            'mon fils': 'M',
+            'mon garçon': 'M',
+            'mon garcon': 'M'
+            
+        }
+        
+        detected_genre = None
+        for indicator, genre in genre_indicators.items():
+            if indicator in question_lower:
+                detected_genre = genre
+                break
+        
+        if detected_genre:
+            # Filtrer par genre
+            children_of_genre = [child for child in children_data if child['genre'] == detected_genre]
+            if len(children_of_genre) == 1:
+                logger.info(f"🎯 Genre spécifique détecté: {detected_genre}, enfant unique trouvé")
+                return None
+            elif len(children_of_genre) > 1:
+                # Plusieurs enfants du même genre
+                names_list = ", ".join([child['prenom'] for child in children_of_genre])
+                return f"Vous avez plusieurs enfants de ce genre. Veuillez préciser de quel enfant il s'agit : {names_list}"
+            else:
+                return f"Aucun enfant de ce genre trouvé dans vos enfants."
+        
+        # 3. Détecter les indicateurs d'âge
+        age_indicators = {
+            'grand': 'oldest',
+            'grande': 'oldest',
+            'plus grand': 'oldest',
+            'plus grande': 'oldest',
+            'aîné': 'oldest',
+            'ainee': 'oldest',
+            'aînée': 'oldest',
+            'petit': 'youngest',
+            'petite': 'youngest',
+            'plus petit': 'youngest',
+            'plus petite': 'youngest',
+            'cadet': 'youngest',
+            'cadette': 'youngest',
+            'benjamin': 'youngest',
+            'benjamine': 'youngest'
+        }
+        
+        detected_age_order = None
+        for indicator, order in age_indicators.items():
+            if indicator in question_lower:
+                detected_age_order = order
+                break
+        
+        if detected_age_order:
+            if detected_age_order == 'oldest':
+                # Le plus âgé
+                oldest_child = min(children_data, key=lambda x: x['age'])
+                logger.info(f"🎯 Plus âgé détecté: {oldest_child['prenom']}")
+                return None
+            elif detected_age_order == 'youngest':
+                # Le plus jeune
+                youngest_child = max(children_data, key=lambda x: x['age'])
+                logger.info(f"🎯 Plus jeune détecté: {youngest_child['prenom']}")
+                return None
+        
+        # 4. Vérifier si la question est générale (sans spécification)
+        general_terms = [
+            'mon enfant', 'mes enfants', 'enfant', 'enfants',
+            'ma classe', 'les notes', 'les résultats', 'le bulletin',
+            'l\'emploi du temps', 'les absences'
+        ]
+        
+        is_general_question = any(term in question_lower for term in general_terms)
+        
+        # Vérifier si c'est une question spécifique à un nom non reconnu
+        specific_name_mentioned = False
+        for child in children_data:
+            if child['prenom'].lower() not in question_lower:
+                # Chercher d'autres noms propres qui ne correspondent pas
+                import re
+                potential_names = re.findall(r'\b[A-ZÀ-ÿ][a-zà-ÿ]+\b', question)
+                child_names = [child['prenom'] for child in children_data]
+                for name in potential_names:
+                    if name not in child_names and name not in ['Mon', 'Ma', 'Le', 'La', 'Les', 'De', 'Du']:
+                        specific_name_mentioned = True
+                        break
+        
+        if specific_name_mentioned:
+            # Un nom spécifique non reconnu est mentionné
+            children_names = ", ".join([child['prenom'] for child in children_data])
+            return f"❌ Je ne reconnais pas ce nom parmi vos enfants. Vos enfants sont : {children_names}"
+        
+        # 5. Si aucun indicateur spécifique, demander clarification
+        if is_general_question or len([term for term in general_terms if term in question_lower]) > 0:
+            children_info = []
+            for child in children_data:
+                genre_text = "garçon" if child['genre'] == 'M' else "fille" if child['genre'] == 'F' else ""
+                classe_text = f"en classe {child['classe']}" if child.get('classe') else ""
+                info = f"**{child['prenom']}** ({genre_text}, {child['age']} ans, {classe_text})"
+                children_info.append(info)
+            
+            children_list = "\n".join(children_info)
+            
+            return f"""👨‍👩‍👧‍👦 Vous avez plusieurs enfants. Veuillez préciser de quel enfant il s'agit :
+
+    {children_list}
+
+    💡 Vous pouvez préciser en disant par exemple :
+    - "**{children_data[0]['prenom']}**" (nom spécifique)
+    - "mon fils" ou "ma fille" (genre)
+    - "mon grand" ou "mon petit" (âge)"""
+        
+        # Aucune clarification nécessaire
+        return None
+
+    def detect_names_in_question_improved(self, question: str, authorized_names: List[str], children_data: List[Dict]) -> Dict[str, List[str]]:
+        """Version améliorée de la détection des noms avec informations détaillées des enfants"""
+        import unicodedata
+
+        def normalize_name(name):
+            name = unicodedata.normalize('NFD', name.lower())
+            return ''.join(char for char in name if unicodedata.category(char) != 'Mn')
+
+        normalized_authorized = [normalize_name(name) for name in authorized_names]
+
+        # Mots à exclure (étendus)
+        excluded_words = {
+            'mon', 'ma', 'mes', 'le', 'la', 'les', 'de', 'du', 'des', 'et', 'ou', 'si', 'ce', 
+            'cette', 'ces', 'son', 'sa', 'ses', 'notre', 'nos', 'votre', 'vos', 'leur', 'leurs',
+            'enfant', 'enfants', 'fils', 'fille', 'garçon', 'garcon', 'petit', 'petite', 'grand', 'grande',
+            'eleve', 'élève', 'eleves', 'élèves', 'classe', 'école', 'ecole', 'moyenne', 'note', 
+            'notes', 'résultat', 'resultats', 'trimestre', 'année', 'annee', 'matière', 'matiere',
+            'emploi', 'temps', 'horaire', 'professeur', 'enseignant', 'directeur', 'principal',
+            'aîné', 'aine', 'ainee', 'aînée', 'cadet', 'cadette', 'benjamin', 'benjamine'
+        }
+        
+        # Extraire les noms potentiels (commence par majuscule)
+        import re
+        potential_names = re.findall(r'\b[A-ZÀ-ÿ][a-zà-ÿ]+\b', question)
+        
+        # Filtrer les mots exclus
+        potential_names = [name for name in potential_names if normalize_name(name) not in excluded_words]
+        
+        authorized_found = []
+        unauthorized_found = []
+        suggestions = []
+        
+        for name in potential_names:
+            normalized_name = normalize_name(name)
+            
+            # Vérifier correspondance exacte
+            if normalized_name in normalized_authorized:
+                authorized_found.append(name)
+            else:
+                # Vérifier si c'est un mot français commun à ignorer
+                common_words = {
+                    'Merci', 'Bonjour', 'Salut', 'Cordialement', 'Madame', 'Monsieur', 
+                    'Mademoiselle', 'Docteur', 'Professeur', 'Janvier', 'Février', 'Mars', 
+                    'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 
+                    'Novembre', 'Décembre', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 
+                    'Vendredi', 'Samedi', 'Dimanche', 'France', 'Tunisie', 'Français'
+                }
+                
+                if name not in common_words:
+                    unauthorized_found.append(name)
+                    
+                    # Suggestions de noms similaires
+                    for child in children_data:
+                        child_name = child['prenom']
+                        # Vérification de similarité simple
+                        if (abs(len(name) - len(child_name)) <= 2 and 
+                            name.lower()[:3] == child_name.lower()[:3]):
+                            suggestions.append(f"Vouliez-vous dire **{child_name}** ?")
+        
+        logger.debug(f"🔍 Prénoms détectés - Autorisés: {authorized_found}, Non autorisés: {unauthorized_found}")
+        
+        result = {
+            "authorized_names": authorized_found,
+            "unauthorized_names": unauthorized_found
+        }
+        
+        if suggestions:
+            result["suggestions"] = suggestions
+        
+        return result  
+        
+    
+    def analyze_child_context_in_question(self, question: str, children_data: List[Dict]) -> Dict[str, Any]:
+        """
+        Analyse intelligente du contexte enfant dans la question
+        Retourne une action à effectuer et les données associées
+        
+        Returns:
+            Dict avec:
+            - action: "process_specific", "process_all", "request_clarification", "no_children"
+            - target_child: Dict avec infos enfant (si action = "process_specific")
+            - message: Message de clarification (si action = "request_clarification")
+        """
+        if len(children_data) <= 1:
+            # Un seul enfant ou aucun, traitement direct
+            return {
+                "action": "process_specific" if children_data else "no_children",
+                "target_child": children_data[0] if children_data else None
+            }
+        
+        question_lower = question.lower()
+        
+        # 1. Vérifier si un prénom spécifique est mentionné
+        for child in children_data:
+            if child['prenom'].lower() in question_lower:
+                logger.info(f"🎯 Prénom détecté dans la question: {child['prenom']}")
+                return {
+                    "action": "process_specific",
+                    "target_child": child
+                }
+        
+        # 2. Détection des indicateurs de genre
+        genre_indicators = {
+            'garçon': 'M', 'garcon': 'M', 'fils': 'M',
+            'mon fils': 'M', 'mon garçon': 'M', 'mon garcon': 'M',
+            'fille': 'F', 'ma fille': 'F'
+        }
+        
+        detected_genre = None
+        for indicator, genre in genre_indicators.items():
+            if indicator in question_lower:
+                detected_genre = genre
+                break
+        
+        if detected_genre:
+            children_of_genre = [child for child in children_data if child.get('genre') == detected_genre]
+            
+            if len(children_of_genre) == 1:
+                logger.info(f"🎯 Genre spécifique détecté: {detected_genre}, enfant unique trouvé")
+                return {
+                    "action": "process_specific",
+                    "target_child": children_of_genre[0]
+                }
+            elif len(children_of_genre) > 1:
+                # Plusieurs enfants du même genre
+                names_list = ", ".join([child['prenom'] for child in children_of_genre])
+                return {
+                    "action": "request_clarification",
+                    "message": f"Vous avez plusieurs enfants de ce genre. Veuillez préciser de quel enfant il s'agit : {names_list}"
+                }
+            else:
+                return {
+                    "action": "request_clarification",
+                    "message": f"Aucun enfant de ce genre trouvé parmi vos enfants."
+                }
+        
+        # 3. Détection des indicateurs d'âge
+        age_indicators = {
+            'grand': 'oldest', 'grande': 'oldest', 'plus grand': 'oldest', 'plus grande': 'oldest',
+            'aîné': 'oldest', 'ainee': 'oldest', 'aînée': 'oldest',
+            'petit': 'youngest', 'petite': 'youngest', 'plus petit': 'youngest', 'plus petite': 'youngest',
+            'cadet': 'youngest', 'cadette': 'youngest', 'benjamin': 'youngest', 'benjamine': 'youngest'
+        }
+        
+        detected_age_order = None
+        for indicator, order in age_indicators.items():
+            if indicator in question_lower:
+                detected_age_order = order
+                break
+        
+        if detected_age_order:
+            if detected_age_order == 'oldest':
+                oldest_child = min(children_data, key=lambda x: x.get('age', 0))
+                logger.info(f"🎯 Plus âgé détecté: {oldest_child['prenom']}")
+                return {
+                    "action": "process_specific",
+                    "target_child": oldest_child
+                }
+            elif detected_age_order == 'youngest':
+                youngest_child = max(children_data, key=lambda x: x.get('age', 0))
+                logger.info(f"🎯 Plus jeune détecté: {youngest_child['prenom']}")
+                return {
+                    "action": "process_specific",
+                    "target_child": youngest_child
+                }
+        
+        # 4. Vérifier si c'est une question générale autorisée pour tous les enfants
+        allowed_general_questions = [
+            'combien d\'enfants', 'mes enfants', 'liste de mes enfants',
+            'tous mes enfants', 'informations générales'
+        ]
+        
+        is_general_allowed = any(term in question_lower for term in allowed_general_questions)
+        
+        if is_general_allowed:
+            logger.info("📊 Question générale autorisée pour tous les enfants")
+            return {
+                "action": "process_all"
+            }
+        
+        # 5. Vérifier si un nom non autorisé est mentionné
+        import re
+        potential_names = re.findall(r'\b[A-ZÀ-ÿ][a-zà-ÿ]+\b', question)
+        child_names = [child['prenom'] for child in children_data]
+        
+        for name in potential_names:
+            if name not in child_names and name not in ['Mon', 'Ma', 'Le', 'La', 'Les', 'De', 'Du']:
+                children_names = ", ".join(child_names)
+                return {
+                    "action": "request_clarification",
+                    "message": f"❌ Je ne reconnais pas ce nom parmi vos enfants. Vos enfants sont : {children_names}"
+                }
+        
+        # 6. Question ambiguë nécessitant clarification
+        children_info = []
+        for child in children_data:
+            genre_text = "garçon" if child.get('genre') == 'M' else "fille" if child.get('genre') == 'F' else ""
+            classe_text = f"en classe {child.get('classe')}" if child.get('classe') else ""
+            info = f"{child['prenom']} ({genre_text}, {child.get('age', 'âge inconnu')} ans, {classe_text})"
+            children_info.append(info)
+        
+        children_list = "\n".join(children_info)
+        
+        return {
+            "action": "request_clarification",
+            "message": f"""👨‍👩‍👧‍👦 Vous avez plusieurs enfants. Veuillez préciser de quel enfant il s'agit :
+
+    {children_list}
+
+    """
+        }
+    
+    
+    
     
     # ================================
     # GÉNÉRATION SQL
@@ -559,53 +1074,90 @@ class SQLAssistant:
     # ================================
     # EXÉCUTION SQL
     # ================================
+    # def execute_sql_query(self, sql_query: str) -> dict:
+    #     """Exécute une requête SQL et retourne les résultats"""
+    #     try:
+    #         if not sql_query:
+    #             return {"success": False, "error": "Requête SQL vide", "data": []}
+            
+    #         # ✅ FIX: Utiliser directement get_db() au lieu de CustomSQLDatabase
+    #         connection = get_db()
+    #         cursor = connection.cursor()
+            
+    #         logger.debug(f"🔍 Exécution SQL: {sql_query}")
+    #         cursor.execute(sql_query)
+            
+    #         # ✅ FIX: Récupération correcte des colonnes et données
+    #         columns = [desc[0] for desc in cursor.description]
+    #         results = cursor.fetchall()
+            
+    #         logger.debug(f"🔍 Colonnes: {columns}")
+    #         logger.debug(f"🔍 Résultats bruts: {results}")
+            
+    #         # ✅ FIX: Construction correcte des dictionnaires
+    #         data = []
+    #         for row in results:
+    #             if isinstance(row, dict):
+    #                 # Si row est déjà un dict (DictCursor)
+    #                 data.append(row)
+    #             else:
+    #                 # Si row est un tuple, créer le dict
+    #                 data.append(dict(zip(columns, row)))
+            
+    #         logger.debug(f"🔍 Données finales: {data}")
+            
+    #         cursor.close()
+            
+    #         # Fermer la connexion si c'est une connexion directe
+    #         if hasattr(connection, '_direct_connection'):
+    #             connection.close()
+            
+    #         # Sérialiser les données
+    #         serialized_data = self._serialize_data(data)
+            
+    #         return {"success": True, "data": serialized_data}
+            
+    #     except Exception as e:
+    #         logger.error(f"❌ Erreur exécution SQL: {e}")
+    #         logger.error(f"❌ SQL qui a échoué: {sql_query}")
+    #         return {"success": False, "error": str(e), "data": []}
+    
+
     def execute_sql_query(self, sql_query: str) -> dict:
         """Exécute une requête SQL et retourne les résultats"""
         try:
             if not sql_query:
                 return {"success": False, "error": "Requête SQL vide", "data": []}
             
-            # ✅ FIX: Utiliser directement get_db() au lieu de CustomSQLDatabase
             connection = get_db()
             cursor = connection.cursor()
             
-            logger.debug(f"🔍 Exécution SQL: {sql_query}")
+           
+            logger.info(f"📜 SQL exécutée:\n{sql_query}")
+            
             cursor.execute(sql_query)
             
-            # ✅ FIX: Récupération correcte des colonnes et données
+            
             columns = [desc[0] for desc in cursor.description]
             results = cursor.fetchall()
+            logger.info(f"📊 {len(results)} ligne(s) retournée(s)")
             
-            logger.debug(f"🔍 Colonnes: {columns}")
-            logger.debug(f"🔍 Résultats bruts: {results}")
-            
-            # ✅ FIX: Construction correcte des dictionnaires
-            data = []
-            for row in results:
-                if isinstance(row, dict):
-                    # Si row est déjà un dict (DictCursor)
-                    data.append(row)
-                else:
-                    # Si row est un tuple, créer le dict
-                    data.append(dict(zip(columns, row)))
-            
-            logger.debug(f"🔍 Données finales: {data}")
+            data = [
+                dict(zip(columns, row)) if not isinstance(row, dict) else row
+                for row in results
+            ]
             
             cursor.close()
-            
-            # Fermer la connexion si c'est une connexion directe
             if hasattr(connection, '_direct_connection'):
                 connection.close()
             
-            # Sérialiser les données
-            serialized_data = self._serialize_data(data)
-            
-            return {"success": True, "data": serialized_data}
+            return {"success": True, "data": self._serialize_data(data)}
             
         except Exception as e:
             logger.error(f"❌ Erreur exécution SQL: {e}")
             logger.error(f"❌ SQL qui a échoué: {sql_query}")
             return {"success": False, "error": str(e), "data": []}
+
     def _serialize_data(self, data):
         """Sérialise les données pour éviter les problèmes de types"""
         if isinstance(data, (list, tuple)):
@@ -1404,6 +1956,9 @@ class SQLAssistant:
         
         return bool(re.match(pattern, name))
     
+     # ================================
+    # FONCTIONS Historiques
+    # ================================
     def get_user_conversations(self, user_id: int, limit: int = 50) -> List[Dict]:
         """Récupère les conversations d'un utilisateur"""
         try:

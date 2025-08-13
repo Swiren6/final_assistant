@@ -7,6 +7,7 @@
     "question_template": "donne moi le nombre des enseingants",
     "sql_template": "SELECT COUNT(*) as nombre_enseignants FROM enseingant"
   },
+
   "5528ecb91dab2a31a6f6605682f3dcde": {
     "question_template": "donne moi le nombre des eleves inscris pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as nombre_eleves FROM inscriptioneleve ie WHERE ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
@@ -34,5 +35,10 @@
   "b13cffa80ec07043dd94832d412b9431": {
     "question_template": "donne moi le nombre des inscriptions pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as total_inscriptions FROM inscriptioneleve WHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  },
+  "620c0c8066b87beff9618de7abcb5f61": {
+    "question_template": "donne moi nombre des nouvelles inscriptions",
+    "sql_template": "SELECT COUNT(*) as nombre_nouvelles_inscriptions FROM inscriptioneleve WHERE TypeInscri = 'N'"
+
   }
 }
