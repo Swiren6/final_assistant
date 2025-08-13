@@ -3,6 +3,8 @@ from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, get_jwt
 import logging
 import re
 import os
+from typing import List, Dict, Optional
+
 
 from routes.auth import login
 from services.auth_service import AuthService
@@ -42,7 +44,7 @@ logger = logging.getLogger(__name__)
 # Global assistant instance
 unified_assistant = None
 
-def initialize_unified_assistant():
+def initialize_assistant():
     """Initialize the unified SQL assistant"""
     global unified_assistant
     try:
@@ -59,19 +61,21 @@ def initialize_unified_assistant():
         return False
 
 # Initialize at import
-initialize_unified_assistant()
+initialize_assistant()
+
+# Ajout dans la route /ask du fichier agent.py
 
 @agent_bp.route('/ask', methods=['POST'])
 def ask_sql():
     """
     Route principale pour les questions SQL avec génération de graphiques
-    Utilise le nouvel assistant unifié qui combine SQL + IA + graphiques
+    Utilise le nouvel assistant unifié qui combine SQL + IA + graphiques + gestion multi-enfants
     """
     jwt_valid = False
     current_user = None
     jwt_error = None
 
-    # 🔐 Authentification via JWT
+    # 🔍 Authentification via JWT
     try:
         if 'Authorization' in request.headers:
             try:
@@ -127,7 +131,7 @@ def ask_sql():
 
         # Vérification de l'assistant
         if not unified_assistant:
-            if not initialize_unified_assistant():
+            if not initialize_assistant():
                 return jsonify({
                     "error": "Assistant non disponible",
                     "details": "Impossible d'initialiser l'assistant IA"
@@ -145,6 +149,17 @@ def ask_sql():
         try:
             # 🎯 MODIFICATION : Récupération de 3 valeurs (sql, response, graph)
             sql_query, ai_response, graph_data = unified_assistant.ask_question(question, user_id, roles)
+            
+            # 🎯 NOUVELLE LOGIQUE : Vérifier si c'est une demande de clarification multi-enfants
+            if not sql_query and ai_response and "plusieurs enfants" in ai_response:
+                # C'est une demande de clarification, pas une erreur
+                return jsonify({
+                    "response": ai_response,
+                    "status": "clarification_needed",
+                    "question": question,
+                    "user_action_required": True,
+                    "timestamp": pd.Timestamp.now().isoformat()
+                }), 200
             
             if not sql_query:
                 return jsonify({
@@ -201,6 +216,115 @@ def ask_sql():
             "details": str(e),
             "status": "error"
         }), 500
+
+# Nouvelle route pour gérer les clarifications multi-enfants
+@agent_bp.route('/clarify-child', methods=['POST'])
+def clarify_child_selection():
+    """
+    Route spéciale pour gérer les clarifications de sélection d'enfant
+    """
+    try:
+        if not request.is_json:
+            return jsonify({"error": "Content-Type application/json requis"}), 415
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Corps de requête JSON vide"}), 400
+
+        # Extraction des paramètres
+        original_question = data.get('original_question', '')
+        child_specification = data.get('child_specification', '')  # "Ahmed", "mon fils", "ma grande", etc.
+        user_id = data.get('user_id')
+
+        if not all([original_question, child_specification, user_id]):
+            return jsonify({
+                "error": "Paramètres manquants",
+                "required": ["original_question", "child_specification", "user_id"]
+            }), 422
+
+        # Reformuler la question avec la spécification de l'enfant
+        clarified_question = f"{original_question} pour {child_specification}"
+        
+        # Retraiter avec la question clarifiée
+        roles = ['ROLE_PARENT']  # Assumer parent pour cette route
+        sql_query, ai_response, graph_data = unified_assistant.ask_question(clarified_question, user_id, roles)
+        
+        if not sql_query:
+            return jsonify({
+                "error": "Impossible de traiter la question clarifiée",
+                "clarified_question": clarified_question,
+                "status": "error"
+            }), 422
+
+        # Réponse enrichie
+        result = {
+            "sql_query": sql_query,
+            "response": ai_response,
+            "status": "success",
+            "original_question": original_question,
+            "clarified_question": clarified_question,
+            "child_specification": child_specification,
+            "timestamp": pd.Timestamp.now().isoformat()
+        }
+        
+        if graph_data:
+            result["graph"] = graph_data
+            result["has_graph"] = True
+        else:
+            result["has_graph"] = False
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"Erreur clarification enfant: {e}")
+        return jsonify({
+            "error": "Erreur lors de la clarification",
+            "details": str(e),
+            "status": "error"
+        }), 500
+
+# Méthode utilitaire pour extraire les informations d'enfant à partir du texte
+def extract_child_context_from_question(question: str, children_data: List[Dict]) -> Optional[Dict]:
+    """
+    Extrait le contexte spécifique d'un enfant à partir de la question
+    Retourne les informations de l'enfant ciblé ou None si ambiguë
+    """
+    question_lower = question.lower()
+    
+    # 1. Vérifier mention directe du prénom
+    for child in children_data:
+        if child['prenom'].lower() in question_lower:
+            return child
+    
+    # 2. Vérifier indicateurs de genre
+    male_indicators = ['garçon', 'garcon', 'fils', 'mon fils', 'mon garçon']
+    female_indicators = ['fille', 'ma fille']
+    
+    male_children = [child for child in children_data if child.get('genre') == 'M']
+    female_children = [child for child in children_data if child.get('genre') == 'F']
+    
+    for indicator in male_indicators:
+        if indicator in question_lower and len(male_children) == 1:
+            return male_children[0]
+    
+    for indicator in female_indicators:
+        if indicator in question_lower and len(female_children) == 1:
+            return female_children[0]
+    
+    # 3. Vérifier indicateurs d'âge
+    age_indicators_old = ['grand', 'grande', 'aîné', 'ainee', 'aînée']
+    age_indicators_young = ['petit', 'petite', 'cadet', 'cadette', 'benjamin', 'benjamine']
+    
+    for indicator in age_indicators_old:
+        if indicator in question_lower:
+            return min(children_data, key=lambda x: x.get('age', 0))
+    
+    for indicator in age_indicators_young:
+        if indicator in question_lower:
+            return max(children_data, key=lambda x: x.get('age', 0))
+    
+    return None
+
 def handle_attestation_request(question: str):
     """Gère les demandes d'attestation de présence"""
     try:
@@ -342,7 +466,7 @@ def handle_bulletin_request(question: str):
 def reinitialize():
     """Réinitialise l'assistant unifié"""
     try:
-        success = initialize_unified_assistant()
+        success = initialize_assistant()
         
         message = "Réinitialisation réussie" if success else "Échec de la réinitialisation"
         
