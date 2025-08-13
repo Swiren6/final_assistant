@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../utils/constants.dart';
+import '../screens/login_screen.dart';
 
 class SidebarMenu extends StatelessWidget {
   const SidebarMenu({super.key});
@@ -60,6 +61,7 @@ class SidebarMenu extends StatelessWidget {
     );
   }
 
+  
   void _logout(BuildContext context) {
     showDialog(
       context: context,
@@ -73,9 +75,24 @@ class SidebarMenu extends StatelessWidget {
               child: const Text('Annuler'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                Provider.of<AuthService>(context, listen: false).logout();
+                try {
+                  final authService = Provider.of<AuthService>(context, listen: false);
+                  await authService.logout();
+                  
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (Route<dynamic> route) => false,
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erreur lors de la déconnexion: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               child: const Text('Déconnexion'),
             ),

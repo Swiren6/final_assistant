@@ -35,6 +35,8 @@ from tabulate import tabulate
 import MySQLdb
 import traceback
 
+from agent.conversation_history import ConversationHistory
+
 # Configure matplotlib for server environment
 matplotlib.use('Agg')  
 plt.switch_backend('Agg')
@@ -75,6 +77,13 @@ class SQLAssistant:
         # Template matcher et templates questions
         self.template_matcher = SemanticTemplateMatcher()
         self.templates_questions = self._safe_load_templates()
+        self.last_generated_sql = ""
+        self.query_history = []
+        self.conversation_history_old = []  # Renommer pour éviter confusion
+
+        
+        # 🆕 NOUVEAU : Gestionnaire d'historique persistant
+        self.conversation_manager = ConversationHistory()
         
         logger.info("✅ SQLAssistant initialisé avec succès")
 
@@ -177,10 +186,11 @@ class SQLAssistant:
     # MÉTHODES PRINCIPALES D'INTERACTION
     # ================================
 
-    # def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str]:
+    
+    # def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
     #     """
     #     Point d'entrée principal pour poser une question
-    #     Retourne (sql_query, formatted_response)
+    #     Retourne (sql_query, formatted_response, graph_data)
     #     """
     #     if user_id is None:
     #         user_id = 0
@@ -189,54 +199,83 @@ class SQLAssistant:
 
     #     # Validation des rôles
     #     if not roles:
-    #         return "", "❌ Accès refusé : Aucun rôle fourni"
+    #         return "", "❌ Accès refusé : Aucun rôle fourni", None
         
     #     valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
     #     has_valid_role = any(role in valid_roles for role in roles)
         
     #     if not has_valid_role:
-    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}"
+    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None
 
     #     # Traitement par rôle
     #     try:
     #         if 'ROLE_SUPER_ADMIN' in roles:
-    #             return self._process_super_admin_question(question)
+    #             return self._process_super_admin_question(question)  # Retourne 3 valeurs
     #         elif 'ROLE_PARENT' in roles:
-    #             return self._process_parent_question(question, user_id)
+    #             return self._process_parent_question(question, user_id)  # Retourne 3 valeurs
     #     except Exception as e:
     #         logger.error(f"Erreur dans ask_question: {e}")
-    #         return "", f"❌ Erreur : {str(e)}"
+    #         return "", f"❌ Erreur : {str(e)}", None
 
-    
-    def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
+    def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
+                                 roles: Optional[List[str]] = None, 
+                                 conversation_id: Optional[int] = None) -> tuple[str, str, Optional[str], int]:
         """
-        Point d'entrée principal pour poser une question
-        Retourne (sql_query, formatted_response, graph_data)
+        Version améliorée qui sauvegarde automatiquement dans l'historique
+        Retourne (sql_query, formatted_response, graph_data, conversation_id)
         """
         if user_id is None:
             user_id = 0
         if roles is None:
             roles = []
 
-        # Validation des rôles
+        # Validation des rôles (identique à la version existante)
         if not roles:
-            return "", "❌ Accès refusé : Aucun rôle fourni", None
+            return "", "❌ Accès refusé : Aucun rôle fourni", None, 0
         
         valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
         has_valid_role = any(role in valid_roles for role in roles)
         
         if not has_valid_role:
-            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None
+            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None, 0
 
-        # Traitement par rôle
         try:
+            # 🆕 GESTION DE LA CONVERSATION
+            if conversation_id is None:
+                conversation_id = self.conversation_manager.create_conversation(user_id, question)
+            
+            # Sauvegarder la question utilisateur
+            self.conversation_manager.add_message(conversation_id, 'user', question)
+
+            # Traitement par rôle (utiliser les méthodes existantes)
             if 'ROLE_SUPER_ADMIN' in roles:
-                return self._process_super_admin_question(question)  # Retourne 3 valeurs
+                sql_query, formatted_response, graph_data = self._process_super_admin_question(question)
             elif 'ROLE_PARENT' in roles:
-                return self._process_parent_question(question, user_id)  # Retourne 3 valeurs
+                sql_query, formatted_response, graph_data = self._process_parent_question(question, user_id)
+            
+            # 🆕 SAUVEGARDER LA RÉPONSE ASSISTANT
+            self.conversation_manager.add_message(
+                conversation_id, 
+                'assistant', 
+                formatted_response, 
+                sql_query, 
+                graph_data
+            )
+            
+            logger.info(f"✅ Question traitée et sauvegardée - Conversation {conversation_id}")
+            return sql_query, formatted_response, graph_data, conversation_id
+            
         except Exception as e:
-            logger.error(f"Erreur dans ask_question: {e}")
-            return "", f"❌ Erreur : {str(e)}", None
+            logger.error(f"Erreur dans ask_question_with_history: {e}")
+            error_message = f"❌ Erreur : {str(e)}"
+            
+            # Sauvegarder l'erreur aussi
+            if conversation_id:
+                self.conversation_manager.add_message(conversation_id, 'system', error_message)
+            
+            return "", error_message, None, conversation_id or 0
+
+    
     def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str]]:
         """Traite une question avec accès admin complet - CORRIGÉ POUR RETOURNER 3 VALEURS"""
         
@@ -313,6 +352,7 @@ class SQLAssistant:
         except Exception as e:
             logger.error(f"Erreur dans _process_super_admin_question: {e}")
             return "", f"❌ Erreur de traitement : {str(e)}", None    
+    
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
         """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
         
@@ -469,37 +509,6 @@ class SQLAssistant:
         sql = re.sub(r'(?i)^\s*(?:--|#).*$', '', sql, flags=re.MULTILINE)
         return sql.strip().rstrip(';')
 
-    # def _validate_sql(self, sql: str) -> bool:
-    #     """Valide la syntaxe SQL et vérifie la sécurité"""
-    #     if not sql:
-    #         raise ValueError("❌ Requête SQL vide")
-            
-    #     sql_lower = sql.lower()
-
-    #     # Protection contre les requêtes destructives
-    #     forbidden_keywords = ['drop', 'delete', 'update', 'insert', ';--', 'exec', 'truncate']
-    #     if any(keyword in sql_lower for keyword in forbidden_keywords):
-    #         raise ValueError("❌ Commande SQL dangereuse détectée")
-
-    #     # Vérification que c'est bien une requête SELECT
-    #     if not sql_lower.strip().startswith('select'):
-    #         raise ValueError("❌ Seules les requêtes SELECT sont autorisées")
-
-    #     try:
-    #         # Validation avec EXPLAIN (si possible)
-    #         connection = get_db()
-    #         cursor = connection.cursor()
-    #         cursor.execute(f"EXPLAIN {sql}")
-    #         cursor.close()
-            
-    #         # Fermer la connexion si c'est une connexion directe
-    #         if hasattr(connection, '_direct_connection'):
-    #             connection.close()
-            
-    #         return True
-
-    #     except Exception as e:
-    #         raise ValueError(f"❌ Requête invalide : {str(e)}")
     
     def _validate_sql(self, sql: str) -> bool:
         """Valide la syntaxe SQL et vérifie la sécurité"""
@@ -521,6 +530,7 @@ class SQLAssistant:
         # L'exécution réelle se fera dans execute_sql_query() qui gère mieux les erreurs
         
         return True
+    
     def _validate_sql_semantics(self, sql: str, question: str) -> bool:
         """Valide la cohérence sémantique entre question et SQL"""
         
@@ -1393,3 +1403,163 @@ class SQLAssistant:
             return False
         
         return bool(re.match(pattern, name))
+    
+    def get_user_conversations(self, user_id: int, limit: int = 50) -> List[Dict]:
+        """Récupère les conversations d'un utilisateur"""
+        try:
+            return self.conversation_manager.get_user_conversations(user_id, limit)
+        except Exception as e:
+            logger.error(f"Erreur récupération conversations: {e}")
+            return []
+
+    def get_conversation_messages(self, conversation_id: int, user_id: int) -> List[Dict]:
+        """Récupère les messages d'une conversation"""
+        try:
+            return self.conversation_manager.get_conversation_messages(conversation_id, user_id)
+        except Exception as e:
+            logger.error(f"Erreur récupération messages: {e}")
+            return []
+
+    def search_conversations(self, user_id: int, query: str, limit: int = 20) -> List[Dict]:
+        """Recherche dans les conversations"""
+        try:
+            return self.conversation_manager.search_conversations(user_id, query, limit)
+        except Exception as e:
+            logger.error(f"Erreur recherche conversations: {e}")
+            return []
+
+    def update_conversation_title(self, conversation_id: int, user_id: int, new_title: str) -> bool:
+        """Met à jour le titre d'une conversation"""
+        try:
+            return self.conversation_manager.update_conversation_title(conversation_id, user_id, new_title)
+        except Exception as e:
+            logger.error(f"Erreur mise à jour titre: {e}")
+            return False
+
+    def delete_conversation(self, conversation_id: int, user_id: int) -> bool:
+        """Supprime une conversation"""
+        try:
+            return self.conversation_manager.delete_conversation(conversation_id, user_id)
+        except Exception as e:
+            logger.error(f"Erreur suppression conversation: {e}")
+            return False
+
+    def get_user_stats(self, user_id: int) -> Dict:
+        """Récupère les statistiques d'un utilisateur"""
+        try:
+            return self.conversation_manager.get_user_stats(user_id)
+        except Exception as e:
+            logger.error(f"Erreur statistiques utilisateur: {e}")
+            return {}
+
+    # 🆕 MÉTHODE POUR MIGRER L'HISTORIQUE EXISTANT
+    def migrate_existing_conversations(self, user_id: int, old_messages: List[Dict]) -> Optional[int]:
+        """Migre une conversation existante vers le nouveau système d'historique"""
+        try:
+            if not old_messages:
+                return None
+                
+            # Créer une nouvelle conversation
+            first_message = old_messages[0].get('text', 'Conversation migrée')
+            conversation_id = self.conversation_manager.create_conversation(user_id, first_message)
+            
+            # Migrer tous les messages
+            for msg in old_messages:
+                message_type = 'user' if msg.get('isMe', False) else 'assistant'
+                content = msg.get('text', '')
+                sql_query = msg.get('sqlQuery')
+                graph_data = msg.get('graphBase64')
+                
+                self.conversation_manager.add_message(
+                    conversation_id, message_type, content, sql_query, graph_data
+                )
+            
+            logger.info(f"✅ {len(old_messages)} messages migrés vers conversation {conversation_id}")
+            return conversation_id
+            
+        except Exception as e:
+            logger.error(f"Erreur migration conversation: {e}")
+            return None
+
+    # 🔄 MÉTHODE DE COMPATIBILITÉ : Wrapper pour l'ancienne méthode
+    def ask_question(self, question: str, user_id: Optional[int] = None, 
+                    roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
+        """
+        Méthode de compatibilité qui utilise le nouveau système avec historique
+        Retourne (sql_query, formatted_response, graph_data)
+        """
+        sql_query, formatted_response, graph_data, _ = self.ask_question_with_history(
+            question, user_id, roles
+        )
+        return sql_query, formatted_response, graph_data
+
+    # 🆕 NETTOYAGE PÉRIODIQUE DE L'HISTORIQUE
+    def cleanup_user_history(self, user_id: int, keep_recent_days: int = 30) -> int:
+        """Nettoie l'historique ancien d'un utilisateur en gardant les conversations récentes"""
+        try:
+            from datetime import datetime, timedelta
+            
+            cutoff_date = datetime.now() - timedelta(days=keep_recent_days)
+            
+            # Récupérer les conversations anciennes
+            all_conversations = self.conversation_manager.get_user_conversations(user_id, limit=1000)
+            old_conversations = [
+                conv for conv in all_conversations 
+                if datetime.fromisoformat(conv['updated_at']) < cutoff_date
+            ]
+            
+            # Archiver les anciennes conversations
+            deleted_count = 0
+            for conv in old_conversations:
+                if self.conversation_manager.delete_conversation(conv['id'], user_id):
+                    deleted_count += 1
+            
+            logger.info(f"🧹 {deleted_count} conversations anciennes archivées pour utilisateur {user_id}")
+            return deleted_count
+            
+        except Exception as e:
+            logger.error(f"Erreur nettoyage historique utilisateur: {e}")
+            return 0
+
+    # 🆕 EXPORT/IMPORT DE CONVERSATIONS
+    def export_conversation(self, conversation_id: int, user_id: int, format: str = 'json') -> Optional[str]:
+        """Exporte une conversation dans différents formats"""
+        try:
+            messages = self.conversation_manager.get_conversation_messages(conversation_id, user_id)
+            if not messages:
+                return None
+            
+            if format == 'json':
+                import json
+                return json.dumps(messages, indent=2, ensure_ascii=False)
+            
+            elif format == 'txt':
+                output = []
+                for msg in messages:
+                    timestamp = msg.get('timestamp', '')
+                    msg_type = msg.get('type', '').upper()
+                    content = msg.get('content', '')
+                    output.append(f"[{timestamp}] {msg_type}: {content}")
+                return '\n\n'.join(output)
+            
+            elif format == 'markdown':
+                output = ["# Conversation Export", ""]
+                for msg in messages:
+                    msg_type = msg.get('type', '')
+                    content = msg.get('content', '')
+                    
+                    if msg_type == 'user':
+                        output.append(f"**👤 Utilisateur:**")
+                        output.append(content)
+                    elif msg_type == 'assistant':
+                        output.append(f"**🤖 Assistant:**")
+                        output.append(content)
+                    output.append("")
+                
+                return '\n'.join(output)
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erreur export conversation: {e}")
+            return None

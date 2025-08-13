@@ -34,5 +34,13 @@
   "232a2cb3f0dbd19c0577f70c787a5176": {
     "question_template": "donnez moi les discipline de {family_relation}",
     "sql_template": "SELECT \n    d.nomDisciplineFr \nFROM \n    discipline d \nJOIN \n    eleve e ON e.IdPersonne IN ({id_personne}) \nJOIN \n    inscriptioneleve ie ON ie.Eleve = e.id \nJOIN \n    classe c ON c.id = ie.Classe \nJOIN \n    matiere m ON m.id = d.id \nWHERE \n    e.IdPersonne IN ({id_personne})"
+  },
+  "d3dcf3964084f0886a5ba547636a8c5e": {
+    "question_template": "donne moi les coordonnée de {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom,\n    p.PrenomFr AS prenom,\n    p.Cin AS cin,\n    p.AdresseFr AS adresse,\n    p.Tel1 AS telephone\nFROM \n    personne p\nJOIN \n    eleve e ON p.id = e.IdPersonne\nWHERE \n    e.IdPersonne IN ({id_personne})"
+  },
+  "4c5bc30cadabd73ef7b720a82a418d43": {
+    "question_template": "donne moi la classe de {family_relation}",
+    "sql_template": "SELECT c.CODECLASSEFR \nFROM classe c \nJOIN inscriptioneleve ie ON c.id = ie.Classe \nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))"
   }
 }

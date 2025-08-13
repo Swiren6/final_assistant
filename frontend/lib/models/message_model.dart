@@ -37,6 +37,15 @@ class Message {
     );
   }
 
+  // Dans message_model.dart
+  factory Message.system({required String text}) {
+    return Message(
+      text: text,
+      type: MessageType.system,
+      isMe: false,
+      timestamp: DateTime.now(),
+    );
+  }
   factory Message.assistant({
     required String text,
     String? sqlQuery,
