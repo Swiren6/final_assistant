@@ -12,8 +12,8 @@ from bidi.algorithm import get_display
 import logging
 from typing import Dict, Any
 import os
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+# from reportlab.pdfbase import pdfmetrics
+# from reportlab.pdfbase.ttfonts import TTFont
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def export_attestation_pdf(donnees):
     # Police dans: agent/pdf_utils/fonts/Amiri-1.002/
     base_dir = os.path.dirname(__file__)
     font_path = os.path.join(base_dir, 'fonts', 'Amiri', 'Amiri-Regular.ttf')
-    pdfmetrics.registerFont(TTFont('Amiri', font_path))
+    # pdfmetrics.registerFont(TTFont('Amiri', font_path))
 
     pdf.ln(30)
 
@@ -77,7 +77,7 @@ class PDFGenerator:
     
     def __init__(self):
         # Chemin exact que vous avez fourni
-        self.font_dir = Path(r"C:\Users\zeineb7\OneDrive\Bureau\zeinebv21\agent_ise1\final_assistant\backend\agent\pdf_utils\fonts\Amiri")
+        self.font_dir = Path(r"C:\Users\HP\Desktop\assistant_ISE - Copie\backend\agent\pdf_utils\fonts\Amiri")
         self.base_dir = Path(__file__).parent.parent.parent  # Racine du projet
         self._validate_fonts()
 
