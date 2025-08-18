@@ -19,6 +19,7 @@
     "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
     "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = 'p'.id\nLEFT JOIN \n    localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
   },
+<<<<<<< HEAD
   "1bb210329eea44305fed369c0adc1665": {
     "question_template": "le nombre des préinscriptions pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as nombre_preinscriptions \nFROM preinscriptionlog \nWHERE date BETWEEN '2024-04-01' AND '2024-08-31'"
@@ -58,5 +59,10 @@
   "2e057be30905aa48bac78012920f9be1": {
     "question_template": "donne moi les matières ,les dates , les durée des retards de {NomFr} {PrenomFr}",
     "sql_template": "SELECT m.nomMatierefr AS matiere, r.Date AS date, r.Duree AS duree\nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = 'ie'.id\nJOIN eleve e ON ie.Eleve = 'e'.id\nJOIN personne p ON e.IdPersonne = 'p'.id\nJOIN matiere m ON r.Matiere = 'm'.id\nWHERE p.NomFr = {NomFr} AND p.PrenomFr = {PrenomFr}"
+=======
+  "7b366591bf75bc68e78226571ec262ef": {
+    "question_template": "nombre total des préinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_preinscriptions \nFROM preinscription \nJOIN anneescolaire ON preinscription.AnneeScolaire = 'anneescolaire'.id \nWHERE anneescolaire.AnneeScolaire = '{AnneeScolaire}'"
+>>>>>>> 07f53f25f329d461677f39ae14dfb7e70afcdce7
   }
 }

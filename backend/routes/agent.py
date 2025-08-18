@@ -4,16 +4,12 @@ import logging
 import re
 import os
 from typing import List, Dict, Optional
-
-
 from routes.auth import login
 from services.auth_service import AuthService
 from agent.assistant import SQLAssistant  # Import du nouvel assistant unifié
 from agent.pdf_utils.attestation import PDFGenerator
 from agent.pdf_utils.bulletin import export_bulletin_pdf
-
 from config.database import init_db, get_db, get_db_connection
-
 # Initialize PDF generator
 generator = PDFGenerator()
 
@@ -53,10 +49,10 @@ def initialize_assistant():
             logger.info("✅ Assistant unifié initialisé avec succès")
             return True
         else:
-            logger.error("❌ Assistant initialisé mais DB manquante")
+            logger.warning("❌ Assistant initialisé mais DB manquante")
             return False
     except Exception as e:
-        logger.error(f"❌ Erreur initialisation assistant unifié: {e}")
+        logger.warning(f"❌ Erreur initialisation assistant unifié: {e}")
         assistant = None
         return False
 
