@@ -25,7 +25,7 @@
 - enseignants_presence liée à jour, salle, classe, Anneescolaire, personne, semaine. 
 - enseingant liée à diplome, modalitepaiement, personne, qualite, situationfamilliale.
 - etablissement liée à dre, gouvernorat, typeetablissement, delegation.
-- fichierpreinscriptionpreinscription liée à preinscriptionpreinscription.
+- fichier preinscriptionpreinscription liée à preinscriptionpreinscription.
 - fonctionaliteprivelge liée à rubrique.
 - groupecourete liée à Anneescolaire, enseingant, matiere.
 - grouperepartition liée à inscriptioneleve, groupe, Anneescolaire, trimestre, groupe, classe, personne.

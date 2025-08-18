@@ -18,5 +18,9 @@
   "6799af4e01dfb0ac0490107b0ae23128": {
     "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
     "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = 'p'.id\nLEFT JOIN \n    localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
+  },
+  "7b366591bf75bc68e78226571ec262ef": {
+    "question_template": "nombre total des préinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_preinscriptions \nFROM preinscription \nJOIN anneescolaire ON preinscription.AnneeScolaire = 'anneescolaire'.id \nWHERE anneescolaire.AnneeScolaire = '{AnneeScolaire}'"
   }
 }

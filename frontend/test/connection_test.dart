@@ -16,7 +16,7 @@ class ConnectionTest {
     print('🏥 Test de l\'endpoint /health...');
     try {
       final isConnected = await _apiService.testConnection();
-      if (isConnected) {
+      if (isConnected == true) {
         print('✅ Endpoint /health : OK');
       } else {
         print('❌ Endpoint /health : Échec');
@@ -37,8 +37,8 @@ class ConnectionTest {
           '' // Sans token pour le test
           );
       print('✅ Question test réussie :');
-      print('   SQL: ${response['sql_query']}');
-      print('   Réponse: ${response['response']}');
+      print('   SQL: ${response.sqlQuery}');
+      print('   Réponse: ${response.response}');
     } catch (e) {
       print('❌ Erreur question test : $e');
     }
