@@ -73,6 +73,9 @@ Question: "Liste des élèves en classe 6A"
 → SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id JOIN inscriptioneleve ie ON e.id = ie.Eleve JOIN classe c ON ie.Classe = c.id WHERE c.CODECLASSEFR = '6A'
 
 ATTENTION: 
+** lorsque la colonne annuler dans la table inscriptioneleve est 0 c'est à dire l'eleve est encore inscris dans l'ecole si elle est egale a 1.
+** on applique le filtre annuler=0 pour calculer le nombre des eleves par délégation , par localité ...  
+** pour le nombre par localité on calcule meme le nombre des eleves ou la localité est NULL 
 **les moyennes des trimestres se trouve dans le table Eduresultatcopie.
 **l'année scolaire se trouve dans anneescolaire.AnneeScolaire non pas dans Annee 
 ** si on dit l'annee XXXX/YYYY on parle de l'année scolaire XXXX/YYYY 

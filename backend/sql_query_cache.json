@@ -7,10 +7,6 @@
     "question_template": "le nombre des réinscriptions pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as nombre_reinscriptions FROM inscriptioneleve ie WHERE ie.TypeInscri = 'R' AND ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
   },
-  "b13cffa80ec07043dd94832d412b9431": {
-    "question_template": "donne moi le nombre des inscriptions pour {AnneeScolaire}",
-    "sql_template": "SELECT COUNT(*) as total_inscriptions FROM inscriptioneleve WHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
-  },
   "89d5c96a4f754dbc9862f83d2ef6b5dc": {
     "question_template": "le nombre des eleves nouvellement inscris pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as nombre_eleves_nouvellement_inscris\nFROM inscriptioneleve ie\nJOIN anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE ie.TypeInscri = 'N' AND a.AnneeScolaire = '{AnneeScolaire}' AND ie.Annuler = '0'"
@@ -19,8 +15,8 @@
     "question_template": "nombre des élèves accepté et non inscris pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) AS nombre_eleves_accepte_non_inscris\nFROM preinscription p\nJOIN anneescolaire a ON p.AnneeScolaire = 'a'.id\nWHERE p.Decision = 'Acceptée'\nAND p.Eleve NOT IN (\n    'SELECT' Eleve\n    FROM inscriptioneleve ie\n    WHERE ie.AnneeScolaire = 'a'.id\n)\nAND a.AnneeScolaire = '{AnneeScolaire}'"
   },
-  "238f4eca8798f5fad30abb6f13e6375d": {
-    "question_template": "nombre des élèves par localité pour {AnneeScolaire}",
-    "sql_template": "SELECT l.LIBELLELOCALITEFR, COUNT(*) as nombre_eleves\nFROM eleve e\nJOIN personne p ON e.IdPersonne = 'p'.id\nJOIN localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE a.AnneeScolaire = '{AnneeScolaire}'\nGROUP BY l.LIBELLELOCALITEFR"
+  "6799af4e01dfb0ac0490107b0ae23128": {
+    "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
+    "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = 'p'.id\nLEFT JOIN \n    localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
   }
 }
