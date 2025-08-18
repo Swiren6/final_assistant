@@ -504,9 +504,13 @@
     "description": "La colonne `PaiementExtras` de la table `paiementextradetails` est une clé étrangère qui fait référence à la colonne `id` de la table `paiementextra`."
   },
   {
-  "relation": "`parenteleve`.`Parent` -> `parent`.`id` -> `parent`.`Personne` -> `personne`.`id`",
-  "tables": ["`parenteleve`", "`parent`", "`personne`"],
-  "description": "Passage obligatoire par `parenteleve` pour retrouver le parent, puis `personne` pour ses coordonnées."
+    "relation": "parent.Personne = personne.id",
+    "tables": [
+      "parent",
+      "personne"
+    ],
+    "join_column": "id",
+    "description": "Les coordonnées des parents (Tel1, Tel2, Tel3, Email) sont dans `personne`. On récupère `personne` du parent via `parent.Personne = personne.id`."
   },
   {
   "relation": "parenteleve.Parent = parent.id, parenteleve.Eleve = eleve.id",
@@ -906,10 +910,5 @@
   "tables": ["eleve", "personne"],
   "join_column": "IdPersonne",
   "description": "Lorsqu'on relie la table `eleve` à `personne`, il ne faut pas utiliser `personne AS eleve`, car cela crée un conflit d'alias avec la vraie table `eleve`. Il faut donner des noms d’alias explicites comme `p_eleve` ou `p_parent` pour les tables `personne`."
-  },
-  {
-  "relation": "CHEMIN CONTACTS PARENTS (canonique)",
-  "tables": ["`personne` (eleve_p)", "`eleve` (e)", "`parenteleve` (pe)", "`parent` (pa)", "`personne` (parent_p)"],
-  "description": "`e`.`IdPersonne` = `eleve_p`.`id` -> `pe`.`Eleve` = `e`.`id` -> `pa`.`id` = `pe`.`Parent` -> `parent_p`.`id` = `pa`.`Personne`. Filtrer le nom/prénom de l'élève UNIQUEMENT sur `eleve_p`. Coordonnées (`Tel1`, `Tel2`, `Tel3`, `Email`) dans `parent_p`."
   }
 ]

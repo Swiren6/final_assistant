@@ -1,0 +1,114 @@
+[
+  {
+    "id": "eleve_identification",
+    "content": "Table 'eleve' : Informations personnelles des élèves. Contient l'identifiant unique (id), la date de naissance (DateNaissance), le lieu de naissance (LieuNaissance), la référence vers les données personnelles via IdPersonne, le solde financier, la photo et l'identifiant externe (IdEdusrv). Pour obtenir nom/prénom d'un élève, joindre avec 'personne' via eleve.IdPersonne = personne.id.",
+    "keywords": ["élève", "étudiant", "enfant", "apprenant", "identité", "nom", "prénom", "date naissance", "lieu naissance", "photo", "identification"],
+    "tables": ["eleve", "personne"],
+    "use_cases": ["Rechercher un élève par nom", "Obtenir l'âge d'un élève", "Lister les élèves nés dans une ville", "Identifier un élève"]
+  },
+  {
+    "id": "parent_contacts",
+    "content": "Contacts parentaux : relier `eleve` à `personne` (alias eleve_p) via `eleve.IdPersonne = eleve_p.id`. Ensuite relier `parenteleve` (Eleve = eleve.id) → `parent` → `personne` (alias parent_p). Toujours filtrer nom/prénom de l'élève sur `eleve_p` (NomFr/PrenomFr ou NomAr/PrenomAr). Les coordonnées (Tel1, Tel2, Tel3, Email, AdresseFr) sont uniquement dans `parent_p`.",
+    "keywords": ["parent", "père", "mère", "tuteur", "contact", "téléphone", "numéro de téléphone", "tel", "email", "mail", "appeler", "joindre", "contacter", "famille"],
+    "tables": ["parent", "personne", "parenteleve", "eleve"],
+    "use_cases": ["Contacter les parents d'un élève", "Obtenir le numéro de téléphone du père", "Envoyer un email à la mère", "Liste des contacts familiaux","comment joindre les parents de"]
+  },
+  {
+    "id": "inscriptions_scolaires",
+    "content": "Table 'inscriptioneleve' : Gère les inscriptions annuelles des élèves. Contient l'élève (Eleve), la classe (Classe), l'année scolaire (AnneeScolaire), la modalité de paiement (Modalite), les montants TTC et restants, le type d'inscription (N=nouveau, R=réinscription). Liée à 'classe' pour le niveau et à 'modalite' pour les tranches de paiement.",
+    "keywords": ["inscription", "inscrire", "classe", "niveau", "année scolaire", "modalité", "paiement", "nouveau", "réinscription", "montant", "restant"],
+    "tables": ["inscriptioneleve", "classe", "eleve", "anneescolaire", "modalite"],
+    "use_cases": ["Vérifier l'inscription d'un élève", "Connaître la classe d'un élève", "Lister les nouveaux élèves", "Calculer les montants dus"]
+  },
+  {
+    "id": "paiements_reglements",
+    "content": "Système de paiements : Table 'paiement' pour les frais scolaires avec motifs, tranches et montants. Table 'reglementeleve' pour les règlements effectués (espèces, chèques, traites). Les montants restants sont calculés automatiquement. Gère aussi les remboursements et annulations.",
+    "keywords": ["paiement", "règlement", "payer", "espèces", "chèque", "traite", "montant", "tranche", "reste", "remboursement", "annulation", "facture"],
+    "tables": ["paiement", "reglementeleve", "paiementmotif", "inscriptioneleve"],
+    "use_cases": ["Consulter les paiements d'un élève", "Vérifier les montants restants", "Historique des règlements", "Gérer les remboursements"]
+  },
+  {
+    "id": "activites_extrascolaires",
+    "content": "Activités extra-scolaires : Table 'paiementextra' et 'paiementextradetails' pour cantine, bus, clubs, casiers, etc. Référencés par 'paiementmotif' (id=1:Cantine, 2:Bus, 3:Club, 4:Panier, 5:Casier, 6:Voucher, 7:Plateforme, 8:Scolaire, 9:Garde, 11:Cantine par jour). Inclut la gestion des montants et modalités.",
+    "keywords": ["cantine", "bus", "club", "activité", "extrascolaire", "casier", "voucher", "plateforme", "garde", "panier", "service"],
+    "tables": ["paiementextra", "paiementextradetails", "paiementmotif", "cantineparjour"],
+    "use_cases": ["Inscrire à la cantine", "Gérer l'abonnement bus", "Lister les clubs disponibles", "Calculer les frais extras"]
+  },
+  {
+    "id": "emploi_temps_classes",
+    "content": "Table 'emploidutemps' : Planning des cours avec enseignant, salle, jour, matière, classe, groupe et séances. Les horaires sont référencés via 'seance'. Permet de visualiser l'emploi du temps des élèves, enseignants et l'occupation des salles par jour de semaine.",
+    "keywords": ["emploi du temps", "planning", "cours", "horaire", "séance", "matière", "salle", "jour", "lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+    "tables": ["emploidutemps", "seance", "matiere", "salle", "classe", "enseingant"],
+    "use_cases": ["Consulter l'emploi du temps d'une classe", "Voir les cours d'un enseignant", "Vérifier la disponibilité d'une salle", "Planning hebdomadaire"]
+  },
+  {
+    "id": "notes_evaluations",
+    "content": "Système de notes : Tables 'edumoymati', 'eduresultat', 'eduattestation' pour moyennes par matière, résultats globaux et attestations. Les notes sont organisées par période d'examen (trimestres) avec calcul des rangs et mentions. Inclut les prix et distinctions académiques.",
+    "keywords": ["note", "moyenne", "résultat", "évaluation", "trimestre", "bulletin", "classement", "rang", "mention", "attestation", "prix", "performance"],
+    "tables": ["edumoymati", "eduresultat", "eduattestation", "eduperiexam", "eduprix"],
+    "use_cases": ["Consulter les notes d'un élève", "Calculer la moyenne générale", "Voir le classement", "Générer un bulletin"]
+  },
+  {
+    "id": "absences_discipline",
+    "content": "Table 'absence' : Enregistrement des absences avec date, séances, justification et état. Tables 'avertissement' et 'blame' pour les sanctions disciplinaires. Toutes liées aux inscriptions pour traçabilité par année scolaire.",
+    "keywords": ["absence", "absent", "retard", "justification", "avertissement", "blâme", "sanction", "discipline", "comportement", "présence"],
+    "tables": ["absence", "avertissement", "blame", "inscriptioneleve"],
+    "use_cases": ["Enregistrer une absence", "Justifier un retard", "Consulter l'assiduité", "Gérer les sanctions"]
+  },
+  {
+    "id": "enseignants_personnel",
+    "content": "Table 'enseingant' : Informations professionnelles des enseignants liées à 'personne' pour coordonnées. Inclut diplômes, modalités paiement, coût horaire. Table 'enseignantmatiere' pour les matières enseignées. Gestion des présences et paiements via 'enseignants_presence' et 'enseignant_paiement'.",
+    "keywords": ["enseignant", "professeur", "personnel", "matière", "diplôme", "salaire", "paiement", "présence", "formation", "qualification"],
+    "tables": ["enseingant", "personne", "enseignantmatiere", "enseignants_presence", "enseignant_paiement"],
+    "use_cases": ["Gérer les enseignants", "Affecter des matières", "Calculer les salaires", "Suivre les présences"]
+  },
+  {
+    "id": "structure_pedagogique",
+    "content": "Organisation pédagogique : 'classe' liée à 'niveau' et 'section'. 'matiere' pour les disciplines enseignées. 'anneescolaire' pour la gestion temporelle. 'etablissement' pour les informations administratives. Structure hiérarchique : établissement → niveau → section → classe.",
+    "keywords": ["classe", "niveau", "section", "matière", "établissement", "organisation", "structure", "pédagogique", "administratif", "hiérarchie"],
+    "tables": ["classe", "niveau", "section", "matiere", "etablissement", "anneescolaire"],
+    "use_cases": ["Organiser les classes", "Définir les niveaux", "Structurer l'établissement", "Gérer l'année scolaire"]
+  },
+  {
+    "id": "gestion_financiere",
+    "content": "Gestion financière complète : 'caisse' et 'caissedetails' pour les opérations quotidiennes. 'banquebordereau' et 'banqueversement' pour les dépôts bancaires. Traçabilité complète des entrées/sorties avec utilisateurs et motifs. Gestion des modes de règlement et des remboursements.",
+    "keywords": ["caisse", "banque", "versement", "bordereau", "financier", "comptabilité", "trésorerie", "dépôt", "recette", "dépense"],
+    "tables": ["caisse", "caissedetails", "banquebordereau", "banqueversement", "modereglement"],
+    "use_cases": ["Gérer la caisse quotidienne", "Effectuer des versements", "Suivre les recettes", "Contrôler la trésorerie"]
+  },
+  {
+    "id": "examens_evaluations",
+    "content": "Système d'examens : 'repartitionexamen' pour planifier les examens avec salles, surveillants et horaires. 'periodeexamen' pour définir trimestres et coefficients. Integration avec les notes pour évaluations complètes.",
+    "keywords": ["examen", "contrôle", "test", "évaluation", "surveillance", "planning", "salle", "période", "trimestre", "coefficient"],
+    "tables": ["repartitionexamen", "periodeexamen", "salle", "surveillant"],
+    "use_cases": ["Planifier les examens", "Affecter les surveillants", "Réserver les salles", "Organiser les épreuves"]
+  },
+  {
+    "id": "uniformes_commandes",
+    "content": "Gestion des uniformes : 'uniformcommande' pour les commandes globales, 'uniformcommandedetails' pour les articles détaillés. Catalogue avec 'uniformmodel', 'uniformtaille', 'uniformcouleur', 'uniformgenre'. Suivi des paiements et livraisons.",
+    "keywords": ["uniforme", "commande", "modèle", "taille", "couleur", "genre", "vêtement", "articles", "catalogue", "livraison"],
+    "tables": ["uniformcommande", "uniformcommandedetails", "uniformmodel", "uniformtaille", "uniformcouleur"],
+    "use_cases": ["Commander des uniformes", "Gérer le catalogue", "Suivre les livraisons", "Calculer les coûts"]
+  },
+  {
+    "id": "preinscriptions",
+    "content": "Système de pré-inscriptions : 'preinscriptionpreinscription' et 'elevepreinscription' pour candidats non encore inscrits. 'personnepreinscription' et 'parentpreinscription' pour les contacts temporaires. Permet la gestion des candidatures avant inscription officielle.",
+    "keywords": ["préinscription", "candidat", "candidature", "inscription future", "demande", "nouveau candidat", "admission"],
+    "tables": ["preinscriptionpreinscription", "elevepreinscription", "personnepreinscription", "parentpreinscription"],
+    "use_cases": ["Gérer les candidatures", "Traiter les pré-inscriptions", "Contacter les candidats", "Valider les admissions"]
+  },
+  {
+    "id": "cours_ete_formation",
+    "content": "Cours d'été et formations : 'groupecourete' pour les groupes de formation, 'inscriptionelevecourete' pour les inscriptions, 'paiementdetailscourete' pour la facturation. Organisation spéciale des cours de rattrapage et formations complémentaires.",
+    "keywords": ["cours été", "formation", "rattrapage", "groupe", "session", "stage", "complément", "vacances"],
+    "tables": ["groupecourete", "inscriptionelevecourete", "paiementdetailscourete"],
+    "use_cases": ["Organiser les cours d'été", "Inscrire aux formations", "Gérer les groupes", "Facturer les sessions"]
+  },
+  {
+    "id": "donnees_nationales",
+    "content": "Interface nationale : Tables 'edu*' (edueleve, educlasse, edumatiere, etc.) pour la synchronisation avec le système éducatif national. Données parallèles avec identifiants spécifiques pour reporting officiel et transferts administratifs.",
+    "keywords": ["national", "ministère", "officiel", "transfert", "reporting", "synchronisation", "administration", "éducation nationale"],
+    "tables": ["edueleve", "educlasse", "edumatiere", "eduinscription", "edumoymati"],
+    "use_cases": ["Synchroniser avec le ministère", "Générer les rapports officiels", "Transférer les données", "Respecter les standards"]
+  }
+]

@@ -1,0 +1,201 @@
+[
+  {
+    "pattern_id": "student_identification",
+    "description": "Recherche et identification d'élèves",
+    "patterns": [
+      "qui est l'élève {nom}",
+      "trouver l'élève {prenom} {nom}",
+      "élève né le {date}",
+      "élève de la classe {classe}",
+      "chercher {nom}",
+      "informations sur {prenom}",
+      "élève avec cin {numero}",
+      "photo de l'élève {nom}"
+    ],
+    "key_tables": ["eleve", "personne", "inscriptioneleve", "classe"],
+    "essential_joins": "eleve.IdPersonne = personne.id, inscriptioneleve.Eleve = eleve.id",
+    "common_filters": "personne.NomFr, personne.PrenomFr, personne.NomAr, personne.PrenomAr",
+    "response_fields": "personne.NomFr, personne.PrenomFr, eleve.DateNaissance, classe.NOMCLASSEFR"
+  },
+  {
+    "pattern_id": "parent_contact_info",
+    "description": "Informations de contact des parents",
+    "patterns": [
+      "contact du père de {nom}",
+      "téléphone de la mère de {prenom}",
+      "email des parents de {nom}",
+      "numéro du tuteur de {prenom}",
+      "adresse de {nom}",
+      "joindre les parents de {nom}",
+      "coordonnées famille {nom}",
+      "appeler les parents de {prenom}"
+    ],
+    "key_tables": ["eleve", "personne", "parenteleve", "parent"],
+    "essential_joins": "eleve.IdPersonne = personne.id (élève), parenteleve.Eleve = eleve.id, parenteleve.Parent = parent.id, parent.Personne = personne.id (parent)",
+    "common_filters": "parenteleve.Type (Père/Mère/Tuteur)",
+    "response_fields":"parent_p.NomFr, parent_p.PrenomFr, parent_p.Tel1, parent_p.Tel2, parent_p.Tel3, parent_p.Email, parent_p.AdresseFr, parenteleve.Type"
+
+  },
+  {
+    "pattern_id": "student_payments",
+    "description": "Paiements et règlements des élèves",
+    "patterns": [
+      "paiements de {nom}",
+      "montant restant pour {prenom}",
+      "facture de {nom}",
+      "règlements de {prenom}",
+      "solde de {nom}",
+      "dette de {prenom}",
+      "situation financière de {nom}",
+      "derniers paiements de {prenom}"
+    ],
+    "key_tables": ["inscriptioneleve", "paiement", "reglementeleve", "eleve", "personne"],
+    "essential_joins": "inscriptioneleve.Eleve = eleve.id, paiement.Inscription = inscriptioneleve.id, reglementeleve.IdInscription = paiement.id",
+    "common_filters": "anneescolaire courante",
+    "response_fields": "paiement.TotalTTC, paiement.MontantRestant, reglementeleve.Date, reglementeleve.Montant"
+  },
+  {
+    "pattern_id": "class_schedule",
+    "description": "Emploi du temps et horaires",
+    "patterns": [
+      "emploi du temps de {classe}",
+      "cours de {jour}",
+      "horaires de {nom}",
+      "planning de la classe {classe}",
+      "professeur de {matiere}",
+      "salle de {cours}",
+      "emploi du temps aujourd'hui",
+      "cours de {matiere} en {classe}"
+    ],
+    "key_tables": ["emploidutemps", "classe", "matiere", "salle", "enseingant", "personne"],
+    "essential_joins": "emploidutemps.Classe = classe.id, emploidutemps.Matiere = matiere.id, emploidutemps.Enseignant = enseingant.id",
+    "common_filters": "jour de la semaine, anneescolaire courante",
+    "response_fields": "matiere.NomMatiereFr, classe.NOMCLASSEFR, salle.nomSalleFr, emploidutemps.SeanceDebut"
+  },
+  {
+    "pattern_id": "extracurricular_activities",
+    "description": "Activités extrascolaires",
+    "patterns": [
+      "cantine de {nom}",
+      "bus pour {prenom}",
+      "clubs de {nom}",
+      "activités de {prenom}",
+      "inscription cantine {nom}",
+      "transport scolaire {prenom}",
+      "casier de {nom}",
+      "services extras de {prenom}"
+    ],
+    "key_tables": ["paiementextra", "paiementextradetails", "paiementmotif", "inscriptioneleve"],
+    "essential_joins": "paiementextra.Inscription = inscriptioneleve.id, paiementextradetails.PaiementExtras = paiementextra.id",
+    "common_filters": "paiementmotif.Libelle (Cantine, Bus, Club, etc.)",
+    "response_fields": "paiementmotif.Libelle, paiementextra.TotalTTC, paiementextra.MontantRestant"
+  },
+  {
+    "pattern_id": "student_grades",
+    "description": "Notes et résultats scolaires",
+    "patterns": [
+      "notes de {nom}",
+      "moyenne de {prenom}",
+      "bulletin de {nom}",
+      "résultats de {prenom}",
+      "classement de {nom}",
+      "notes en {matiere} de {prenom}",
+      "moyenne générale de {nom}",
+      "attestation de {prenom}"
+    ],
+    "key_tables": ["edumoymati", "eduresultat", "eduattestation", "edueleve"],
+    "essential_joins": "edumoymati.idenelev = edueleve.idenelev, eduresultat.idenelev = edueleve.idenelev",
+    "common_filters": "période d'examen (trimestre), matière",
+    "response_fields": "edumoymati.moyemati, eduresultat.moyeperiexam, eduattestation.moyenne, eduattestation.attestation"
+  },
+  {
+    "pattern_id": "attendance_discipline",
+    "description": "Assiduité et discipline",
+    "patterns": [
+      "absences de {nom}",
+      "retards de {prenom}",
+      "assiduité de {nom}",
+      "avertissements de {prenom}",
+      "sanctions de {nom}",
+      "présence de {prenom}",
+      "justifications de {nom}",
+      "comportement de {prenom}"
+    ],
+    "key_tables": ["absence", "avertissement", "blame", "inscriptioneleve"],
+    "essential_joins": "absence.Inscription = inscriptioneleve.id, avertissement.Inscription = inscriptioneleve.id",
+    "common_filters": "période scolaire, état de justification",
+    "response_fields": "absence.Date, absence.Justifier, avertissement.Date, blame.Date"
+  },
+  {
+    "pattern_id": "teacher_information",
+    "description": "Informations sur les enseignants",
+    "patterns": [
+      "qui enseigne {matiere}",
+      "professeur de {classe}",
+      "enseignant {nom}",
+      "matières de {professeur}",
+      "horaires de {enseignant}",
+      "contact professeur {nom}",
+      "présence enseignant {nom}",
+      "salaire de {professeur}"
+    ],
+    "key_tables": ["enseingant", "personne", "enseignantmatiere", "matiere"],
+    "essential_joins": "enseingant.idPersonne = personne.id, enseignantmatiere.idPersonne = personne.id",
+    "common_filters": "anneescolaire courante, matière enseignée",
+    "response_fields": "personne.NomFr, personne.PrenomFr, matiere.NomMatiereFr, personne.Tel1"
+  },
+  {
+    "pattern_id": "financial_operations",
+    "description": "Opérations financières et caisse",
+    "patterns": [
+      "recettes du jour",
+      "état de la caisse",
+      "versements en banque",
+      "bordereau du {date}",
+      "encaissements de {date}",
+      "remboursements",
+      "chèques en attente",
+      "situation financière"
+    ],
+    "key_tables": ["caisse", "caissedetails", "banqueversement", "reglementeleve"],
+    "essential_joins": "caissedetails.Caisse = caisse.id, caissedetails.Reglement = reglementeleve.id",
+    "common_filters": "date d'opération, mode de règlement",
+    "response_fields": "caisse.montant_fermeture, caissedetails.Montant, banqueversement.Montant"
+  },
+  {
+    "pattern_id": "uniform_orders",
+    "description": "Commandes d'uniformes",
+    "patterns": [
+      "commande uniforme de {nom}",
+      "uniformes de {prenom}",
+      "tailles disponibles",
+      "modèles d'uniformes",
+      "couleurs uniformes",
+      "prix des uniformes",
+      "livraison uniforme {nom}",
+      "catalogue uniformes"
+    ],
+    "key_tables": ["uniformcommande", "uniformcommandedetails", "uniformmodel", "uniformtaille"],
+    "essential_joins": "uniformcommande.Inscription = inscriptioneleve.id, uniformcommandedetails.UniformCommande = uniformcommande.id",
+    "common_filters": "genre, taille, couleur",
+    "response_fields": "uniformmodel.Model, uniformtaille.Taille, uniformcommande.TotalTTC"
+  },
+  {
+    "pattern_id": "exam_planning",
+    "description": "Planification des examens",
+    "patterns": [
+      "examens de {classe}",
+      "planning examens",
+      "surveillance examen",
+      "salles d'examen",
+      "calendrier examens",
+      "examen de {matiere}",
+      "surveillants du {date}",
+      "répartition examens"
+    ],
+    "key_tables": ["repartitionexamen", "classe", "matiere", "salle", "surveillant"],
+    "essential_joins": "repartitionexamen.idClasse = classe.id, repartitionexamen.idMatiere = matiere.id",
+    "common_filters": "date d'examen, trimestre, classe",
+    "response_fields": "repartitionexamen.date, matiere.NomMatiereFr, salle.nomSalleFr"
+  }
+]

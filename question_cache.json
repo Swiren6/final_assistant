@@ -1,1 +1,14 @@
-{}
+{
+  "donne moi le contact des parents de Zeineb Bouharb": {
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Bouharb' AND eleve_p.`PrenomFr` = 'Zeineb') OR (eleve_p.`NomFr` = 'Zeineb' AND eleve_p.`PrenomFr` = 'Bouharb')",
+    "response": "[('BOUHARB', 'Sahl', '22209230', '71234540', None, None, '6 Rue Riode Jenero', 'Pere'), ('KACEM', 'Alia', None, '71234540', None, None, '6 Rue Riodejenero', 'Mere')]"
+  },
+  "donne moi le contact des parents de Malak Benabda": {
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Benabda' AND eleve_p.`PrenomFr` = 'Malak') OR (eleve_p.`NomFr` = 'Malak' AND eleve_p.`PrenomFr` = 'Benabda')",
+    "response": "[('BENABDA', 'Walid', '25220415', None, None, 'walid.benabda@gmail.com', 'Av Om Kholthoum Rue Jeljlen', 'Pere'), ('CHABOUT', 'Mouna', '28210710', None, None, 'mouna.chabout@gmail.com', 'Av Om Kholthoum Rue Jeljlen', 'Mere')]"
+  },
+  "donne moi le solde de Malak Benabda": {
+    "sql": "SELECT `e`.`Solde` FROM `eleve` AS `e` JOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`Id` WHERE (`p`.`NomFr` = 'Benabda' AND `p`.`PrenomFr` = 'Malak') OR (`p`.`NomFr` = 'Malak' AND `p`.`PrenomFr` = 'Benabda')",
+    "response": "[(None,)]"
+  }
+}

@@ -90,18 +90,6 @@ def clean_metadata(metadata: dict) -> dict:
 def load_documents():
     docs = []
 
-    # Chargement des chunks supplémentaires (auto_chunks.json ou autre)
-    try:
-        with open("chunks.json", encoding="utf-8") as f:
-            for entry in json.load(f):
-                docs.append(Document(
-                    page_content=normalize(entry["page_content"]),
-                    metadata=clean_metadata(entry.get("metadata", {}))
-                ))
-        print("✅ chunks.json chargé avec succès.")
-    except Exception as e:
-        print("⚠️ Erreur chunks.json :", e)
-
     # Chargement de schema_description.json
     try:
         with open("schema_description.json", encoding="utf-8") as f:
@@ -163,6 +151,39 @@ def load_documents():
     except Exception as e:
         print("⚠️ Erreur rag_table_relationships.json :", e)
 
+     # 🚀 Chargement des domaines (table_domains.json)
+    try:
+        with open("table_domains.json", encoding="utf-8") as f:
+            data = json.load(f)
+            for entry in data:
+                domain_id = entry.get("id")
+                content = entry.get("content", "")
+                keywords = ", ".join(entry.get("keywords", []))
+                tables = ", ".join(entry.get("tables", []))
+
+                text = f"Domaine {domain_id} : {content}\nTables : {tables}\nMots-clés : {keywords}"
+                for chunk in chunk_text(normalize(text), max_length=900):
+                    docs.append(Document(page_content=chunk, metadata={"type": "domain", "id": domain_id}))
+    except Exception as e:
+        print("⚠️ Erreur table_domains.json :", e)
+
+    # 🚀 Chargement des patterns de requêtes (query_patterns.json)
+    try:
+        with open("query_patterns.json", encoding="utf-8") as f:
+            data = json.load(f)
+            for entry in data:
+                pattern_id = entry.get("pattern_id")
+                desc = entry.get("description", "")
+                patterns = ", ".join(entry.get("patterns", []))
+                joins = entry.get("essential_joins", "")
+                resp_fields = entry.get("response_fields", "")
+
+                text = f"Pattern {pattern_id} : {desc}\nExemples : {patterns}\nJoins essentiels : {joins}\nChamps réponse : {resp_fields}"
+                for chunk in chunk_text(normalize(text), max_length=900):
+                    docs.append(Document(page_content=chunk, metadata={"type": "query_pattern", "id": pattern_id}))
+    except Exception as e:
+        print("⚠️ Erreur query_patterns.json :", e)
+
     print(f"📄 {len(docs)} documents à indexer.")
     return docs
 
@@ -195,7 +216,7 @@ shared_vectordb = Chroma(persist_directory=RAG_DB_PATH, embedding_function=share
 class SQLAssistant:
     def __init__(self):
         self.llm_client = ChatOpenAI(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             openai_api_key=os.getenv("OPENAI_API_KEY"),
             temperature=0.1,
             max_tokens=2048
@@ -269,27 +290,31 @@ class SQLAssistant:
         context = "\n".join(context_list)
         schema = get_schema_description(self.db)
         full_prompt = f"""Tu es un expert SQL.
-        Voici du contexte utile extrait des documents (schéma, relations, etc.) :
+            Voici du contexte utile extrait des documents (schéma, relations, patterns, domaines, etc.) :
 
-        {context}
+            {context}
 
-        !!!! Règles STRICTES :
-        - Si un nom contient des caractères arabes (ء-ي), utilise `NomAr` et `PrenomAr`.
-        - Sinon, utilise `NomFr` et `PrenomFr`.
-        - Utilise uniquement les tables et colonnes présentes dans le contexte ci-dessus.
-        - Si une table n’est pas dans cette liste, réponds : 'Données non disponibles'.
-        - Entoure toujours les noms de tables et de colonnes avec des `backticks`.
-        - Génère une requête SQL VALIDE (sans commentaire ni balise Markdown).
-        - ⚠️ Si aucune donnée n’est trouvée, RÉESSAYE en inversant le prénom et le nom.
-        - Quand la question concerne un contact (comment JOINDRE ou contacter une personne), retourne les colonnes `Tel1`, `Tel2`, `Tel3` et `Email` si elles sont disponibles.
-        - Si ces colonnes existent dans plusieurs tables, privilégie la table `personne`. Si elle ne contient pas la personne, utilise `personnepreinscription`.
-        - ❌ N’utilise jamais une colonne provenant d’une autre table que celle du `FROM`, même si elle semble pertinente (ex: `mailpere` ne va PAS dans `personne`).
-        - Ne réponds jamais 'Données non disponibles' sans avoir essayé aussi l’inversion du prénom et du nom.
-        - Ne jamais utiliser un alias déjà employé pour une autre table dans la même requête SQL.
+            !!!! Règles STRICTES :
+            - Utilise UNIQUEMENT les tables, colonnes et relations présentes dans le contexte ci-dessus (RAG).
+            - ❌ N’invente jamais de table ni de colonne qui n’apparaît pas dans le contexte.
+            - Les jointures doivent être construites UNIQUEMENT à partir des relations explicites présentes dans le contexte.
+            - Si une table possède une clé IdPersonne vers la table `personne`, les filtres sur le nom/prénom doivent TOUJOURS être appliqués sur `personne` (NomFr/PrenomFr ou NomAr/PrenomAr), et JAMAIS sur la table de rattachement.
+            - Si un nom contient des caractères arabes (ء-ي), utilise `NomAr` et `PrenomAr`.
+            - Sinon, utilise `NomFr` et `PrenomFr`.
+            - Quand la question concerne un contact (comment JOINDRE ou contacter une personne), retourne les colonnes `Tel1`, `Tel2`, `Tel3` et `Email` si elles sont disponibles.
+            - Si ces colonnes existent dans plusieurs tables, privilégie la table `personne`. Si la donnée n’existe pas là, utilise `personnepreinscription`.
+            - Entoure TOUJOURS les noms de tables et de colonnes avec des `backticks`.
+            - Utilise des alias courts, clairs et distincts pour chaque table (ex: `e` pour eleve, `pe` pour parenteleve, `pa` pour parent, `eleve_p` pour personne de l’élève, `parent_p` pour personne du parent). ❌ Ne réutilise jamais un alias pour deux tables différentes.
+            - Génère une requête SQL VALIDE (une seule requête, sans commentaire ni balise Markdown).
+            - ❌ Pas de SELECT * : sélectionne uniquement les colonnes nécessaires.
+            - Si aucune donnée n’est trouvée, RÉESSAYE en inversant le prénom et le nom.
+            - Ne réponds jamais 'Données non disponibles' sans avoir essayé aussi l’inversion du prénom et du nom.
+            - Ne jamais utiliser une colonne provenant d’une autre table que celle du `FROM` ou d’une table jointe explicitement.
 
-        Question : {question}
-        Requête SQL :
+            Question : {question}
+            Requête SQL :
         """
+
 
         print("🧾 CONTEXTE FINAL UTILISÉ POUR LE PROMPT :")
         print(context)
