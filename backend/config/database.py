@@ -56,33 +56,88 @@ class CustomSQLDatabase(SQLDatabase):
             logger.error(f"Erreur get_simplified_relations_text: {e}")
             return ""
 
+    def get_table_info(self, table_names=None):
+        """
+        Récupère les informations des tables de la base de données
+        
+        Args:
+            table_names (list, optional): Liste des noms de tables spécifiques. 
+                                        Si None, récupère toutes les tables.
+        
+        Returns:
+            str: Description des tables au format texte
+        """
+        try:
+            if table_names is None:
+                # Récupérer toutes les tables
+                tables_result = self.run("SHOW TABLES")
+                table_names = [list(table.values())[0] for table in tables_result]
+            
+            table_info = []
+            for table_name in table_names:
+                try:
+                    # Récupérer la structure de la table
+                    columns_result = self.run(f"DESCRIBE {table_name}")
+                    columns_info = []
+                    for column in columns_result:
+                        col_name = column.get('Field', '')
+                        col_type = column.get('Type', '')
+                        col_null = column.get('Null', '')
+                        col_key = column.get('Key', '')
+                        col_default = column.get('Default', '')
+                        
+                        column_desc = f"  - {col_name} ({col_type})"
+                        if col_null == 'NO':
+                            column_desc += " NOT NULL"
+                        if col_key == 'PRI':
+                            column_desc += " PRIMARY KEY"
+                        if col_default:
+                            column_desc += f" DEFAULT {col_default}"
+                        
+                        columns_info.append(column_desc)
+                    
+                    table_info.append(f"Table: {table_name}\n" + "\n".join(columns_info))
+                    
+                except Exception as e:
+                    logger.warning(f"Impossible de récupérer les infos pour la table {table_name}: {e}")
+                    continue
+            
+            return "\n\n".join(table_info) if table_info else "Aucune table trouvée"
+            
+        except Exception as e:
+            logger.error(f"Erreur get_table_info: {e}")
+            return f"Erreur lors de la récupération des informations des tables: {str(e)}"
+
     
 # ✅ Initialisation de Flask MySQL
 def init_db(app):
     try:
-        app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
-        app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-        app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
-        app.config['MYSQL_DB'] = os.getenv('MYSQL_DATABASE')
+        # Configuration de base pour Flask-MySQLdb (optionnel)
+        app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', 'localhost')
+        app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
+        app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'infosef')
+        app.config['MYSQL_DB'] = os.getenv('MYSQL_DATABASE', 'bd_eduise')
         app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
         app.config['MYSQL_AUTOCOMMIT'] = True
         app.config['MYSQL_CONNECT_TIMEOUT'] = 60
-
+        app.config['MYSQL_CHARSET'] = 'latin1'
+        
+        # Vérification des variables critiques
         required_vars = ['MYSQL_HOST', 'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_DATABASE']
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         if missing_vars:
-            raise ValueError(f"Variables d'environnement manquantes: {missing_vars}")
+            logger.warning(f"⚠️ Variables manquantes: {missing_vars} - Utilisation des valeurs par défaut")
 
-        mysql.init_app(app)
-
+        # Test de connexion directe uniquement
         test_connection = create_direct_connection()
         if test_connection:
             test_connection.close()
             logger.info("✅ Configuration MySQL initialisée et testée")
+            # Retourner un objet mock pour Flask-MySQLdb
+            return type('MockMySQL', (), {'connection': None})()
         else:
             raise Exception("Impossible de se connecter à MySQL")
 
-        return mysql
     except Exception as e:
         logger.error(f"❌ Erreur init MySQL: {e}")
         raise
@@ -90,14 +145,16 @@ def init_db(app):
 # ✅ Connexion directe via MySQLdb
 def create_direct_connection():
     try:
+        # Configuration de base avec encodage latin1 compatible
         connection = MySQLdb.connect(
-            host=os.getenv('MYSQL_HOST'),
-            user=os.getenv('MYSQL_USER'),
-            passwd=os.getenv('MYSQL_PASSWORD'),
-            db=os.getenv('MYSQL_DATABASE'),
+            host=os.getenv('MYSQL_HOST', 'localhost'),
+            user=os.getenv('MYSQL_USER', 'root'),
+            passwd=os.getenv('MYSQL_PASSWORD', 'infosef'),
+            db=os.getenv('MYSQL_DATABASE', 'bd_eduise'),
             cursorclass=MySQLdb.cursors.DictCursor,
             autocommit=True,
-            connect_timeout=10
+            connect_timeout=10,
+            charset='latin1'
         )
         connection._direct_connection = True  # Marqueur pour fermeture plus tard
         logger.debug("✅ Connexion MySQL directe créée")
@@ -158,17 +215,24 @@ def get_db_connection():
         db_name = os.getenv('MYSQL_DATABASE')
 
         if not all([db_user, db_password, db_host, db_name]):
+            logger.error("❌ Variables de connexion DB manquantes")
             raise ValueError("Variables de connexion DB manquantes")
 
-        db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
+        db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}?charset=latin1"
         db = CustomSQLDatabase.from_uri(db_uri)
-        db.run("SELECT 1")
+        
+        # Test de connexion
+        test_result = db.run("SELECT 1 as test")
+        if not test_result:
+            raise Exception("Test de connexion échoué")
+            
         logger.info("✅ Connexion LangChain SQLDatabase établie")
         return db
 
     except Exception as e:
         logger.error(f"❌ Erreur connexion LangChain: {e}")
-        return None
+        # Au lieu de retourner None, on lève une exception pour être plus explicite
+        raise Exception(f"Impossible d'établir la connexion à la base de données: {str(e)}")
 
 def get_schema(self):
     """

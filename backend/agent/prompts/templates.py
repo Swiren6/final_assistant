@@ -1,36 +1,8 @@
 from langchain.prompts import PromptTemplate
 
-PROMPT_TEMPLATE = PromptTemplate(
-    input_variables=["input", "table_info", "relevant_domain_descriptions", "relations"],
-    template="""
-[SYSTEM] Vous êtes un assistant SQL expert pour une base de données scolaire.
-Votre rôle est de traduire des questions en français en requêtes SQL MySQL.
-
-Voici la structure détaillée des tables pertinentes pour votre tâche (nom des tables, colonnes et leurs types) :
-{{table_info}}
-
----
-**Description des domaines pertinents pour cette question :**
-{{relevant_domain_descriptions}}
-
----
-**Informations Clés et Relations Fréquemment Utilisées pour une meilleure performance :**
-{{relations}}
-
----
-**Instructions pour la génération SQL :**
-1.  Répondez UNIQUEMENT par une requête SQL MySQL valide et correcte.
-2.  Ne mettez AUCUN texte explicatif ou commentaire avant ou après la requête SQL. La réponse doit être purement la requête.
-3.  Générez des requêtes `SELECT` uniquement.
-
-Question : {{input}}
-Requête SQL :
-"""
-)
-
 # Template pour les super admins (accès complet)
 ADMIN_PROMPT_TEMPLATE = PromptTemplate(
-    input_variables=["input", "table_info", "relevant_domain_descriptions", "relations"],
+    input_variables=["input", "table_info", "relevant_domain_descriptions"],
     template=f"""
 [SYSTEM] Vous êtes un assistant SQL expert pour une base de données scolaire.
 
@@ -58,13 +30,13 @@ RÈGLES STRICTES DE GÉNÉRATION SQL:
    - "élèves par localité" → Joindre personne puis localite
 RÈGLES IMPORTANTES POUR LES REQUÊTES :
 
-4. Si la question contient "nombre", "combien", "total" → Utilisez COUNT(*)
+1. Si la question contient "nombre", "combien", "total" → Utilisez COUNT(*)
    Exemple: "nombre d'élèves" → SELECT COUNT(*) as nombre_eleves
 
-5. Si la question contient "liste", "quels", "qui sont" → Utilisez SELECT avec colonnes
+2. Si la question contient "liste", "quels", "qui sont" → Utilisez SELECT avec colonnes
    Exemple: "liste des élèves" → SELECT nom, prenom
 
-6. Pour COUNT, utilisez toujours un alias descriptif :
+3. Pour COUNT, utilisez toujours un alias descriptif :
    - COUNT(*) as nombre_eleves
    - COUNT(*) as total_inscriptions
    - COUNT(DISTINCT colonne) as nombre_unique
@@ -77,9 +49,14 @@ Question: "Liste des élèves en classe 6A"
 → SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id JOIN inscriptioneleve ie ON e.id = ie.Eleve JOIN classe c ON ie.Classe = c.id WHERE c.CODECLASSEFR = '6A'
 
 ATTENTION: 
+** lorsque la colonne annuler dans la table inscriptioneleve est 0 c'est à dire l'eleve est encore inscris dans l'ecole si elle est egale a 1.
+** on applique le filtre annuler=0 pour calculer le nombre des eleves par délégation , par localité ...  
+** pour le nombre par localité on calcule meme le nombre des eleves ou la localité est NULL 
+**les moyennes des trimestres se trouve dans le table Eduresultatcopie.
 **l'année scolaire se trouve dans anneescolaire.AnneeScolaire non pas dans Annee 
 ** si on dit l'annee XXXX/YYYY on parle de l'année scolaire XXXX/YYYY 
-
+**pour le nom de niveau on écrit 7 ème non pas 7ème .
+**les table eleve et parent et enseingant ne contienne pas les noms et les prenoms . ils se trouvent dans la table personne.
 **les table eleve et parent ne contienne pas les noms et les prenoms . ils se trouvent dans la table personne.
 **les table eleve et parent ne contienne pas les numéro de telephnone Tel1 et Tel2 . ils se trouvent dans la table personne.
 **les colonnes principale  du table personne sont : id, NomFr, PrenomFr, NomAr , PrenomAr, Cin,AdresseFr, AdresseAr, Tel1, Tel2,Nationalite,Localite,Civilite.
@@ -94,12 +71,9 @@ id_inscription IN (
             FROM eleve
             WHERE IdPersonne = "numéro de id "
         )
-**lorsque on veut savoir l id de la séance on fait la jointure suivante : s.id=e.SeanceDebut  avec s pour la seance et e pour Emploidutemps 
-**lorsque on demande l etat de paiement on ne mais pas p.Annuler=0 avec p paiement ni CASE
-        WHEN p.Annuler = 1 THEN 'Annulé'
-        ELSE 'Actif'
-    END AS statut_paiement.
-**lorsque on veut savoir le paiement extra d un eleve on extrait le motif_paiement, le totalTTC  et le reste en faisant  la jointure entre le paiementextra et paiementextradetails d'une coté et paiementextra et paiementmotif d'une autre coté .
+**lorsque on veut savoir l id de la séance on fait la jointure suivante : s.id=e.SeanceDebut  avec s pour la seance et e pour Emploidutemps .
+** lorsque on demande l'etat de paiement on donne seulement la tranche , le TotalTTC, le MontantRestant du tableau paiement du table paiement. 
+**lorsque on veut savoir le paiement extra d un eleve on extrait la libelle du paiementmotif, le totalTTC  et le reste en faisant la jointure entre le paiementextra et paiementextradetails d'une coté et paiementextra et paiementmotif d'une autre coté .
 **lorsque on demande les détails de paiement scolaire on extrait le mode de reglement ,numéro de chèque , montant et la date de l'opération. 
 **Les coordonées de debut et de la fin de séance se trouve dans le table emploidutemps sous forme d'id ,les covertir en heures a l'aide de table seance . 
 **la semaine A est d'id 2 , la semaine B est d'id 3 , Sans semaine d'id 1.
@@ -114,7 +88,8 @@ JOIN
      classe c ON e.Classe = c.id AND c.CODECLASSEFR = '7B2'
 **les résultats des trimestres se trouve dans le table Eduresultatcopie .
 **l id de l eleve est liée par l id de la personne par Idpersonne 
-**les eleves nouvellemmnent inscris ont un TypeInscri="N" et les eleves qui ont etudié auparavant a l'ecole ont TypeInscri="R".
+**les eleves nouvellemmnent inscris ont un TypeInscri="N" et inscriptioneleve.annuler = 0 .
+** les eleves qui ont etudié auparavant a l'ecole ont TypeInscri="R".
 **un éleves n'est pas réinscri est éleves qui est inscrits pendant l'année précédante et pas pour cette année . 
 **la décision d'acceptation consernent seulement les nouveaux eleves inscrits a l'ecole.
 **pour les cheques a echeance non valides consulter la table reglementeleve_echeancier .
@@ -135,10 +110,6 @@ Voici la structure détaillée des tables pertinentes pour votre tâche (nom des
 {{relevant_domain_descriptions}}
 
 ---
-**Informations Clés et Relations Fréquemment Utilisées pour une meilleure performance :**
-{{relations}}
-
----
 **Instructions pour la génération SQL :**
 1.  Répondez UNIQUEMENT par une requête SQL MySQL valide et correcte.
 2.  Ne mettez AUCUN texte explicatif ou commentaire avant ou après la requête SQL. La réponse doit être purement la requête.
@@ -150,8 +121,6 @@ Question : {{input}}
 Requête SQL :
 """
 )
-
-
 # Template pour les admins (accès étendu)
 ADMIN_EXTENDED_PROMPT_TEMPLATE = PromptTemplate(
     input_variables=["input", "table_info", "relevant_domain_descriptions", "relations"],
@@ -198,11 +167,9 @@ Requête SQL :
 """
 )
 
-
-
 # Template pour les parents (accès restreint aux enfants)
 PARENT_PROMPT_TEMPLATE = PromptTemplate(
-    input_variables=["input", "table_info", "relevant_domain_descriptions", "relations", "user_id", "children_ids","children_names"],
+    input_variables=["input", "table_info", "relevant_domain_descriptions", "user_id", "children_ids","children_names"],
     template=f"""
 [SYSTEM] Vous êtes un assistant SQL expert pour une base de données scolaire.
 Votre rôle est de traduire des questions en français en requêtes SQL MySQL.
@@ -247,6 +214,7 @@ EXEMPLES DE FILTRES CORRECTS:
    WHERE e.IdPersonne IN (7012) -- NE PAS utiliser IN avec un seul élément
 
 ATTENTION: 
+**les moyennes des trimestres se trouve dans le table Eduresultatcopie.
 **l'année scolaire se trouve dans anneescolaire.AnneeScolaire non pas dans Annee.
 ** si on dit l'annee XXXX/YYYY on parle de l'année scolaire XXXX/YYYY. 
 **les table eleve et parent et enseingant ne contienne pas les noms et les prenoms . ils se trouvent dans la table personne.
@@ -273,6 +241,36 @@ JOIN
    - PLUSIEURS: idClasse IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({{children_ids}}))))
 ** le nom de matière dans la table edumatiere est libematifr non pas NomMatiereFr .
 ** la matière mathématique s'appelle Maths dans la table matiere. 
+
+POUR L'EMPLOI DU TEMPS :la semaine A est d'id 2 , la semaine B est d'id 3 , Sans semaine d'id 1.
+** lorsque on ne précie pas la semaine faire la semaine d'id 1 sinon la semaine précisé.
+SELECT 
+    p.NomFr AS nom_enseignant,
+    p.PrenomFr AS prenom_enseignant,
+    m.NomMatiereFr AS nom_matiere,
+    s.nomSalleFr AS nom_salle,
+    sc1.debut AS debut_seance,
+    sc2.fin AS fin_seance,
+FROM
+    emploidutemps e
+JOIN
+    jour j ON e.Jour = j.id AND j.libelleJourFr = (jour)
+JOIN
+    semaine sm ON e.Semaine = sm.id AND sm.id = (id_semaine)
+JOIN
+    salle s ON e.Salle = s.id
+JOIN
+    enseingant en ON e.Enseignant = en.id
+JOIN
+    personne p ON en.idPersonne = p.id
+JOIN
+    matiere m ON e.Matiere = m.id
+JOIN
+    seance sc1 ON e.SeanceDebut = sc1.id
+JOIN
+    seance sc2 ON e.SeanceFin = sc2.id
+WHERE
+    e.Classe IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({{children_ids}}))));
 
 🎯 EXEMPLE NOTES POUR UN SEUL ENFANT (children_ids = "7012"):
 SELECT 
@@ -305,10 +303,6 @@ Voici la structure détaillée des tables pertinentes pour votre tâche (nom des
 {{relevant_domain_descriptions}}
 
 ---
-**Informations Clés et Relations Fréquemment Utilisées pour une meilleure performance :**
-{{relations}}
-
----
 **Instructions pour la génération SQL :**
 1.  Répondez UNIQUEMENT par une requête SQL MySQL valide et correcte.
 2.  Ne mettez AUCUN texte explicatif ou commentaire avant ou après la requête SQL. La réponse doit être purement la requête.
@@ -322,3 +316,4 @@ Question : {{input}}
 Requête SQL :
 """
 )
+

@@ -3,44 +3,24 @@
     "question_template": "donne moi la courbe d'evolution d'inscriptions",
     "sql_template": "SELECT YEAR(Date) AS annee, COUNT(*) AS total_inscriptions \nFROM inscriptioneleve \nGROUP BY YEAR(Date) \nORDER BY annee"
   },
-  "c3f9720a4d8c90741554cb760cb91949": {
-    "question_template": "donne moi le nombre des enseingants",
-    "sql_template": "SELECT COUNT(*) as nombre_enseignants FROM enseingant"
-  },
-  "5528ecb91dab2a31a6f6605682f3dcde": {
-    "question_template": "donne moi le nombre des eleves inscris pour {AnneeScolaire}",
-    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM inscriptioneleve ie WHERE ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
-  },
-  "3d3b234a761f79f6c521a224dd082359": {
-    "question_template": "enseignants",
-    "sql_template": "SELECT * FROM viewenseignant"
-  },
-  "95028ee3a6482e29a3d505b97cf5f888": {
-    "question_template": "nombre d eleves",
-    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM eleve"
-  },
   "fefc83db0665109dc6c86ea1bf044527": {
     "question_template": "le nombre des réinscriptions pour {AnneeScolaire}",
     "sql_template": "SELECT COUNT(*) as nombre_reinscriptions FROM inscriptioneleve ie WHERE ie.TypeInscri = 'R' AND ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
   },
-  "270603fff1a5aeefe5b23cb0b88c6c18": {
-    "question_template": "donne moi le nombre des classes",
-    "sql_template": "SELECT COUNT(*) as nombre_classes FROM classe"
+  "89d5c96a4f754dbc9862f83d2ef6b5dc": {
+    "question_template": "le nombre des eleves nouvellement inscris pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves_nouvellement_inscris\nFROM inscriptioneleve ie\nJOIN anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE ie.TypeInscri = 'N' AND a.AnneeScolaire = '{AnneeScolaire}' AND ie.Annuler = '0'"
   },
-  "94df1df882950eced16e9d7cd15ac041": {
-    "question_template": "donne moi le nombre des eleves",
-    "sql_template": "SELECT COUNT(*) as nombre_eleves FROM eleve"
+  "2c36dc3b831ddd41137afd3ae50bbcc1": {
+    "question_template": "nombre des élèves accepté et non inscris pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_accepte_non_inscris\nFROM preinscription p\nJOIN anneescolaire a ON p.AnneeScolaire = 'a'.id\nWHERE p.Decision = 'Acceptée'\nAND p.Eleve NOT IN (\n    'SELECT' Eleve\n    FROM inscriptioneleve ie\n    WHERE ie.AnneeScolaire = 'a'.id\n)\nAND a.AnneeScolaire = '{AnneeScolaire}'"
   },
-  "b13cffa80ec07043dd94832d412b9431": {
-    "question_template": "donne moi le nombre des inscriptions pour {AnneeScolaire}",
-    "sql_template": "SELECT COUNT(*) as total_inscriptions FROM inscriptioneleve WHERE AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  "6799af4e01dfb0ac0490107b0ae23128": {
+    "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
+    "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = 'p'.id\nLEFT JOIN \n    localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
   },
-  "620c0c8066b87beff9618de7abcb5f61": {
-    "question_template": "donne moi nombre des nouvelles inscriptions",
-    "sql_template": "SELECT COUNT(*) as nombre_nouvelles_inscriptions FROM inscriptioneleve WHERE TypeInscri = 'N'"
-  },
-  "824178632d1aeaf9399e657af4c8ccb6": {
-    "question_template": "donne moi la repartition des eleves",
-    "sql_template": "SELECT * FROM eleve"
+  "7b366591bf75bc68e78226571ec262ef": {
+    "question_template": "nombre total des préinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_preinscriptions \nFROM preinscription \nJOIN anneescolaire ON preinscription.AnneeScolaire = 'anneescolaire'.id \nWHERE anneescolaire.AnneeScolaire = '{AnneeScolaire}'"
   }
 }
