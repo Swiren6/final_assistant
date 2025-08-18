@@ -10,6 +10,10 @@ class Message {
   final String? graphBase64;
   final DateTime timestamp;
   final Map<String, dynamic>? metadata;
+  final String? pdfUrl; 
+  final String? pdfType;
+  final String? imageUrl;
+
 
   Message({
     required this.text,
@@ -18,6 +22,9 @@ class Message {
     this.sqlQuery,
     this.graphBase64,
     this.metadata,
+    this.pdfUrl,    
+    this.pdfType,
+    this.imageUrl,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -91,7 +98,22 @@ class Message {
       isMe: false,
     );
   }
-
+  Message.assistantWithPdf({
+    required String text,
+    String? sqlQuery,
+    String? graphBase64,
+    String? pdfUrl,
+    String? pdfType,
+  }) : this(
+          text: text,
+          isMe: false,
+          type: MessageType.assistant,
+          sqlQuery: sqlQuery,
+          graphBase64: graphBase64,
+          pdfUrl: pdfUrl,
+          pdfType: pdfType,
+          
+        );
   // Méthode pour créer une copie avec des modifications
   Message copyWith({
     String? text,

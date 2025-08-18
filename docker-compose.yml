@@ -5,7 +5,7 @@ services:
     build: ./backend
     container_name: assistant_ISE
     ports:
-      - "5000:5000"
+      - "5001:5001"
     volumes:
       - ./backend:/app
     environment:

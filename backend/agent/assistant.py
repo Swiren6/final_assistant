@@ -186,248 +186,176 @@ class SQLAssistant:
     # ================================
     # MÉTHODES PRINCIPALES D'INTERACTION
     # ================================
-
-    
-    # def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
-    #     """
-    #     Point d'entrée principal pour poser une question
-    #     Retourne (sql_query, formatted_response, graph_data)
-    #     """
-    #     if user_id is None:
-    #         user_id = 0
-    #     if roles is None:
-    #         roles = []
-
-    #     # Validation des rôles
-    #     if not roles:
-    #         return "", "❌ Accès refusé : Aucun rôle fourni", None
-        
-    #     valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
-    #     has_valid_role = any(role in valid_roles for role in roles)
-        
-    #     if not has_valid_role:
-    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None
-
-    #     # Traitement par rôle
-    #     try:
-    #         if 'ROLE_SUPER_ADMIN' in roles:
-    #             return self._process_super_admin_question(question)  # Retourne 3 valeurs
-    #         elif 'ROLE_PARENT' in roles:
-    #             return self._process_parent_question(question, user_id)  # Retourne 3 valeurs
-    #     except Exception as e:
-    #         logger.error(f"Erreur dans ask_question: {e}")
-    #         return "", f"❌ Erreur : {str(e)}", None
-
-    def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
-                                 roles: Optional[List[str]] = None, 
-                                 conversation_id: Optional[int] = None) -> tuple[str, str, Optional[str], int]:
+    def ask_question_with_history(
+    self, 
+    question: str, 
+    user_id: Optional[int] = None, 
+    roles: Optional[List[str]] = None, 
+    conversation_id: Optional[int] = None
+) -> tuple[str, str, Optional[str], Optional[str], Optional[str], int]:
         """
         Version améliorée qui sauvegarde automatiquement dans l'historique
-        Retourne (sql_query, formatted_response, graph_data, conversation_id)
+        Retourne :
+        (sql_query, formatted_response, graph_data, pdf_url, pdf_type, conversation_id)
         """
         if user_id is None:
             user_id = 0
         if roles is None:
             roles = []
 
-        # Validation des rôles (identique à la version existante)
+        # Validation des rôles
         if not roles:
-            return "", "❌ Accès refusé : Aucun rôle fourni", None, 0
+            return "", "❌ Accès refusé : Aucun rôle fourni", None, None, None, 0
         
         valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
         has_valid_role = any(role in valid_roles for role in roles)
         
         if not has_valid_role:
-            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None, 0
+            return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None, None, None, 0
 
         try:
-            # 🆕 GESTION DE LA CONVERSATION
+            # 🆕 Gestion conversation
             if conversation_id is None:
                 conversation_id = self.conversation_manager.create_conversation(user_id, question)
             
-            # Sauvegarder la question utilisateur
+            # Sauvegarde question user
             self.conversation_manager.add_message(conversation_id, 'user', question)
 
-            # Traitement par rôle (utiliser les méthodes existantes)
+            # Traitement par rôle
             if 'ROLE_SUPER_ADMIN' in roles:
-                sql_query, formatted_response, graph_data = self._process_super_admin_question(question)
+                sql_query, formatted_response, graph_data, pdf_url, pdf_type = \
+                    self._process_super_admin_question(question)
             elif 'ROLE_PARENT' in roles:
-                sql_query, formatted_response, graph_data = self._process_parent_question(question, user_id)
-            
-            # 🆕 SAUVEGARDER LA RÉPONSE ASSISTANT
+                sql_query, formatted_response, graph_data, pdf_url, pdf_type = \
+                    self._process_parent_question(question, user_id)
+            else:
+                return "", "❌ Rôle non supporté", None, None, None, conversation_id
+
+            # 🆕 Sauvegarde réponse assistant (avec PDF)
             self.conversation_manager.add_message(
                 conversation_id, 
                 'assistant', 
                 formatted_response, 
                 sql_query, 
-                graph_data
+                graph_data,
+                pdf_url=pdf_url,
+                pdf_type=pdf_type
             )
             
             logger.info(f"✅ Question traitée et sauvegardée - Conversation {conversation_id}")
-            return sql_query, formatted_response, graph_data, conversation_id
+            return sql_query, formatted_response, graph_data, pdf_url, pdf_type, conversation_id
             
         except Exception as e:
-            logger.error(f"Erreur dans ask_question_with_history: {e}")
+            logger.error(f"Erreur dans ask_question_with_history: {e}", exc_info=True)
             error_message = f"❌ Erreur : {str(e)}"
             
-            # Sauvegarder l'erreur aussi
+            # Sauvegarde erreur
             if conversation_id:
                 self.conversation_manager.add_message(conversation_id, 'system', error_message)
             
-            return "", error_message, None, conversation_id or 0
+            return "", error_message, None, None, None, conversation_id or 0
 
-    
-    def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str]]:
-        """Traite une question avec accès admin complet - CORRIGÉ POUR RETOURNER 3 VALEURS"""
-        
-        # 1. Vérifier le cache
-        cached = self.cache.get_cached_query(question)
-        if cached:
-            sql_template, variables = cached
-            sql_query = sql_template
-            for column, value in variables.items():
-                sql_query = sql_query.replace(f"{{{column}}}", value)
-            
-            logger.info("⚡ Requête admin récupérée depuis le cache")
-            try:
-                result = self.execute_sql_query(sql_query)
-                if result['success']:
-                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
-                    graph_data = self.generate_graph_if_relevant(result['data'], question)
-                    formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-                else:
-                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-            except Exception as db_error:
-                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
-        
-        # 2. Vérifier les templates existants
-        template_match = self.find_matching_template(question)
-        if template_match:
-            logger.info("🔍 Template admin trouvé")
-            sql_query = self.generate_query_from_template(
-                template_match["template"],
-                template_match["variables"]
-            )
-            try:
-                result = self.execute_sql_query(sql_query)
-                if result['success']:
-                    # 🎯 GÉNÉRATION DE GRAPHIQUE POUR TEMPLATE
-                    graph_data = self.generate_graph_if_relevant(result['data'], question)
-                    formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                    return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-                else:
-                    return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-            except Exception as db_error:
-                return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
-        
-        # 3. Génération AI + exécution + formatage
-        try:
-            # 🎯 GÉNÉRATION SQL MANQUANTE - AJOUT ICI
-            sql_query = self.generate_sql_with_ai(question)
-            
-            if not sql_query:
-                return "", "❌ La requête générée est vide.", None
-                
-            result = self.execute_sql_query(sql_query)
-            if result['success']:
-                # 🎯 GÉNÉRATION DE GRAPHIQUE
-                graph_data = self.generate_graph_if_relevant(result['data'], question)
-                
-                formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-                self.cache.cache_query(question, sql_query)
-                
-                return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-            else:
-                # Tentative de correction automatique
-                corrected_sql = self._auto_correct_sql(sql_query, result['error'])
-                if corrected_sql:
-                    retry_result = self.execute_sql_query(corrected_sql)
-                    if retry_result['success']:
-                        graph_data = self.generate_graph_if_relevant(retry_result['data'], question)
-                        formatted_result = self.format_response_with_ai(retry_result['data'], question, corrected_sql)
-                        return corrected_sql, formatted_result, graph_data  # 🎯 3 VALEURS
-                
-                return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-            
-        except Exception as e:
-            logger.error(f"Erreur dans _process_super_admin_question: {e}")
-            return "", f"❌ Erreur de traitement : {str(e)}", None    
+    # def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str], Optional[str], Optional[str]]:
+    #     """
+    #     Traite une question en mode super admin.
+    #     Retourne un tuple :
+    #     (sql_query, response_text, graph_base64, pdf_url, pdf_type)
+    #     """
 
-    
+    #     # 🔎 Vérifier si la question demande un PDF (bulletin, attestation, etc.)
+    #     pdf_result = self._check_for_pdf_request(question)
+    #     if pdf_result:
+    #         pdf_url, pdf_type = pdf_result
+    #         return "", f"📄 Document {pdf_type} généré avec succès.", None, pdf_url, pdf_type
 
-    # def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
-    #     """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
-        
-    #     # Nettoyage du cache
-    #     self.cache1.clean_double_braces_in_cache()
-        
-    #     # Vérification cache parent
-    #     cached = self.cache1.get_cached_query(question, user_id)
-    #     if cached:
-    #         sql_template, variables = cached
-    #         sql_query = sql_template
-    #         for column, value in variables.items():
-    #             sql_query = sql_query.replace(f"{{{column}}}", value)
-            
-    #         logger.info("⚡ Requête parent récupérée depuis le cache")
-    #         try:
-    #             result = self.execute_sql_query(sql_query)
-    #             if result['success']:
-    #                 # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
-    #                 graph_data = self.generate_graph_if_relevant(result['data'], question)
-    #                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-    #                 return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-    #             else:
-    #                 return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-    #         except Exception as db_error:
-    #             return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
-
-    #     # Récupération des données enfants
-    #     children_ids, children_prenoms = self.get_user_children_data(user_id)
-    #     children_ids_str = ", ".join(map(str, children_ids))
-    #     children_names_str = ", ".join(children_prenoms)
-        
-    #     if not children_ids:
-    #         return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès.", None
-        
-    #     logger.info(f"🔒 Restriction parent - Enfants autorisés: {children_ids}")
-
-    #     # Validation des noms dans la question
-    #     detected_names = self.detect_names_in_question(question, children_prenoms)
-    #     if detected_names["unauthorized_names"]:
-    #         unauthorized_list = ", ".join(detected_names["unauthorized_names"])
-    #         return "", f"❌ Accès interdit: Vous n'avez pas le droit de consulter les données de {unauthorized_list}", None
-        
-    #     # Génération SQL avec template parent
     #     try:
-    #         sql_query = self.generate_sql_parent(question, user_id, children_ids_str, children_names_str)
-            
-    #         if not sql_query:
-    #             return "", "❌ La requête générée est vide.", None
+    #         # ✅ Génération SQL avec LLM
+    #         sql_query = self.sql_generator.generate_sql(question)
 
-    #         # Validation de sécurité (sauf pour infos publiques)
-    #         if not self._is_public_info_query(question, sql_query):
-    #             if not self.validate_parent_access(sql_query, children_ids):
-    #                 return "", "❌ Accès refusé: La requête ne respecte pas les restrictions parent.", None
-    #         else:
-    #             logger.info("ℹ️ Question sur information publique - validation bypassée")
+    #         # ✅ Exécution SQL
+    #         result_df = self.db_executor.execute_query(sql_query)
 
-    #         # Exécution
-    #         result = self.execute_sql_query(sql_query)
-            
-    #         if result['success']:
-    #             # 🎯 GÉNÉRATION DE GRAPHIQUE
-    #             graph_data = self.generate_graph_if_relevant(result['data'], question)
-    #             formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-    #             self.cache1.cache_query(question, sql_query)
-    #             return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-    #         else:
-    #             return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-                
+    #         if result_df is None or result_df.empty:
+    #             return sql_query, "Aucun résultat trouvé.", None, None, None
+
+    #         # ✅ Formatage de la réponse texte
+    #         formatted_result = self._format_result(result_df)
+
+    #         # ✅ Vérifier si un graphique doit être généré
+    #         graph_data = None
+    #         if self._should_generate_graph(question, result_df):
+    #             graph_data = self._generate_graph(result_df)
+
+    #         return sql_query, formatted_result, graph_data, None, None
+
     #     except Exception as e:
-    #         logger.error(f"Erreur dans _process_parent_question: {e}")
-    #         return "", f"❌ Erreur de traitement : {str(e)}", None
+    #         logger.error(f"Erreur process super admin: {e}", exc_info=True)
+    #         return "", f"Erreur: {str(e)}", None, None, None
+    def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str], Optional[str], Optional[str]]:
+        """ traitement super admin """
+
+        # 🔎 Vérifier si la question demande un PDF
+        pdf_result = self._check_for_pdf_request(question)
+        if pdf_result:
+            pdf_url, pdf_type = pdf_result
+            return "", f"📄 Document {pdf_type} généré avec succès.", None, pdf_url, pdf_type
+
+        try:
+            # ✅ Génération SQL avec LLM
+            sql_query = self.sql_generator.generate_sql(question)
+
+            # ✅ Exécution SQL
+            result_df = self.db_executor.execute_query(sql_query)
+
+            if result_df is None or result_df.empty:
+                return sql_query, "Aucun résultat trouvé.", None, None, None
+
+            # ✅ Formatage de la réponse texte
+            formatted_result = self._format_result(result_df)
+
+            # ✅ Vérifier si un graphique doit être généré
+            graph_data = None
+            if self._should_generate_graph(question, result_df):
+                graph_data = self._generate_graph(result_df)
+
+            return sql_query, formatted_result, graph_data, None, None
+
+        except Exception as e:
+            logger.error(f"❌ Erreur process super admin: {e}", exc_info=True)
+            return "", f"Erreur: {str(e)}", None, None, None
+    def _check_for_pdf_request(self, question: str) -> Optional[tuple[str, str]]:
+        patterns = {
+            'attestation': [
+                r'attestation\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+                r'certificat\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+                r'document\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+            ],
+            'bulletin': [
+                r'bulletin\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+                r'notes?\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+                r'relevé\s+(de\s+|pour\s+)?([A-Za-zÀ-ÿ\s]+)',
+            ]
+        }
+        
+        for doc_type, regex_list in patterns.items():
+            for pattern in regex_list:
+                match = re.search(pattern, question, re.IGNORECASE)
+                if match:
+                    student_name = match.group(2).strip() if match.group(2) else "Étudiant"
+                    
+                    try:
+                        if doc_type == 'attestation':
+                            pdf_url, _ = generate_attestation_with_preview(student_name, 1)
+                            return pdf_url, 'Attestation'
+                        elif doc_type == 'bulletin':
+                            pdf_url, _ = generate_bulletin_with_preview(student_name, 1)
+                            return pdf_url, 'Bulletin'
+                            
+                    except Exception as e:
+                        logger.error(f"❌ Erreur génération {doc_type}: {e}")
+                        return None
+        
+        return None
 
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
         """Traite une question avec restrictions parent - VERSION CORRIGÉE MULTI-ENFANTS"""
@@ -938,9 +866,6 @@ class SQLAssistant:
     """
         }
     
-    
-    
-    
     # ================================
     # GÉNÉRATION SQL
     # ================================
@@ -1023,8 +948,6 @@ class SQLAssistant:
         sql = re.sub(r'```(sql)?|```', '', text)
         sql = re.sub(r'(?i)^\s*(?:--|#).*$', '', sql, flags=re.MULTILINE)
         return sql.strip().rstrip(';')
-
-    
     def _validate_sql(self, sql: str) -> bool:
         """Valide la syntaxe SQL et vérifie la sécurité"""
         if not sql:
@@ -1074,55 +997,7 @@ class SQLAssistant:
     # ================================
     # EXÉCUTION SQL
     # ================================
-    # def execute_sql_query(self, sql_query: str) -> dict:
-    #     """Exécute une requête SQL et retourne les résultats"""
-    #     try:
-    #         if not sql_query:
-    #             return {"success": False, "error": "Requête SQL vide", "data": []}
-            
-    #         # ✅ FIX: Utiliser directement get_db() au lieu de CustomSQLDatabase
-    #         connection = get_db()
-    #         cursor = connection.cursor()
-            
-    #         logger.debug(f"🔍 Exécution SQL: {sql_query}")
-    #         cursor.execute(sql_query)
-            
-    #         # ✅ FIX: Récupération correcte des colonnes et données
-    #         columns = [desc[0] for desc in cursor.description]
-    #         results = cursor.fetchall()
-            
-    #         logger.debug(f"🔍 Colonnes: {columns}")
-    #         logger.debug(f"🔍 Résultats bruts: {results}")
-            
-    #         # ✅ FIX: Construction correcte des dictionnaires
-    #         data = []
-    #         for row in results:
-    #             if isinstance(row, dict):
-    #                 # Si row est déjà un dict (DictCursor)
-    #                 data.append(row)
-    #             else:
-    #                 # Si row est un tuple, créer le dict
-    #                 data.append(dict(zip(columns, row)))
-            
-    #         logger.debug(f"🔍 Données finales: {data}")
-            
-    #         cursor.close()
-            
-    #         # Fermer la connexion si c'est une connexion directe
-    #         if hasattr(connection, '_direct_connection'):
-    #             connection.close()
-            
-    #         # Sérialiser les données
-    #         serialized_data = self._serialize_data(data)
-            
-    #         return {"success": True, "data": serialized_data}
-            
-    #     except Exception as e:
-    #         logger.error(f"❌ Erreur exécution SQL: {e}")
-    #         logger.error(f"❌ SQL qui a échoué: {sql_query}")
-    #         return {"success": False, "error": str(e), "data": []}
     
-
     def execute_sql_query(self, sql_query: str) -> dict:
         """Exécute une requête SQL et retourne les résultats"""
         try:

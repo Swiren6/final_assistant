@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 import '../models/message_model.dart';
+import '../utils/constants.dart'; // 🔧 Ajouté pour AppConstants
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -75,15 +78,57 @@ class MessageBubble extends StatelessWidget {
             padding: const EdgeInsets.only(top: 12),
             child: _buildGraphWidget(context, message.graphBase64!),
           ),
+        // 🆕 Affichage PDF amélioré
+        if (_shouldShowPdfWidget()) ...[
+          const SizedBox(height: 12),
+          _buildPdfWidget(context),
+        ],
       ],
     );
+  }
+
+  // 🆕 Vérification intelligente pour afficher le widget PDF
+  bool _shouldShowPdfWidget() {
+    // Cas 1: PDF URL directement fournie
+    if (message.pdfUrl != null && message.pdfUrl!.isNotEmpty) {
+      return true;
+    }
+
+    // Cas 2: Lien PDF détecté dans le texte
+    if (_extractPdfLinkFromText() != null) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // 🆕 Extraction du lien PDF depuis le texte
+  String? _extractPdfLinkFromText() {
+    if (message.text.isEmpty) return null;
+
+    // Pattern pour détecter les liens d'attestation/PDF
+    final patterns = [
+      RegExp(r"<a href='([^']*\.pdf[^']*)'[^>]*>.*?</a>", caseSensitive: false),
+      RegExp(r"href='([^']*attestation[^']*\.pdf[^']*)'", caseSensitive: false),
+    ];
+
+    for (var pattern in patterns) {
+      final match = pattern.firstMatch(message.text);
+      if (match != null) {
+        String url = match.group(1) ?? match.group(0)!;
+        // Nettoyer l'URL
+        url = url.replaceAll(RegExp(r'''[<>"'\\s]'''), '');
+        return url;
+      }
+    }
+
+    return null;
   }
 
   Widget _buildTextContent(BuildContext context) {
     String textToDisplay = message.text;
     String? extractedGraphBase64;
 
-    // Patterns pour détecter et extraire les graphiques du texte
     final graphRegexPatterns = [
       RegExp(r"<img src='(data:image/[^']+)"),
       RegExp(r"📊 Graphique généré: <img[^>]*>"),
@@ -91,7 +136,6 @@ class MessageBubble extends StatelessWidget {
       RegExp(r"<img[^>]*data:image[^>]*>"),
     ];
 
-    // Extraire et nettoyer les graphiques du texte
     for (var pattern in graphRegexPatterns) {
       final match = pattern.firstMatch(textToDisplay);
       if (match != null && extractedGraphBase64 == null) {
@@ -100,13 +144,14 @@ class MessageBubble extends StatelessWidget {
       textToDisplay = textToDisplay.replaceAll(pattern, '');
     }
 
-    // Nettoyer les références aux graphiques
+    // 🆕 Nettoyer les liens PDF du texte d'affichage
+    textToDisplay = _cleanPdfLinksFromText(textToDisplay);
+
     textToDisplay = textToDisplay.replaceAll(
         RegExp(r"📊\s*\*\*Graphique généré\s*:\*\*"), "");
     textToDisplay =
         textToDisplay.replaceAll(RegExp(r"📊\s*Graphique généré\s*:"), "");
 
-    // Nettoyer les sauts de ligne multiples
     textToDisplay = textToDisplay.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
     textToDisplay = textToDisplay.trim();
 
@@ -127,6 +172,21 @@ class MessageBubble extends StatelessWidget {
               : Text(textToDisplay, style: _getTextStyle(context)),
       ],
     );
+  }
+
+  // 🆕 Nettoyer les liens PDF du texte pour éviter la duplication
+  String _cleanPdfLinksFromText(String text) {
+    final patterns = [
+      RegExp(r"<a href='[^']*\.pdf[^']*'[^>]*>.*?</a>", caseSensitive: false),
+      RegExp(r"📄 Télécharger l'attestation</a>", caseSensitive: false),
+      RegExp(r"✅\s*Attestation générée pour [^<\n]*", caseSensitive: false),
+    ];
+
+    for (var pattern in patterns) {
+      text = text.replaceAll(pattern, '');
+    }
+
+    return text;
   }
 
   bool _isMarkdown(String text) {
@@ -238,11 +298,8 @@ class MessageBubble extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.bar_chart,
-                        size: 18,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                      Icon(Icons.bar_chart,
+                          size: 18, color: Theme.of(context).primaryColor),
                       const SizedBox(width: 8),
                       Text(
                         '📊 Graphique généré',
@@ -253,11 +310,8 @@ class MessageBubble extends StatelessWidget {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: Icon(
-                          Icons.fullscreen,
-                          size: 16,
-                          color: Colors.grey[600],
-                        ),
+                        icon: Icon(Icons.fullscreen,
+                            size: 16, color: Colors.grey[600]),
                         onPressed: () =>
                             _showFullscreenGraph(context, snapshot.data!),
                         tooltip: 'Voir en plein écran',
@@ -355,19 +409,6 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Future<void> _copyImageToClipboard(
-      BuildContext context, Uint8List imageData) async {
-    try {
-      await Clipboard.setData(ClipboardData(
-          text: 'data:image/png;base64,${base64Encode(imageData)}'));
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image copiée dans le presse-papier')));
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Erreur lors de la copie: $e')));
-    }
-  }
-
   void _showFullscreenGraph(BuildContext context, Uint8List imageData) {
     showDialog(
       context: context,
@@ -395,11 +436,7 @@ class MessageBubble extends StatelessWidget {
                 top: 10,
                 right: 10,
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
@@ -428,6 +465,431 @@ class MessageBubble extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  // 🔧 Widget PDF corrigé
+  Widget _buildPdfWidget(BuildContext context) {
+    // Déterminer l'URL du PDF
+    String? pdfUrl = message.pdfUrl ?? _extractPdfLinkFromText();
+    String pdfType = message.pdfType ?? 'PDF';
+
+    if (pdfUrl == null) {
+      return _buildErrorWidget('URL PDF introuvable');
+    }
+
+    // Nettoyer l'URL si nécessaire
+    pdfUrl = _cleanPdfUrl(pdfUrl);
+
+    // 🔧 Correction : Convertir correctement l'URL PDF en URL d'image
+    String imageUrl = _convertPdfUrlToImageUrl(pdfUrl);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // En-tête du PDF
+          Row(
+            children: [
+              Icon(Icons.picture_as_pdf, color: Colors.red[700], size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '📄 Document $pdfType généré',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red[700],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Aperçu de l'image du document avec gestion du tap pour agrandir
+          GestureDetector(
+            onTap: () => _showFullscreenDocument(context, imageUrl),
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                maxHeight: 300,
+                minHeight: 150,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Chargement du document...',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('⚠️ Erreur chargement image PDF: $error');
+                        debugPrint('🔗 URL tentée: $imageUrl');
+
+                        return Container(
+                          height: 200,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.picture_as_pdf,
+                                size: 48,
+                                color: Colors.red[300],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Aperçu non disponible',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                'Utilisez le bouton télécharger',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                ),
+                              ),
+                              if (kDebugMode) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[100],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: SelectableText(
+                                    'Debug: Erreur $error\nURL: $imageUrl',
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // Indicateur de zoom
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.zoom_in, color: Colors.white, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Toucher pour agrandir',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Bouton de téléchargement uniquement
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _downloadPdf(context, pdfUrl!),
+              icon: const Icon(Icons.download, size: 18),
+              label: const Text('Télécharger le document'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[600],
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+
+          // URL de débogage (en mode debug seulement)
+          if (kDebugMode) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SelectableText(
+                    'Debug PDF URL: $pdfUrl',
+                    style:
+                        const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+                  ),
+                  SelectableText(
+                    'Debug Image URL: $imageUrl',
+                    style:
+                        const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // 🔧 Conversion corrigée de l'URL PDF vers URL image
+  String _convertPdfUrlToImageUrl(String pdfUrl) {
+    debugPrint('🔄 Conversion PDF -> Image: $pdfUrl');
+
+    // Si l'URL pointe vers /static/attestations/file.pdf
+    if (pdfUrl.contains('/static/attestations/')) {
+      // Remplacer par /static/images/ et changer l'extension
+      String imageUrl = pdfUrl
+          .replaceAll('/static/attestations/', '/static/images/')
+          .replaceAll('.pdf', '.png');
+
+      debugPrint('🖼️ URL image générée: $imageUrl');
+      return imageUrl;
+    }
+
+    // Si c'est déjà un chemin image, le retourner tel quel
+    if (pdfUrl.contains('/static/images/')) {
+      return pdfUrl;
+    }
+
+    // Fallback: essayer de construire l'URL image
+    if (pdfUrl.endsWith('.pdf')) {
+      String filename = pdfUrl.split('/').last;
+      String imageFilename = filename.replaceAll('.pdf', '.png');
+      String baseUrl = AppConstants.apiBaseUrl;
+      String imageUrl = '$baseUrl/static/images/$imageFilename';
+
+      debugPrint('🔧 Fallback URL image: $imageUrl');
+      return imageUrl;
+    }
+
+    // Dernier recours
+    return pdfUrl;
+  }
+
+  // 🆕 Nettoyage de l'URL PDF
+  String _cleanPdfUrl(String url) {
+    // Supprimer les caractères indésirables
+    url = url.replaceAll(RegExp(r'''[<>"'\s]'''), '');
+
+    // Si l'URL est relative, construire l'URL complète
+    if (url.startsWith('/')) {
+      // Utiliser la constante de base URL de votre app
+      url = '${AppConstants.apiBaseUrl}$url';
+    }
+
+    return url;
+  }
+
+  // 🆕 Téléchargement PDF amélioré
+  Future<void> _downloadPdf(BuildContext context, String pdfUrl) async {
+    try {
+      debugPrint('🔗 Tentative téléchargement PDF: $pdfUrl');
+
+      final Uri url = Uri.parse(pdfUrl);
+
+      // Vérifier si l'URL est valide
+      if (!url.hasScheme || (!url.scheme.startsWith('http'))) {
+        throw Exception('URL invalide: $pdfUrl');
+      }
+
+      if (await canLaunchUrl(url)) {
+        final launched = await launchUrl(
+          url,
+          mode: LaunchMode.externalApplication,
+        );
+
+        if (launched) {
+          _showSnackBar(context, '📱 Ouverture du téléchargement...');
+        } else {
+          throw Exception('Impossible de lancer l\'URL');
+        }
+      } else {
+        throw Exception('URL non supportée');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Erreur téléchargement PDF: $e');
+      _showSnackBar(context, 'Erreur téléchargement: ${e.toString()}');
+    }
+  }
+
+  // 🆕 Affichage plein écran de l'image du document
+  void _showFullscreenDocument(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(10),
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  scaleEnabled: true,
+                  minScale: 0.3,
+                  maxScale: 5.0,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        width: 200,
+                        height: 200,
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 200,
+                        height: 200,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.white70,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Impossible de charger\nl\'aperçu du document',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Pincer pour zoomer • Faire glisser pour naviguer • Toucher pour fermer',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Méthode _showSnackBar
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 }

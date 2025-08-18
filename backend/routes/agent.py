@@ -1,9 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify,send_from_directory
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, get_jwt
 import logging
 import re
 import os
 from typing import List, Dict, Optional
+import fitz  
+from PIL import Image
+import io
+import base64
 
 
 from routes.auth import login
@@ -385,9 +389,9 @@ def handle_attestation_request(question: str):
         return jsonify({
             "response": (
                 f"✅ Attestation générée pour {student_data['nom_complet']}\n\n"
-                f"<a href='/static/attestations/{filename}' download>📄 Télécharger l'attestation</a>"
+                # f"<a href='/static/attestations/{filename}' download>📄 Télécharger l'attestation</a>"
             ),
-            "pdf_url": f"/static/attestations/{filename}",
+            "pdf_url": f'/download-attestation/{filename}',
             "status": "success",
             "document_type": "attestation"
         })
@@ -625,6 +629,127 @@ def generate_graph_only():
             "details": str(e),
             "timestamp": pd.Timestamp.now().isoformat()
         }), 500
+@agent_bp.route('/static/images/<path:filename>')
+def serve_image(filename):
+    """
+    Sert les images de prévisualisation des PDF ou les convertit à la volée
+            """
+    try:
+        # Construire le chemin de l'image
+        image_path = os.path.join('static', 'images', filename)
+        
+        # Si l'image existe déjà, la servir directement
+        if os.path.exists(image_path):
+            logger.info(f"✅ Image trouvée: {image_path}")
+            return send_from_directory("static/images", filename)
+        
+        # Sinon, essayer de la générer depuis le PDF correspondant
+        logger.info(f"🔄 Génération image à la volée pour: {filename}")
+        
+        # Construire le chemin du PDF original
+        pdf_filename = filename.replace('.png', '.pdf').replace('.jpg', '.pdf')
+        pdf_path = os.path.join('static', 'attestations', pdf_filename)
+        
+        if not os.path.exists(pdf_path):
+            logger.warning(f"❌ PDF source non trouvé: {pdf_path}")
+            return jsonify({'error': 'PDF source non trouvé'}), 404
+        
+        # Créer le dossier images s'il n'existe pas
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        
+        # Convertir PDF en image
+        logger.info(f"🖼️ Conversion PDF -> PNG: {pdf_path} -> {image_path}")
+        pdf_document = fitz.open(pdf_path)
+        page = pdf_document[0]  # Première page
+        
+        # Rendu en image (résolution 200 DPI pour bonne qualité mobile)
+        matrix = fitz.Matrix(200/72, 200/72)  # 200 DPI
+        pix = page.get_pixmap(matrix=matrix)
+        
+        # Sauvegarder l'image
+        pix.save(image_path)
+        pdf_document.close()
+        
+        logger.info(f"✅ Image générée avec succès: {image_path}")
+        
+        # Servir l'image nouvellement créée
+        return send_from_directory("static/images", filename)
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur conversion PDF vers image: {e}")
+        # Fallback: servir une image par défaut ou erreur 404
+        return jsonify({'error': f'Erreur génération image: {str(e)}'}), 500
+def generate_attestation_with_preview(student_name: str, user_id: int) -> tuple[str, str]:
+    """
+    Génère l'attestation PDF + URL pour l'image de prévisualisation
+    Retourne (pdf_url, image_url)
+    """
+    try:
+        # 1. Générer le PDF comme d'habitude
+        timestamp = int(time.time())
+        pdf_filename = f"attestation_{user_id}.pdf"
+        pdf_path = os.path.join('static', 'attestations', pdf_filename)
+        
+        # Créer le dossier attestations s'il n'existe pas
+        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+        
+        # TODO: Votre code de génération PDF existant ici
+        # generate_pdf_content(pdf_path, student_name, ...)
+        # logger.info(f"📄 PDF généré: {pdf_path}")
+        
+        # 2. Définir les URLs
+        pdf_url = f"/static/attestations/{pdf_filename}"
+        
+        # L'image sera générée à la volée par l'endpoint /static/images/
+        img_filename = pdf_filename.replace('.pdf', '.png')
+        img_url = f"/static/images/{img_filename}"
+        
+        # logger.info(f"✅ Attestation générée - PDF: {pdf_url}, Preview: {img_url}")
+        return pdf_url, img_url
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur génération attestation: {e}")
+        raise
+
+
+@agent_bp.route('/download-attestation/<filename>')
+def download_attestation(filename):
+    try:
+        return send_from_directory(
+            os.path.abspath('static/attestations'),
+            filename,
+            as_attachment=True
+        )
+    except FileNotFoundError:
+        return jsonify({"error": "Fichier non trouvé"}), 404
+
+def generate_bulletin_with_preview(student_name: str, user_id: int) -> tuple[str, str]:
+    """
+    Génère le bulletin PDF + URL pour l'image de prévisualisation
+    Retourne (pdf_url, image_url)
+    """
+    try:
+        timestamp = int(time.time())
+        pdf_filename = f"bulletin_{user_id}_{timestamp}.pdf"
+        pdf_path = os.path.join('static', 'bulletins', pdf_filename)
+        
+        # Créer le dossier bulletins s'il n'existe pas
+        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+        
+        # TODO: Votre code de génération PDF existant ici
+        logger.info(f"📄 Bulletin généré: {pdf_path}")
+        
+        # URLs
+        pdf_url = f"/static/bulletins/{pdf_filename}"
+        img_filename = pdf_filename.replace('.pdf', '.png')
+        img_url = f"/static/images/{img_filename}"  # Sera généré à la volée
+        
+        logger.info(f"✅ Bulletin généré - PDF: {pdf_url}, Preview: {img_url}")
+        return pdf_url, img_url
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur génération bulletin: {e}")
+        raise
 
 @agent_bp.route('/health', methods=['GET'])
 def health_check():

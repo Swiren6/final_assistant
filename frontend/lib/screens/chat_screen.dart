@@ -93,6 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+
   void _startNewConversation() {
     setState(() {
       _messages.clear();
@@ -130,11 +131,13 @@ class _ChatScreenState extends State<ChatScreen> {
               _messages.add(Message.user(text: content));
               break;
             case 'assistant':
-              _messages.add(Message.assistant(
-                text: content,
-                sqlQuery: messageData['sql_query'] as String?,
-                graphBase64: messageData['graph_data'] as String?,
-              ));
+            _messages.add(Message.assistantWithPdf(
+              text: content,
+              sqlQuery: messageData['sql_query'] as String?,
+              graphBase64: messageData['graph_data'] as String?,
+              pdfUrl: messageData['pdf_url'] as String?,      
+              pdfType: messageData['pdf_type'] as String?,    
+            ));
               break;
             case 'system':
               _messages.add(Message.system(text: content));
@@ -169,6 +172,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _saveMessageToHistory(String messageType, String content, {
     String? sqlQuery,
     String? graphData,
+    String? pdfUrl,     
+    String? pdfType,    
   }) async {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
@@ -228,6 +233,8 @@ class _ChatScreenState extends State<ChatScreen> {
           'content': content,
           'sql_query': sqlQuery,
           'graph_data': graphData,
+          'pdf_url': pdfUrl,      
+          'pdf_type': pdfType,    
         };
         
         debugPrint('🌐 POST ${AppConstants.apiBaseUrl}/conversations/$_currentConversationId/messages');
@@ -261,6 +268,8 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+
+  
   Future<void> _sendMessage() async {
     final userMessage = _messageController.text.trim();
     if (userMessage.isEmpty || _isLoading) return;
@@ -297,37 +306,44 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSuccessfulResponse(ApiResponse response) {
-    debugPrint('🔥 Réponse complète du backend: ${response.response}');
-    
-    String responseText = response.response;
-    String? graphBase64 = response.graphBase64;
-    String? sqlQuery = response.sqlQuery;
+  debugPrint('🔥 Réponse complète du backend: ${response.response}');
+  
+  String responseText = response.response;
+  String? graphBase64 = response.graphBase64;
+  String? sqlQuery = response.sqlQuery;
+  String? pdfUrl = response.pdfUrl;        // 🆕 support PDF
+  String? pdfType = response.pdfType;      // 🆕 type (ex: bulletin, relevé...)
 
-    responseText = _cleanResponseText(responseText);
+  // Nettoyage du texte
+  responseText = _cleanResponseText(responseText);
 
-    setState(() {
-      _messages.removeLast(); // Retirer le message "typing..."
-      _messages.add(
-        Message.assistant(
-          text: responseText,
-          sqlQuery: sqlQuery,
-          graphBase64: graphBase64,
-        ),
-      );
-    });
+  setState(() {
+    _messages.removeLast(); // Retirer le "assistant tape..."
+    _messages.add(
+      Message.assistantWithPdf( // 🆕 utilise la nouvelle factory
+        text: responseText,
+        sqlQuery: sqlQuery,
+        graphBase64: graphBase64,
+        pdfUrl: pdfUrl,     
+        pdfType: pdfType,   
+      ),
+    );
+  });
 
-    _saveMessageToHistory(
-      'assistant', 
-      responseText, 
-      sqlQuery: sqlQuery,
-      graphData: graphBase64,
-    ).catchError((error) {
-      debugPrint('Erreur sauvegarde message assistant: $error');
-    });
-    
-    debugPrint('✅ Message ajouté avec graphique: ${graphBase64 != null}');
-    _scrollToBottom();
-  }
+  // Sauvegarde dans l’historique
+  _saveMessageToHistory(
+    'assistant',
+    responseText,
+    sqlQuery: sqlQuery,
+    graphData: graphBase64,
+    pdfUrl: pdfUrl,      
+    pdfType: pdfType,    
+  ).catchError((error) {
+    debugPrint('Erreur sauvegarde message assistant: $error');
+  });
+
+  _scrollToBottom();
+}
 
   void _logout() async {
     try {
