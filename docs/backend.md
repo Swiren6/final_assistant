@@ -317,3 +317,14 @@ def find_matching_template(self, question: str):
 - **Invalidation automatique**  
 - **Personnalisation par rôle**
 - **Compression optimisée**
+
+
+
+
+
+
+
+### 
+les paiements 
+cantine
+image 

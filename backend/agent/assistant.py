@@ -26,7 +26,6 @@ from agent.pdf_utils.attestation import PDFGenerator
 
 # Imports security and templates
 from agent.prompts.templates import PROMPT_TEMPLATE, ADMIN_PROMPT_TEMPLATE, PARENT_PROMPT_TEMPLATE
-from security.roles import is_super_admin, is_parent, validate_parent_access, is_admin, validate_admin_access
 
 # Imports for graphs and data processing
 import pandas as pd
@@ -46,12 +45,9 @@ plt.switch_backend('Agg')
 logger = logging.getLogger(__name__)
 
 class SQLAssistant:
-    """
-    Assistant SQL unifié combinant les fonctionnalités de SQLAssistant et SQLAgent
-    Capable de générer du SQL, exécuter les requêtes, créer des graphiques et répondre en langage naturel
-    """
     
     def __init__(self, db=None, model="gpt-4o", temperature=0.3, max_tokens=500):
+
         # Configuration base
         self.db = db if db is not None else get_db_connection()
         self.model = model
@@ -70,7 +66,7 @@ class SQLAssistant:
         self.schema = self._safe_get_schema()
         
         # Chargement des configurations
-        self.relations_description = self._safe_load_relations()
+        #self.relations_description = self._safe_load_relations()
         self.domain_descriptions = self._safe_load_domain_descriptions()
         self.domain_to_tables_mapping = self._safe_load_domain_to_tables_mapping()
         self.ask_llm = ask_llm
@@ -87,30 +83,25 @@ class SQLAssistant:
         self.conversation_manager = ConversationHistory()
         
         logger.info("✅ SQLAssistant initialisé avec succès")
-
-    # ================================
-    # MÉTHODES DE CHARGEMENT SÉCURISÉES
-    # ================================
     
     def _safe_get_schema(self):
-        """Récupère le schéma de base de données de manière sécurisée"""
         try:
             return self.db.get_schema() if self.db else []
         except Exception as e:
             logger.warning(f"⚠️ Impossible de récupérer le schéma: {e}")
             return []
 
-    def _safe_load_relations(self) -> str:
-        """Charge les relations avec gestion d'erreurs"""
-        try:
-            relations_path = Path(__file__).parent  / 'prompts' / 'relations.txt'
-            if relations_path.exists():
-                return relations_path.read_text(encoding='utf-8')
-            logger.warning("⚠️ Fichier relations.txt non trouvé")
-            return "# Aucune relation définie"
-        except Exception as e:
-            logger.error(f"❌ Erreur chargement relations: {e}")
-            return "# Erreur chargement relations"
+    # def _safe_load_relations(self) -> str:
+    #     """Charge les relations avec gestion d'erreurs"""
+    #     try:
+    #         relations_path = Path(__file__).parent  / 'prompts' / 'relations.txt'
+    #         if relations_path.exists():
+    #             return relations_path.read_text(encoding='utf-8')
+    #         logger.warning("⚠️ Fichier relations.txt non trouvé")
+    #         return "# Aucune relation définie"
+    #     except Exception as e:
+    #         logger.error(f"❌ Erreur chargement relations: {e}")
+    #         return "# Erreur chargement relations"
 
     def _safe_load_domain_descriptions(self) -> dict:
         """Charge les descriptions de domaine avec gestion d'erreurs"""
@@ -186,37 +177,6 @@ class SQLAssistant:
     # ================================
     # MÉTHODES PRINCIPALES D'INTERACTION
     # ================================
-
-    
-    # def ask_question(self, question: str, user_id: Optional[int] = None, roles: Optional[List[str]] = None) -> tuple[str, str, Optional[str]]:
-    #     """
-    #     Point d'entrée principal pour poser une question
-    #     Retourne (sql_query, formatted_response, graph_data)
-    #     """
-    #     if user_id is None:
-    #         user_id = 0
-    #     if roles is None:
-    #         roles = []
-
-    #     # Validation des rôles
-    #     if not roles:
-    #         return "", "❌ Accès refusé : Aucun rôle fourni", None
-        
-    #     valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
-    #     has_valid_role = any(role in valid_roles for role in roles)
-        
-    #     if not has_valid_role:
-    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None
-
-    #     # Traitement par rôle
-    #     try:
-    #         if 'ROLE_SUPER_ADMIN' in roles:
-    #             return self._process_super_admin_question(question)  # Retourne 3 valeurs
-    #         elif 'ROLE_PARENT' in roles:
-    #             return self._process_parent_question(question, user_id)  # Retourne 3 valeurs
-    #     except Exception as e:
-    #         logger.error(f"Erreur dans ask_question: {e}")
-    #         return "", f"❌ Erreur : {str(e)}", None
 
     def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
                                  roles: Optional[List[str]] = None, 
@@ -337,7 +297,7 @@ class SQLAssistant:
                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
                 self.cache.cache_query(question, sql_query)
                 
-                return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
+                return sql_query, formatted_result, graph_data  
             else:
                 # Tentative de correction automatique
                 corrected_sql = self._auto_correct_sql(sql_query, result['error'])
@@ -346,7 +306,8 @@ class SQLAssistant:
                     if retry_result['success']:
                         graph_data = self.generate_graph_if_relevant(retry_result['data'], question)
                         formatted_result = self.format_response_with_ai(retry_result['data'], question, corrected_sql)
-                        return corrected_sql, formatted_result, graph_data  # 🎯 3 VALEURS
+                        self.cache.cache_query(question, sql_query)
+                        return corrected_sql, formatted_result, graph_data  
                 
                 return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
             
@@ -354,80 +315,6 @@ class SQLAssistant:
             logger.error(f"Erreur dans _process_super_admin_question: {e}")
             return "", f"❌ Erreur de traitement : {str(e)}", None    
 
-    
-
-    # def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
-    #     """Traite une question avec restrictions parent - CORRIGÉ POUR RETOURNER 3 VALEURS"""
-        
-    #     # Nettoyage du cache
-    #     self.cache1.clean_double_braces_in_cache()
-        
-    #     # Vérification cache parent
-    #     cached = self.cache1.get_cached_query(question, user_id)
-    #     if cached:
-    #         sql_template, variables = cached
-    #         sql_query = sql_template
-    #         for column, value in variables.items():
-    #             sql_query = sql_query.replace(f"{{{column}}}", value)
-            
-    #         logger.info("⚡ Requête parent récupérée depuis le cache")
-    #         try:
-    #             result = self.execute_sql_query(sql_query)
-    #             if result['success']:
-    #                 # 🎯 GÉNÉRATION DE GRAPHIQUE POUR CACHE
-    #                 graph_data = self.generate_graph_if_relevant(result['data'], question)
-    #                 formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-    #                 return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-    #             else:
-    #                 return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-    #         except Exception as db_error:
-    #             return sql_query, f"❌ Erreur d'exécution SQL : {str(db_error)}", None
-
-    #     # Récupération des données enfants
-    #     children_ids, children_prenoms = self.get_user_children_data(user_id)
-    #     children_ids_str = ", ".join(map(str, children_ids))
-    #     children_names_str = ", ".join(children_prenoms)
-        
-    #     if not children_ids:
-    #         return "", "❌ Aucun enfant trouvé pour ce parent ou erreur d'accès.", None
-        
-    #     logger.info(f"🔒 Restriction parent - Enfants autorisés: {children_ids}")
-
-    #     # Validation des noms dans la question
-    #     detected_names = self.detect_names_in_question(question, children_prenoms)
-    #     if detected_names["unauthorized_names"]:
-    #         unauthorized_list = ", ".join(detected_names["unauthorized_names"])
-    #         return "", f"❌ Accès interdit: Vous n'avez pas le droit de consulter les données de {unauthorized_list}", None
-        
-    #     # Génération SQL avec template parent
-    #     try:
-    #         sql_query = self.generate_sql_parent(question, user_id, children_ids_str, children_names_str)
-            
-    #         if not sql_query:
-    #             return "", "❌ La requête générée est vide.", None
-
-    #         # Validation de sécurité (sauf pour infos publiques)
-    #         if not self._is_public_info_query(question, sql_query):
-    #             if not self.validate_parent_access(sql_query, children_ids):
-    #                 return "", "❌ Accès refusé: La requête ne respecte pas les restrictions parent.", None
-    #         else:
-    #             logger.info("ℹ️ Question sur information publique - validation bypassée")
-
-    #         # Exécution
-    #         result = self.execute_sql_query(sql_query)
-            
-    #         if result['success']:
-    #             # 🎯 GÉNÉRATION DE GRAPHIQUE
-    #             graph_data = self.generate_graph_if_relevant(result['data'], question)
-    #             formatted_result = self.format_response_with_ai(result['data'], question, sql_query)
-    #             self.cache1.cache_query(question, sql_query)
-    #             return sql_query, formatted_result, graph_data  # 🎯 3 VALEURS
-    #         else:
-    #             return sql_query, f"❌ Erreur d'exécution SQL : {result['error']}", None
-                
-    #     except Exception as e:
-    #         logger.error(f"Erreur dans _process_parent_question: {e}")
-    #         return "", f"❌ Erreur de traitement : {str(e)}", None
 
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
         """Traite une question avec restrictions parent - VERSION CORRIGÉE MULTI-ENFANTS"""
@@ -963,7 +850,7 @@ class SQLAssistant:
             input=question,
             table_info=table_info,
             relevant_domain_descriptions=relevant_domain_descriptions,
-            relations=self.relations_description
+            #relations=self.relations_description
         )
 
         llm_response = self.ask_llm(prompt)
@@ -997,7 +884,7 @@ class SQLAssistant:
             input=question,
             table_info=table_info,
             relevant_domain_descriptions=relevant_domain_descriptions,
-            relations=self.relations_description,
+            #relations=self.relations_description,
             user_id=user_id,
             children_ids=children_ids_str,
             children_names=children_names_str
@@ -1074,54 +961,6 @@ class SQLAssistant:
     # ================================
     # EXÉCUTION SQL
     # ================================
-    # def execute_sql_query(self, sql_query: str) -> dict:
-    #     """Exécute une requête SQL et retourne les résultats"""
-    #     try:
-    #         if not sql_query:
-    #             return {"success": False, "error": "Requête SQL vide", "data": []}
-            
-    #         # ✅ FIX: Utiliser directement get_db() au lieu de CustomSQLDatabase
-    #         connection = get_db()
-    #         cursor = connection.cursor()
-            
-    #         logger.debug(f"🔍 Exécution SQL: {sql_query}")
-    #         cursor.execute(sql_query)
-            
-    #         # ✅ FIX: Récupération correcte des colonnes et données
-    #         columns = [desc[0] for desc in cursor.description]
-    #         results = cursor.fetchall()
-            
-    #         logger.debug(f"🔍 Colonnes: {columns}")
-    #         logger.debug(f"🔍 Résultats bruts: {results}")
-            
-    #         # ✅ FIX: Construction correcte des dictionnaires
-    #         data = []
-    #         for row in results:
-    #             if isinstance(row, dict):
-    #                 # Si row est déjà un dict (DictCursor)
-    #                 data.append(row)
-    #             else:
-    #                 # Si row est un tuple, créer le dict
-    #                 data.append(dict(zip(columns, row)))
-            
-    #         logger.debug(f"🔍 Données finales: {data}")
-            
-    #         cursor.close()
-            
-    #         # Fermer la connexion si c'est une connexion directe
-    #         if hasattr(connection, '_direct_connection'):
-    #             connection.close()
-            
-    #         # Sérialiser les données
-    #         serialized_data = self._serialize_data(data)
-            
-    #         return {"success": True, "data": serialized_data}
-            
-    #     except Exception as e:
-    #         logger.error(f"❌ Erreur exécution SQL: {e}")
-    #         logger.error(f"❌ SQL qui a échoué: {sql_query}")
-    #         return {"success": False, "error": str(e), "data": []}
-    
 
     def execute_sql_query(self, sql_query: str) -> dict:
         """Exécute une requête SQL et retourne les résultats"""
@@ -1218,7 +1057,7 @@ class SQLAssistant:
                 },
                 {
                     "role": "user",
-                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:10], ensure_ascii=False)}"
+                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:50], ensure_ascii=False)}"
                 }
             ]
             
