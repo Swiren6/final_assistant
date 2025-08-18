@@ -1,0 +1,45 @@
+Relations clés principales entre tables :
+
+- absence liée à inscriptioneleve.
+- actionfonctionalitepriv liée à fonctionaliteprivelge.
+- avertissement liée à inscriptioneleve.
+- banque liée à localite, personne.
+- banquebordereaudetails liée à banquebordereau, reglementeleve.
+- banqueversement liée à banquebordereau.
+- blame liée à inscriptioneleve.
+- caisse liée à utilisateur.
+- caisse_log liée à personne, utilisateur.
+- caissedetails liée à banqueversement, caisse, cantineparjour, paiementdetailscourete, personne, reglementeleve, utilisateur.
+- cantineparjour liée à utilisateur.
+- cantineparjourenseignant liée à utilisateur.
+- classe liée à etablissement, niveau.
+- delegation liée à gouvernorat.
+- disponibiliteenseignant liée à enseingant, jour.
+- dre liée à gouvernorat.
+- eleve liée à personne.
+- enseigantmatiere liée à anneescolaire, matiere, personne.
+- enseingant liée à diplome, modalitepaiement, personne, qualite, situationfamilliale.
+- etablissement liée à dre, gouvernorat, typeetablissement.
+- fichierpreinscriptionpreinscription liée à preinscriptionpreinscription.
+- fonctionaliteprivelge liée à rubrique.
+- inscriptioneleve liée à anneescolaire, personne.
+- jourfr liée à anneescolaire.
+- modalitetranche liée à anneescolaire, modalite.
+- paiement liée à inscriptioneleve, paiementmotif.
+- paiementdetailscourete liée à paiementcourete.
+- paiementextra liée à anneescolaire, classe, inscriptioneleve, modalite, paiementmotif, personne.
+- paiementextradetails liée à paiementextra.
+- parent liée à personne.
+- parenteleve liée à eleve, parent.
+- personne liée à civilite, localite, nationalite.
+- personnepreinscription liée à civilite, localite.
+- preinscription liée à eleve, niveau, personne, section.
+- preinscriptionpreinscription liée à elevepreinscription, niveau, personnepreinscription, section.
+- reglementeleve liée à modereglement, paiement, paiementextradetails, personne, uniformcommande, utilisateur.
+- reglementeleve_echeancier liée à modereglement, paiementextradetails, personne, uniformcommande, utilisateur.
+- renseignementmedicaux liée à eleve, personne.
+- section liée à niveau.
+- surveillant liée à diplome, modalitepaiement, personne, qualite, situationfamilliale.
+- uniformcommandedetails liée à uniformcommande, uniformcouleur, uniformmodel, uniformtaille.
+- uniformmodel liée à uniformgenre.
+- utilisateur liée à grade.
