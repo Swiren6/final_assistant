@@ -1,12 +1,5 @@
 {
-  "questions": [
-    {
-      "template_question": "le nombre des enseignants",
-      "requete_template": "SELECT COUNT(*) AS nombre_enseignants FROM enseingnant;",
-      "description": "Cette requête retourne le nombre total d'enseignants dans la base de données."
-    },
-
-  
+  "questions": [  
    {
     "template_question": "le nombre d'absences par matière pour un élève donné",
     "requete_template": "SELECT m.NomMatiereFr AS Matiere, COUNT(a.id) AS Nombre_Absences FROM absence a JOIN inscriptioneleve ie ON a.Inscription = ie.id JOIN eleve e ON ie.Eleve = e.id JOIN personne p ON e.IdPersonne = p.id JOIN matiere m ON a.Matiere = m.id JOIN anneescolaire an ON a.anneeSco = an.id WHERE p.NomFr = ? AND p.PrenomFr = ? AND an.AnneeScolaire = ? GROUP BY m.NomMatiereFr;",
