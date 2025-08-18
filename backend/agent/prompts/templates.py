@@ -67,7 +67,7 @@ RÈGLES IMPORTANTES POUR LES REQUÊTES :
 6. Pour COUNT, utilisez toujours un alias descriptif :
    - COUNT(*) as nombre_eleves
    - COUNT(*) as total_inscriptions
-   - COUNT(DISTINCT colonne) as nombre_unique
+   - COUNT(DISTINCT colonne) as nombre_unique 
 
 EXEMPLES :
 Question: "Combien d'élèves en classe 6A ?"
@@ -75,6 +75,9 @@ Question: "Combien d'élèves en classe 6A ?"
 
 Question: "Liste des élèves en classe 6A"
 → SELECT p.NomFr, p.PrenomFr FROM eleve e JOIN personne p ON e.IdPersonne = p.id JOIN inscriptioneleve ie ON e.id = ie.Eleve JOIN classe c ON ie.Classe = c.id WHERE c.CODECLASSEFR = '6A'
+
+
+7. si la classe n'etait pas precise par exemple 7eme ou 8eme on utilise a partir de table niveau si non on utilise la table classe .
 
 ATTENTION: 
 **l'année scolaire se trouve dans anneescolaire.AnneeScolaire non pas dans Annee 
@@ -99,7 +102,7 @@ id_inscription IN (
         WHEN p.Annuler = 1 THEN 'Annulé'
         ELSE 'Actif'
     END AS statut_paiement.
-**lorsque on veut savoir le paiement extra d un eleve on extrait le motif_paiement, le totalTTC  et le reste en faisant  la jointure entre le paiementextra et paiementextradetails d'une coté et paiementextra et paiementmotif d'une autre coté .
+**lorsque on veut savoir le paiement extra d'un eleve on extrait le motif_paiement, le totalTTC  et le reste en faisant  la jointure entre le paiementextra et paiementextradetails d'une coté et paiementextra et paiementmotif d'une autre coté .
 **lorsque on demande les détails de paiement scolaire on extrait le mode de reglement ,numéro de chèque , montant et la date de l'opération. 
 **Les coordonées de debut et de la fin de séance se trouve dans le table emploidutemps sous forme d'id ,les covertir en heures a l'aide de table seance . 
 **la semaine A est d'id 2 , la semaine B est d'id 3 , Sans semaine d'id 1.
@@ -116,7 +119,7 @@ JOIN
 **l id de l eleve est liée par l id de la personne par Idpersonne 
 **les eleves nouvellemmnent inscris ont un TypeInscri="N" et les eleves qui ont etudié auparavant a l'ecole ont TypeInscri="R".
 **un éleves n'est pas réinscri est éleves qui est inscrits pendant l'année précédante et pas pour cette année . 
-**la décision d'acceptation consernent seulement les nouveaux eleves inscrits a l'ecole.
+**la décision d'acceptation concernant les nouveaux eleves inscrits a l'ecole.
 **pour les cheques a echeance non valides consulter la table reglementeleve_echeancier .
 **les cheques echancier non valide le champ isvalide=0.
 **pour les CODECLASSEFR on met la classe entre guemets . exemple :CODECLASSEFR = '8B2'
@@ -192,7 +195,7 @@ and parenteleve.parent=parent.id
 and pp.id=parent.personne and inscriptioneleve.anneescolaire=7 order by eleve asc;
 4. Remplacez [PAIEMENTMOTIF] par la valeur demandée (1, 2, 3, etc.)
 5. Pour toutes autres demandes, suivez les règles standard de génération SQL.
-
+6.
 Question : {{input}}
 Requête SQL :
 """
