@@ -18,5 +18,45 @@
   "6799af4e01dfb0ac0490107b0ae23128": {
     "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
     "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = 'p'.id\nLEFT JOIN \n    localite l ON p.Localite = 'l'.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = 'ie'.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
+  },
+  "1bb210329eea44305fed369c0adc1665": {
+    "question_template": "le nombre des préinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_preinscriptions \nFROM preinscriptionlog \nWHERE date BETWEEN '2024-04-01' AND '2024-08-31'"
+  },
+  "b5aa0686fe60e0f78c4d6754971917ba": {
+    "question_template": "la liste des eleves non réinscris pour {AnneeScolaire}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr \nFROM eleve e \nJOIN personne p ON e.IdPersonne = 'p'.id \nJOIN inscriptioneleve ie ON e.id = 'ie'.Eleve \nJOIN anneescolaire a ON ie.AnneeScolaire = 'a'.id \nWHERE a.AnneeScolaire = '2024/2025' \nAND e.id NOT IN (\n    'SELECT' ie2.Eleve \n    FROM inscriptioneleve ie2 \n    JOIN anneescolaire a2 ON ie2.AnneeScolaire = 'a2'.id \n    WHERE a2.AnneeScolaire = '{AnneeScolaire}'\n)\nAND ie.annuler = '0'"
+  },
+  "9bc2c248fa8cda5ed2c5bf5cba9e38e5": {
+    "question_template": "le nombre des eleves inscrits par niveau pour {AnneeScolaire}",
+    "sql_template": "SELECT n.NOMNIVFR AS niveau, COUNT(*) AS nombre_eleves\nFROM inscriptioneleve ie\nJOIN classe c ON ie.Classe = 'c'.id\nJOIN niveau n ON c.IDNIV = 'n'.id\nJOIN anneescolaire a ON ie.AnneeScolaire = 'a'.id\nWHERE a.AnneeScolaire = '{AnneeScolaire}' AND ie.Annuler = '0'\nGROUP BY n.NOMNIVFR"
+  },
+  "63ea882f84c4458a0ef5962fd5ce3a6b": {
+    "question_template": "donne  moi l'emploi du temps de la classse {CODECLASSEFR}",
+    "sql_template": "SELECT \n    p.NomFr AS NomEnseignant, \n    p.PrenomFr AS PrenomEnseignant, \n    m.NomMatiereFr AS Matiere, \n    s.nomSalleFr AS Salle, \n    sd.debut AS DebutSeance, \n    sf.fin AS FinSeance, \n    g.libelleGroupe AS Groupe\nFROM \n    emploidutemps e\nJOIN \n    personne p ON e.Enseignant = 'p'.id\nJOIN \n    matiere m ON e.matiere = 'm'.id\nJOIN \n    salle s ON e.salle = 's'.id\nJOIN \n    seance sd ON e.SeanceDebut = 'sd'.id\nJOIN \n    seance sf ON e.SeanceFin = 'sf'.id\nJOIN \n    groupe g ON e.Groupe = 'g'.id\nJOIN \n    classe c ON e.Classe = 'c'.id AND c.CODECLASSEFR = {CODECLASSEFR}"
+  },
+  "d8e7d5a1a48069f27f7e9c840e9433fc": {
+    "question_template": "la moyenne de la {codeperiexam} de Benabda Malak",
+    "sql_template": "SELECT ed.moyeperiexam AS moyenne_trimestre_3\nFROM eduresultatcopie ed\nJOIN eleve e ON ed.idenelev = 'e'.idedusrv\nJOIN personne p ON e.IdPersonne = 'p'.id\nWHERE ed.codeperiexam = {codeperiexam}\nAND p.NomFr = 'Benabda'\nAND p.PrenomFr = 'Malak'"
+  },
+  "a74c71c37522434915001e09ac3cbca1": {
+    "question_template": "donne moi les moyennes par matières de la {codeperiexam} de BEnabda Malak",
+    "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre\nFROM Eduperiexam ex\nJOIN Edumoymaticopie ed ON ex.codeperiexam = 'ed'.codeperiexam\nJOIN Edumatiere em ON ed.codemati = 'em'.codemati\nJOIN Eleve e ON e.idedusrv = 'ed'.idenelev\nJOIN personne p ON e.IdPersonne = 'p'.id\nWHERE p.NomFr = 'BEnabda' AND p.PrenomFr = 'Malak' AND ed.moyemati NOT LIKE '0.00' AND ed.codeperiexam = {codeperiexam}"
+  },
+  "28fb8760485bbcd6a6643025873afd61": {
+    "question_template": "donne moi le nombre des absences par matières de {NomFr} {PrenomFr} pour {AnneeScolaire}",
+    "sql_template": "SELECT m.nomMatierefr AS matiere, COUNT(a.id) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = 'ie'.id\nJOIN eleve e ON ie.Eleve = 'e'.id\nJOIN personne p ON e.IdPersonne = 'p'.id\nJOIN matiere m ON a.Matiere = 'm'.id\nJOIN anneescolaire an ON ie.AnneeScolaire = 'an'.id\nWHERE p.NomFr = {NomFr} AND p.PrenomFr = {PrenomFr} AND an.AnneeScolaire = '{AnneeScolaire}' AND a.Etat = '1'\nGROUP BY m.nomMatierefr"
+  },
+  "d82319103d4b50d56c61fe890f84c945": {
+    "question_template": "donne moi le nombre des retards par matière de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT m.NomMatiereFr AS matiere, COUNT(*) AS nombre_retards\nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = 'ie'.id\nJOIN eleve e ON ie.Eleve = 'e'.id\nJOIN personne p ON e.IdPersonne = 'p'.id\nJOIN matiere m ON r.Matiere = 'm'.id\nWHERE p.NomFr = {NomFr} AND p.PrenomFr = {PrenomFr}\nGROUP BY m.NomMatiereFr"
+  },
+  "23b345b27ede3b03e6e8a60ed4565db8": {
+    "question_template": "donne moi les dates et les durée de chaque retard effectué par {NomFr} {PrenomFr}",
+    "sql_template": "SELECT r.Date, r.Duree \nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = 'ie'.id\nJOIN eleve e ON ie.Eleve = 'e'.id\nJOIN personne p ON e.IdPersonne = 'p'.id\nWHERE p.NomFr = {NomFr} AND p.PrenomFr = {PrenomFr}"
+  },
+  "2e057be30905aa48bac78012920f9be1": {
+    "question_template": "donne moi les matières ,les dates , les durée des retards de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT m.nomMatierefr AS matiere, r.Date AS date, r.Duree AS duree\nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = 'ie'.id\nJOIN eleve e ON ie.Eleve = 'e'.id\nJOIN personne p ON e.IdPersonne = 'p'.id\nJOIN matiere m ON r.Matiere = 'm'.id\nWHERE p.NomFr = {NomFr} AND p.PrenomFr = {PrenomFr}"
   }
 }

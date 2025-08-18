@@ -25,7 +25,7 @@ from agent.pdf_utils.bulletin import export_bulletin_pdf
 from agent.pdf_utils.attestation import PDFGenerator
 
 # Imports security and templates
-from agent.prompts.templates import PROMPT_TEMPLATE, ADMIN_PROMPT_TEMPLATE, PARENT_PROMPT_TEMPLATE
+from agent.prompts.templates import  ADMIN_PROMPT_TEMPLATE, PARENT_PROMPT_TEMPLATE
 
 # Imports for graphs and data processing
 import pandas as pd
@@ -1057,7 +1057,7 @@ class SQLAssistant:
                 },
                 {
                     "role": "user",
-                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:50], ensure_ascii=False)}"
+                    "content": f"Question: {question}\n\nDonnées: {json.dumps(data[:100], ensure_ascii=False)}"
                 }
             ]
             
@@ -1167,7 +1167,7 @@ class SQLAssistant:
             return "pie"
         
         # Détection comparaison/bar
-        if any(k in user_query for k in ["comparaison", "comparer", "nombre", "count", "somme", "total"]):
+        if any(k in user_query for k in ["comparaison", "comparer", "count", "somme", "total"]):
             # Si c'est temporel, préférer line
             temporal_cols = [col for col in columns if any(t in col for t in ["annee", "année", "year", "date"])]
             if temporal_cols and any(k in user_query for k in ["évolution", "evolution", "courbe", "tendance"]):
@@ -1176,7 +1176,7 @@ class SQLAssistant:
                 return "bar"
         
         # Détection automatique basée sur les données
-        numeric_cols = len([col for col in df_columns if any(num in col.lower() for num in ["count", "nombre", "total", "somme"])])
+        numeric_cols = len([col for col in df_columns if any(num in col.lower() for num in ["count", "total", "somme"])])
         if numeric_cols >= 1:
             temporal_cols = [col for col in columns if any(t in col for t in ["annee", "année", "year", "date"])]
             if temporal_cols:
