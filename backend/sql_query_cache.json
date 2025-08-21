@@ -82,5 +82,9 @@
   "fad487930476f7d362b218261d8e1fd9": {
     "question_template": "les notes de benabda malak",
     "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = 'benabda' \nAND p.PrenomFr = 'malak' \nAND ed.moyemati NOT LIKE '0.00'"
+  },
+  "0f89096f64e804eba85bacd9dc3fa279": {
+    "question_template": "donne moi les notes de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = '{NomFr}' \nAND p.PrenomFr = '{PrenomFr}' \nAND ed.moyemati NOT LIKE '0.00'"
   }
 }

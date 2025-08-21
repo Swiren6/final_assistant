@@ -68,7 +68,7 @@ class AppConstants {
   static const int maxUsernameLength = 50;
 
   // Chat
-  static const int maxMessageLength = 10000;
+  static const int? maxMessageLength = null;
   static const int maxChatHistory = 100;
   static const String defaultWelcomeMessage =
       'Bonjour! Comment puis-je vous aider aujourd\'hui?';

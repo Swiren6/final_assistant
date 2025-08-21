@@ -582,7 +582,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   );
                 }
                 
-                // ➕ Modifié: Ajouter le bouton de copie
+                // ➕ Modifié: Ajouter le bouton de copie pour TOUS les messages
                 return GestureDetector(
                   onLongPress: () => _copyTextToClipboard(message.text, context),
                   child: Stack(
@@ -591,11 +591,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         message: message,
                         isMe: message.isMe,
                       ),
-                      // Bouton de copie pour les messages de l'assistant
-                      if (!message.isMe && message.type != MessageType.system)
+                      // Bouton de copie pour TOUS les messages (sauf system/typing)
+                      if (message.type != MessageType.system)
                         Positioned(
                           top: 8,
-                          right: 8,
+                          right: message.isMe ? 8 : 8,  // Position pour user et assistant
+                          left: message.isMe ? null : null,
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -604,7 +605,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: message.isMe 
+                                      ? Colors.white.withOpacity(0.9)  // Blanc pour messages user
+                                      : Colors.white.withOpacity(0.9), // Blanc pour messages assistant
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -617,7 +620,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                 child: Icon(
                                   Icons.copy,
                                   size: 16,
-                                  color: Colors.grey[600],
+                                  color: message.isMe 
+                                      ? AppConstants.primaryColor  // Couleur primaire pour user
+                                      : Colors.grey[600],          // Gris pour assistant
                                 ),
                               ),
                             ),
@@ -771,7 +776,7 @@ class _ChatScreenState extends State<ChatScreen> {
       textCapitalization: TextCapitalization.sentences,
       maxLines: null,
       minLines: 1,
-      maxLength: AppConstants.maxMessageLength,
+      maxLength: null, // ➕ Supprimé la limite de caractères
       onSubmitted: (_) => _sendMessage(),
       onChanged: (_) => setState(() {}),
       enabled: !_isLoading,
@@ -852,7 +857,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   const Text('• Statistiques et analyses'),
                   const Text('• Export de documents PDF'),
                   const Text('• 🆕 Historique des conversations'),
-                  const Text('• 🆕 Copie de texte (appui long ou bouton)'), // ➕ Ajouté
+                  const Text('• 🆕 Copie de texte (appui long ou bouton) - TOUS les messages'), // ➕ Mis à jour
                 ],
               ),
             ),
