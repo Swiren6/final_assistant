@@ -144,7 +144,7 @@ class PDFGenerator:
     def _build_header(self, pdf: FPDF):
         """Construit l'en-tête du document"""
         # Logo (optionnel)
-        logo_path = self.base_dir / "assets" / "logo_ise.jpeg"
+        logo_path = self.base_dir / "assets" / "logo.jpeg"
         if logo_path.exists():
             pdf.image(str(logo_path), x=10, y=10, w=30)
 

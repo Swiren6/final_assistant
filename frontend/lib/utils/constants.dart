@@ -77,10 +77,7 @@ class AppConstants {
   static const String appName = 'Assistant Scolaire';
   static const String appVersion = '1.0.0';
 
-  // Permissions et rôles
-  // static const List<String> adminRoles = ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'];
-  // static const List<String> teacherRoles = ['ROLE_TEACHER', 'ROLE_ADMIN'];
-  // static const List<String> studentRoles = ['ROLE_STUDENT'];
+
 
   // Regex patterns
   static const String emailPattern =
