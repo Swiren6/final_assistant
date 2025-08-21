@@ -1,0 +1,15 @@
+{
+  "questions": [  
+   {
+    "template_question": "le nombre d'absences par matière pour un élève donné",
+    "requete_template": "SELECT m.NomMatiereFr AS Matiere, COUNT(a.id) AS Nombre_Absences FROM absence a JOIN inscriptioneleve ie ON a.Inscription = ie.id JOIN eleve e ON ie.Eleve = e.id JOIN personne p ON e.IdPersonne = p.id JOIN matiere m ON a.Matiere = m.id JOIN anneescolaire an ON a.anneeSco = an.id WHERE p.NomFr = ? AND p.PrenomFr = ? AND an.AnneeScolaire = ? GROUP BY m.NomMatiereFr;",
+    "description": "Cette requête compte le nombre d'absences par matière pour un élève spécifique (nom + prénom) et une année scolaire donnée."
+  },
+  {
+  "template_question": "Donne-moi l'emploi du temps des enfants avec le nom des enseignants et des matières",
+  "requete_template": "SELECT p.NomFr AS nom_enseignant, p.PrenomFr AS prenom_enseignant, m.NomMatiereFr AS nom_matiere, s.nomSalleFr AS nom_salle, SeanceDebut AS debut_seance, SeanceFin AS fin_seance FROM emploidutemps e JOIN jour j ON e.Jour = j.id JOIN semaine sm ON e.Semaine = sm.id AND sm.id = 1 JOIN salle s ON e.Salle = s.id JOIN enseingant en ON e.Enseignant = en.id JOIN personne p ON en.idPersonne = p.id JOIN matiere m ON e.Matiere = m.id WHERE e.Classe IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({idpersonne}))))",
+  "description": "Récupère l'emploi du temps des enfants d'un parent, avec le nom et prénom de l'enseignant, la matière, la salle, ainsi que les horaires de début et de fin de séance pour la semaine spécifiée."
+}
+
+]
+}

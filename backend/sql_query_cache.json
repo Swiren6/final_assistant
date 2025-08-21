@@ -1,0 +1,86 @@
+{
+  "7a133fc114f6da10cee7d0c2ec7698d3": {
+    "question_template": "donne moi la courbe d'evolution d'inscriptions",
+    "sql_template": "SELECT YEAR(Date) AS annee, COUNT(*) AS total_inscriptions \nFROM inscriptioneleve \nGROUP BY YEAR(Date) \nORDER BY annee"
+  },
+  "fefc83db0665109dc6c86ea1bf044527": {
+    "question_template": "le nombre des réinscriptions pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_reinscriptions FROM inscriptioneleve ie WHERE ie.TypeInscri = 'R' AND ie.AnneeScolaire = (SELECT id FROM anneescolaire WHERE AnneeScolaire = '{AnneeScolaire}')"
+  },
+  "89d5c96a4f754dbc9862f83d2ef6b5dc": {
+    "question_template": "le nombre des eleves nouvellement inscris pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves_nouvellement_inscris\nFROM inscriptioneleve ie\nJOIN anneescolaire a ON ie.AnneeScolaire = a.id\nWHERE ie.TypeInscri = 'N' AND a.AnneeScolaire = '{AnneeScolaire}' AND ie.Annuler = '0'"
+  },
+  "2c36dc3b831ddd41137afd3ae50bbcc1": {
+    "question_template": "nombre des élèves accepté et non inscris pour {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) AS nombre_eleves_accepte_non_inscris\nFROM preinscription p\nJOIN anneescolaire a ON p.AnneeScolaire = a.id\nWHERE p.Decision = 'Acceptée'\nAND p.Eleve NOT IN (\n    'SELECT' Eleve\n    FROM inscriptioneleve ie\n    WHERE ie.AnneeScolaire = a.id\n)\nAND a.AnneeScolaire = '{AnneeScolaire}'"
+  },
+  "6799af4e01dfb0ac0490107b0ae23128": {
+    "question_template": "le nombre des eleves par localité en {AnneeScolaire}",
+    "sql_template": "SELECT \n    l.LIBELLELOCALITEFR AS localite, \n    COUNT(*) AS nombre_eleves\nFROM \n    eleve e\nJOIN \n    personne p ON e.IdPersonne = p.id\nLEFT JOIN \n    localite l ON p.Localite = l.IDLOCALITE\nJOIN \n    inscriptioneleve ie ON e.id = ie.Eleve\nJOIN \n    anneescolaire a ON ie.AnneeScolaire = a.id\nWHERE \n    a.AnneeScolaire = '{AnneeScolaire}' \n    AND ie.Annuler = '0'\nGROUP BY \n    l.LIBELLELOCALITEFR"
+  },
+  "9bc2c248fa8cda5ed2c5bf5cba9e38e5": {
+    "question_template": "le nombre des eleves inscrits par niveau pour {AnneeScolaire}",
+    "sql_template": "SELECT n.NOMNIVFR AS niveau, COUNT(*) AS nombre_eleves\nFROM inscriptioneleve ie\nJOIN classe c ON ie.Classe = c.id\nJOIN niveau n ON c.IDNIV = n.id\nJOIN anneescolaire a ON ie.AnneeScolaire = a.id\nWHERE a.AnneeScolaire = '{AnneeScolaire}' AND ie.Annuler = '0'\nGROUP BY n.NOMNIVFR"
+  },
+  "28fb8760485bbcd6a6643025873afd61": {
+    "question_template": "donne moi le nombre des absences par matières de {NomFr} {PrenomFr} pour {AnneeScolaire}",
+    "sql_template": "SELECT m.nomMatierefr AS matiere, COUNT(a.id) AS nombre_absences\nFROM absence a\nJOIN inscriptioneleve ie ON a.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nJOIN personne p ON e.IdPersonne = p.id\nJOIN matiere m ON a.Matiere = m.id\nJOIN anneescolaire an ON ie.AnneeScolaire = an.id\nWHERE p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}' AND an.AnneeScolaire = '{AnneeScolaire}' AND a.Etat = '1'\nGROUP BY m.nomMatierefr"
+  },
+  "d82319103d4b50d56c61fe890f84c945": {
+    "question_template": "donne moi le nombre des retards par matière de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT m.NomMatiereFr AS matiere, COUNT(*) AS nombre_retards\nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nJOIN personne p ON e.IdPersonne = p.id\nJOIN matiere m ON r.Matiere = m.id\nWHERE p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}'\nGROUP BY m.NomMatiereFr"
+  },
+  "23b345b27ede3b03e6e8a60ed4565db8": {
+    "question_template": "donne moi les dates et les durée de chaque retard effectué par {NomFr} {PrenomFr}",
+    "sql_template": "SELECT r.Date, r.Duree \nFROM retard r\nJOIN inscriptioneleve ie ON r.Inscription = ie.id\nJOIN eleve e ON ie.Eleve = e.id\nJOIN personne p ON e.IdPersonne = p.id\nWHERE p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}'"
+  },
+  "ec20a1a42daba75b0a69eed7b6befba2": {
+    "question_template": "le nombre des eleves inscris {AnneeScolaire}",
+    "sql_template": "SELECT COUNT(*) as nombre_eleves\nFROM eleve e\nJOIN inscriptioneleve ie ON e.id = ie.Eleve\nJOIN anneescolaire a ON ie.AnneeScolaire = a.id\nWHERE a.AnneeScolaire = '{AnneeScolaire}' AND ie.annuler = '0'"
+  },
+  "df3723e2ac615b197bc6e41fa3b13e0c": {
+    "question_template": "nombre des classes",
+    "sql_template": "SELECT COUNT(*) as nombre_classes FROM classe"
+  },
+  "ad951962fdf5a1534695090a513503db": {
+    "question_template": "emploi pour la classe {CODECLASSEFR}",
+    "sql_template": "SELECT \n    p.NomFr AS NomEnseignant, \n    p.PrenomFr AS PrenomEnseignant, \n    m.NomMatiereFr AS Matiere, \n    s.nomSalleFr AS Salle, \n    sd.debut AS DebutSeance, \n    sf.fin AS FinSeance, \n    j.libelleJourFr AS Jour\nFROM \n    emploidutemps edt\nJOIN \n    enseingant e ON edt.enseignant = e.id\nJOIN \n    personne p ON e.IdPersonne = p.id\nJOIN \n    matiere m ON edt.matiere = m.id\nJOIN \n    salle s ON edt.salle = s.id\nJOIN \n    seance sd ON edt.SeanceDebut = sd.id\nJOIN \n    seance sf ON edt.SeanceFin = sf.id\nJOIN \n    jour j ON edt.jour = j.id\nJOIN \n    classe c ON edt.classe = c.id\nWHERE \n    c.CODECLASSEFR = '{CODECLASSEFR}'\nORDER BY \n    j.id, sd.debut"
+  },
+  "9881b453b18b35ba5c3d71008438ba36": {
+    "question_template": "donne moi les coordonné des parents de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, p.Tel1, p.Tel2, p.AdresseFr \nFROM parent pa \nJOIN personne p ON pa.personne = p.id \nJOIN parenteleve pe ON pa.id = pe.parent \nJOIN eleve e ON pe.eleve = e.id \nJOIN personne pe ON e.IdPersonne = pe.id \nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
+  },
+  "f877e2ef909997b80edf803325259716": {
+    "question_template": "la classe de kouki bochra",
+    "sql_template": "SELECT c.CODECLASSEFR, c.NOMCLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'kouki' AND p.PrenomFr = 'bochra' AND ie.annuler = '0'"
+  },
+  "69d42433354c5f5003fd6c572885086c": {
+    "question_template": "kouki bochra",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr FROM personne p WHERE (p.NomFr = 'kouki' AND p.PrenomFr = 'bochra') OR (p.NomFr = 'bochra' AND p.PrenomFr = 'kouki')"
+  },
+  "d7d9f12439bc2f8f7d16e9672d75543d": {
+    "question_template": "classe de BOUTITI Rimes",
+    "sql_template": "SELECT c.CODECLASSEFR, c.NOMCLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'BOUTITI' AND p.PrenomFr = 'Rimes' AND ie.annuler = '0'"
+  },
+  "a0b8081a0071657a41ab84b073c80a14": {
+    "question_template": "donne moi la classe de BOUTITI Rimes",
+    "sql_template": "SELECT c.CODECLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'BOUTITI' AND p.PrenomFr = 'Rimes'"
+  },
+  "1a39ea23f3b36813650917869238dee5": {
+    "question_template": "donne moi la classe de HMISSI Tasnim",
+    "sql_template": "SELECT c.CODECLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'HMISSI' AND p.PrenomFr = 'Tasnim' AND ie.annuler = '0'"
+  },
+  "ddf88982d1e1e39dc79fd166648ca69f": {
+    "question_template": "donne moi l'id de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.id FROM personne p WHERE (p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}') OR (p.NomFr = '{PrenomFr}' AND p.PrenomFr = '{NomFr}')"
+  },
+  "45ac8473149dc8faa662001309a95f93": {
+    "question_template": "donne moi l'enfant de boutiti olfa",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr \nFROM eleve e \nJOIN personne pe ON e.IdPersonne = pe.id \nJOIN parenteleve pelev ON e.id = pelev.eleve \nJOIN parent pa ON pelev.parent = pa.id \nJOIN personne p ON pa.personne = p.id \nWHERE p.NomFr = 'boutiti' AND p.PrenomFr = 'olfa'"
+  },
+  "fad487930476f7d362b218261d8e1fd9": {
+    "question_template": "les notes de benabda malak",
+    "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = 'benabda' \nAND p.PrenomFr = 'malak' \nAND ed.moyemati NOT LIKE '0.00'"
+  }
+}

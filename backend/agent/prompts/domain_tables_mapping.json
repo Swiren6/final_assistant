@@ -1,0 +1,65 @@
+{
+    "ELEVES_INSCRIPTIONS": [
+        "eleveinscri", "getallelevefordescipline", "geteleveinscrisansreglement",
+        "pbiviewinscritscolaire", "teamstudentenrollementview", "vieweleveparclasse", "viewelevereinscri",
+        "viewgeteleveinscri", "viewgeteleveinscridup", "viewnouveaueleve", "viewtouslesinscri",
+        "documentelevepreinscri", "edueleve", "eduinscription", "eleve_archive", "elevepreinscription",
+        "elevepreinscriptionlog", "nationalite", "preinscription_archive", "preinscriptionlog",
+        "situationfamilliale", "representantlegal", "stagiaires_int", "teamsstudent", "teamsstudentenrollement",
+        "teamspasswordstudent", "eleve", "fichierpreinscriptionpreinscription", "inscriptioneleve",
+        "personnepreinscription", "preinscription", "preinscriptionpreinscription", "renseignementmedicaux","personne"
+    ],
+    "SUIVI_SCOLARITE": [
+        "viewabsence", "viewavertissement", "viewblame", "viewgetblame", "viewgetretard",
+        "viewgetretards", "viewretard", "viewstatmoyenneglobal",
+        "dossierscolaire", "eduattestation","edumoymati", "edumoymaticopie", "edumoymatisave", "edunoteelev", "decision", "discipline",
+        "eduperiexam", "eduprix", "eduresultat", "eduresultatcopie", "eduresultatcopie11", "edutypeepre","noteeleveview", 
+        "justificationeleve", "logsms", "noteseleve", "noteeleveparmatiere", "piecejoint", "retard",
+        "statarithconcours", "statconcoursglobal", "suivihomework", "absence", "avertissement", "blame"
+    ],
+    "PARENTS": [
+        "parenteleveannee4", "viewgeteleveparent", "viewgeteleveparentdup", "viewgetparent",
+        "parent_archive", "parent_ise", "parenteleve_archive", "parentelevepreinscription",
+        "personne_archive", "personnepreinscriptionlog", "parent", "parenteleve","personne"
+    ],
+    "CANTINE": [
+        "viewcantineparjour", "viewcantineparjourenseignant","viewetatcantineparjour",
+         "cantine", "menu_cantine", "menu_cantine_jour", "suivicantineparjour",
+        "cantineparjour", "cantineparjourenseignant","nvetatcantineparjourglobale"
+    ],
+    "PERSONNEL_ENSEIGNEMENT": [
+        "viewenseignant", "viewgetmatiereclasseenseignant", "viewmatiereenseignant","viewrepartitionenseignant", "viewrepartitionsurveillant",
+        "educycleens", "edumatiere","teamsteacherrostarview",
+        "enseignant_double", "enseignant_motif", "enseignant_paiement", "enseignants_presence", "grade",
+        "matiere", "naturematiere", "matiereexamenbloque", "matieresection", "qualite", "personnesupp",
+        "teamsteacher", "teamsteacherrostar", "teamspasswordteacher", "disponibiliteenseignant",
+        "enseigantmatiere", "enseingant", "surveillant","personne"
+    ],
+    "FINANCES_PAIEMENTS": [
+        "viewetatdepaiementuniform", "viewextras", "viewgetclub", "viewgetpaiementextra",
+        "viewgetpaiementscolaire", "viewgetpaiementscolairedetaillee", "viewrchequeecheancier",
+        "viewreglementecheanciernonvalide", "viewtranchepaiement", "viewuniformcommande",
+        "caissemotif", "configuration", "infosfornisseur", "inscriptionelevecourete", "modalite", "banquebordereau",
+        "modalitepaiement", "modereglement", "paiementcourete", "paiementmotif", "reglementfornisseur",
+        "situationeleve", "banque", "banquebordereaudetails", "banqueversement", "caisse", "caisse_log",
+        "caissedetails", "uniformcommande", "modalitetranche", "paiement", "paiementdetailscourete",
+        "paiementextra", "paiementextradetails", "reglementeleve", "reglementeleve_echeancier",
+        "uniformcommandedetails", "uniformmodel"
+    ],
+    "EMPLOIS_DU_TEMPS": [
+        "viewemploi", "viewemploi_enligne", "viewemploiexameneleve", 
+        "groupe", "groupecourete","homeworkclasse", "jour", "periodeexamen", "matiere", "repartitionexamen", "repartitionexamencopie",
+        "repartitionsemaine", "salle", "seance", "sectioncourete", "semaine", "trimestre", "typepre", "jourfr"
+    ],
+    "GENERAL_ADMINISTRATION_CONFIG": [
+        "viewcasiervide", "viewstatistiquelocalite",
+        "actualite1", "actualites","anneescolaire", "civilite", "codepostal", "configaffichage", "configmatiereclsstat",
+        "configmatierenivstat", "diplome", "dre", "educlasse", "edusection", "eduniveau", "gouvernorat",
+        "localite", "extracasier", "extraclub", "extravaucher", "motifdoc", "motifsms", "motiftelechargement",
+        "notifications", "notificationcompagne", "pays", "niveau", "privilege", "reclamation", "rubrique",
+        "smscampagnes", "smslog", "suggestion", "telechargement", "test", "test2", "tokenfirebases",
+        "typeetablissement", "typemessagerie", "typesms", "uniformcouleur", "uniformgenre",
+        "uniformtaille", "user", "useradmin", "utilisateur", "actionfonctionalitepriv", "classe",
+        "delegation", "dre", "etablissement", "fonctionaliteprivelge", "personne", "section", "utilisateur"
+    ]
+}

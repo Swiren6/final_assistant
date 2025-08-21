@@ -1,0 +1,94 @@
+name: assistant_scolaire
+description: "Une application Flutter pour l'assistant scolaire avec chat IA et authentification"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  image: ^4.0.17  # Pour le décodage avancé des images
+  cached_network_image: ^3.3.0  # Pour une meilleure gestion des images
+
+  # UI & Navigation
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # HTTP & API
+  http: ^1.1.0
+  
+  # Storage & Persistence
+  shared_preferences: ^2.2.2
+  
+  # Authentication & Security
+  jwt_decoder: ^2.0.1
+  
+  # Utilities
+  intl: ^0.18.1
+  uuid: ^3.0.7
+  connectivity_plus: ^5.0.2
+  
+  # UI Components
+  flutter_spinkit: ^5.2.0
+  
+  # Development & Debugging
+  flutter_dotenv: ^5.1.0
+  flutter_markdown: ^0.7.7+1
+  url_launcher: ^6.3.2
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code Quality
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
+
+  # Assets (temporairement commentés)
+   
+
+  # Fonts (optionnel, Google Fonts est utilisé)
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
+  #       - asset: fonts/CustomFont-Bold.ttf
+  #         weight: 700
+
+# Configuration des icônes de l'app (commenté temporairement)
+# flutter_icons:
+#   android: "launcher_icon"
+#   ios: true
+#   image_path: "assets/logo.png"
+
+# Configuration Dart Code Metrics (commenté temporairement)
+# dart_code_metrics:
+#   anti-patterns:
+#     - long-method
+#     - long-parameter-list
+#   metrics:
+#     cyclomatic-complexity: 20
+#     maximum-nesting-level: 5
+#     number-of-parameters: 4
+#     source-lines-of-code: 50
+#   metrics-exclude:
+#     - test/**
+#   rules:
+#     - newline-before-return
+#     - no-boolean-literal-compare
+#     - no-empty-block
+#     - prefer-trailing-comma
+#     - prefer-conditional-expressions
+#     - no-equal-then-else

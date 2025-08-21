@@ -1,0 +1,30 @@
+{
+  "3f0f8ead9a0598c0682f40ffa5600878": {
+    "question_template": "donne moi les moyennes de {family_relation} pour la {codeperiexam}",
+    "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e \nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne IN ({id_personne}) \nAND ed.moyemati NOT LIKE '0.00' \nAND ed.codeperiexam = {codeperiexam};"
+  },
+  "c2f4131c1b9632d76505b9fce9b7b158": {
+    "question_template": "donne moi les coordonnées de {family_relation}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, p.Tel1, p.Tel2, p.AdresseFr\nFROM personne p\nJOIN eleve e ON p.id = e.IdPersonne\nWHERE e.IdPersonne IN ({id_personne});"
+  },
+  "953b3decd22f1b75e7cc3a667751d8c9": {
+    "question_template": "donne moi les dates et les durée et les matieres de retards effectué par {family_relation}",
+    "sql_template": "SELECT r.Date, r.Duree, m.NomMatiereFr \nFROM retard r \nJOIN matiere m ON r.Matiere = m.id \nWHERE r.Inscription IN (SELECT id FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne})));"
+  },
+  "437fb0033da5b7276ee9adcb906a254e": {
+    "question_template": "donne moi la repartion des examens pour {family_relation} de la {codeperiexam} pour les examens",
+    "sql_template": "SELECT \n    m.NomMatiereFr, \n    re.date, \n    re.heureDeb AS HeureDebut, \n    re.heureFin AS HeureFin, \n    s.nomSalleFr AS Salle\nFROM \n    repartitionexamen re\nJOIN \n    matiere m ON re.idMatiere = m.id\nJOIN \n    salle s ON re.idSalle = s.id\nWHERE \n    re.idTrimestre = {codeperiexam} \n    AND re.idClasse IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))));"
+  },
+  "e204ea26eb6f15217756f6b77a746fe5": {
+    "question_template": "donne moi les paiement effectuée pour {family_relation}",
+    "sql_template": "SELECT p.*, pm.Libelle AS MotifPaiement\nFROM paiement p\nJOIN paiementmotif pm ON p.MotifPaiement = pm.id\nWHERE p.Inscription IN (SELECT id FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne})));"
+  },
+  "d3dcf3964084f0886a5ba547636a8c5e": {
+    "question_template": "donne moi les coordonnée de {family_relation}",
+    "sql_template": "SELECT \n    p.NomFr AS nom,\n    p.PrenomFr AS prenom,\n    p.Cin AS cin,\n    p.AdresseFr AS adresse,\n    p.Tel1 AS telephone\nFROM \n    personne p\nJOIN \n    eleve e ON p.id = e.IdPersonne\nWHERE \n    e.IdPersonne IN ({id_personne})"
+  },
+  "4c5bc30cadabd73ef7b720a82a418d43": {
+    "question_template": "donne moi la classe de {family_relation}",
+    "sql_template": "SELECT c.CODECLASSEFR \nFROM classe c \nJOIN inscriptioneleve ie ON c.id = ie.Classe \nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))"
+  }
+}
