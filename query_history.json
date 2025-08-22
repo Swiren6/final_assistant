@@ -2146,5 +2146,911 @@
     "question": "donne moi le solde de Malak Benabda",
     "sql": "SELECT `e`.`Solde` FROM `eleve` AS `e` JOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`Id` WHERE (`p`.`NomFr` = 'Benabda' AND `p`.`PrenomFr` = 'Malak') OR (`p`.`NomFr` = 'Malak' AND `p`.`PrenomFr` = 'Benabda')",
     "response": "[(None,)]"
+  },
+  {
+    "timestamp": "2025-08-18T15:14:30.046540",
+    "question": "donne moi le contact des parents de Zeineb Bouharb",
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Bouharb' AND eleve_p.`PrenomFr` = 'Zeineb') OR (eleve_p.`NomFr` = 'Zeineb' AND eleve_p.`PrenomFr` = 'Bouharb')",
+    "response": "[('BOUHARB', 'Sahl', '22209230', '71234540', None, None, '6 Rue Riode Jenero', 'Pere'), ('KACEM', 'Alia', None, '71234540', None, None, '6 Rue Riodejenero', 'Mere')]"
+  },
+  {
+    "timestamp": "2025-08-19T10:53:13.482858",
+    "question": "donne moi le contact des parents de Imene Laataoui",
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE eleve_p.`NomFr` = 'Laataoui' AND eleve_p.`PrenomFr` = 'Imene' UNION SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE eleve_p.`NomFr` = 'Imene' AND eleve_p.`PrenomFr` = 'Laataoui'",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-19T10:53:34.699855",
+    "question": "donne moi le contact des parents de Nouha Laataoui",
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE eleve_p.`NomFr` = 'Laataoui' AND eleve_p.`PrenomFr` = 'Nouha' UNION SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE eleve_p.`NomFr` = 'Nouha' AND eleve_p.`PrenomFr` = 'Laataoui'",
+    "response": "[('LAATAOUI', 'Mourad', None, None, None, None)]"
+  },
+  {
+    "timestamp": "2025-08-19T10:54:05.327013",
+    "question": "donne moi le contact des parents de Malak Benabda",
+    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Benabda' AND eleve_p.`PrenomFr` = 'Malak') OR (eleve_p.`NomFr` = 'Malak' AND eleve_p.`PrenomFr` = 'Benabda')",
+    "response": "[('BENABDA', 'Walid', '25220415', None, None, 'walid.benabda@gmail.com'), ('CHABOUT', 'Mouna', '28210710', None, None, 'mouna.chabout@gmail.com')]"
+  },
+  {
+    "timestamp": "2025-08-19T10:56:18.512509",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `n`.`niveorie`, COUNT(`i`.`numeordr`) AS `nombre_eleves` FROM `eduinscription` AS `i` JOIN `educlasse` AS `c` ON `i`.`codenive` = `c`.`codenive` JOIN `eduniveau` AS `n` ON `c`.`codenive` = `n`.`codenive` GROUP BY `n`.`niveorie`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'i.codenive' in 'on clause'\n[SQL: SELECT `n`.`niveorie`, COUNT(`i`.`numeordr`) AS `nombre_eleves` FROM `eduinscription` AS `i` JOIN `educlasse` AS `c` ON `i`.`codenive` = `c`.`codenive` JOIN `eduniveau` AS `n` ON `c`.`codenive` = `n`.`codenive` GROUP BY `n`.`niveorie`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T10:58:25.782340",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `e`.`localite`, COUNT(`i`.`eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `i` JOIN `eleve` AS `e` ON `i`.`eleve` = `e`.`id` JOIN `anneescolaire` AS `a` ON `i`.`anneesco` = `a`.`id` WHERE `a`.`annee` = '2024' -- Remplacez '2024' par l'année scolaire en cours GROUP BY `e`.`localite`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'e.localite' in 'field list'\n[SQL: SELECT `e`.`localite`, COUNT(`i`.`eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `i` JOIN `eleve` AS `e` ON `i`.`eleve` = `e`.`id` JOIN `anneescolaire` AS `a` ON `i`.`anneesco` = `a`.`id` WHERE `a`.`annee` = '2024' -- Remplacez '2024' par l'année scolaire en cours GROUP BY `e`.`localite`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T11:15:35.965680",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-19T11:17:15.101239",
+    "question": "donne moi le contact des parents de Malak Benabda",
+    "sql": "SELECT `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Tel3`, `parent_p`.`Email` FROM `eleve` AS `e` JOIN `personne` AS `eleve_p` ON `e`.`IdPersonne` = `eleve_p`.`id` JOIN `parenteleve` AS `pe` ON `pe`.`Eleve` = `e`.`id` JOIN `parent` AS `pa` ON `pe`.`Parent` = `pa`.`id` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE (`eleve_p`.`NomFr` = 'Benabda' AND `eleve_p`.`PrenomFr` = 'Malak') OR (`eleve_p`.`NomFr` = 'Malak' AND `eleve_p`.`PrenomFr` = 'Benabda')",
+    "response": "[('25220415', None, None, 'walid.benabda@gmail.com'), ('28210710', None, None, 'mouna.chabout@gmail.com')]"
+  },
+  {
+    "timestamp": "2025-08-19T11:50:03.182989",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `AnneeScolaire` = '2024-2025' AND `Actif` = 1) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-19T11:50:21.227245",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2019/2020?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1 AND `anneescolaire` = '2019/2020') GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-19T11:50:59.528078",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1 AND `Annee` = '2020/2021') GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-19T12:28:09.643985",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-19T12:28:27.227963",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1 AND `Annee` = '2020/2021') GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-19T12:34:32.124653",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` = (SELECT MAX(`AnneeScolaire`) FROM `inscriptioneleve`) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-19T12:36:35.779094",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T12:48:09.077436",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T12:51:12.499450",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T12:55:39.465058",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1140 (42000): In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'bd_eduise.l.LIBELLELOCALITEFR'; this is incompatible with sql_mode=only_full_group_by\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T12:58:05.806878",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:01:19.788578",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:01:54.426187",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:05:42.351051",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1140 (42000): In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'bd_eduise.l.LIBELLELOCALITEFR'; this is incompatible with sql_mode=only_full_group_by\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:05:59.092061",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:25:43.613067",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = '2020/2021' GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T13:26:03.956935",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-19T14:02:31.906809",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1140 (42000): In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'bd_eduise.l.LIBELLELOCALITEFR'; this is incompatible with sql_mode=only_full_group_by\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Eleve`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024' -- Remplace '2024' par l'année scolaire en cours si différente GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T10:07:00.029288",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'as.anneesco' in 'where clause'\n[SQL: SELECT `l`.`LIBELLELOCALITEFR`, COUNT(`ie`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `ie` JOIN `personne` AS `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` AS `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`anneesco` = YEAR(CURDATE()) GROUP BY `l`.`LIBELLELOCALITEFR`]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T10:14:44.775409",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `ie`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T10:15:27.433284",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025?",
+    "sql": "SELECT `l`.`LIBELLELOCALITEFR` AS `localite`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` `ie` JOIN `personne` `p` ON `ie`.`Personne` = `p`.`id` JOIN `localite` `l` ON `p`.`Localite` = `l`.`IDLOCALITE` JOIN `anneescolaire` `as` ON `ie`.`AnneeScolaire` = `as`.`id` WHERE `as`.`AnneeScolaire` = '2024-2025' GROUP BY `l`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T10:31:30.869071",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` JOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` JOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` JOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id` WHERE `anneescolaire`.`Actif` = 1 GROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T10:46:51.407601",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` JOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` JOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` JOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`AnneeScolaire` WHERE `anneescolaire`.`Actif` = 1 GROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T10:54:16.522130",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT loc.`LIBELLELOCALITEFR`, COUNT(insc.`Personne`) AS nombre_inscriptions FROM `inscriptioneleve` insc JOIN `personne` pers ON insc.`Personne` = pers.`id` JOIN `localite` loc ON pers.`Localite` = loc.`IDLOCALITE` WHERE insc.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY loc.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T10:54:50.477137",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025 ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(`insc`.`Personne`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `insc` JOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` JOIN `anneescolaire` AS `annee` ON `insc`.`AnneeScolaire` = `annee`.`id` WHERE `annee`.`AnneeScolaire` = '2024/2025' GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "[('Nabeul', 332), ('Dar Chaabane Elfehri', 50), ('Hammamet', 159), ('Korba', 6), ('Somaa', 5), ('Bir Bouregba', 9), ('Grombalia', 25), ('Beni Khiar', 39), ('Baraket El Sahel', 5), ('Borj Cedria', 2), ('Beni Khalled', 8), ('Dar Chaabane Plage', 4), ('Menzel Bouzelfa', 6), ('El Maamoura', 6), ('Soliman', 2), ('Kelibia', 1), ('Gafsa', 1), ('Tazarka', 1), ('Cite El Wafa', 2), ('Bou Argoub', 13), ('Sidi Dhaher', 1), ('Yasmine Hammamet', 2), ('Maamoura', 1), ('Sousse', 1), ('Menzel Temime', 1), ('Zaghouan', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T10:56:03.067608",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021 ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(*) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `insc` JOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` JOIN `anneescolaire` AS `annee` ON `insc`.`AnneeScolaire` = `annee`.`id` WHERE `annee`.`AnneeScolaire` = '2020/2021' GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "[('Nabeul', 191), ('Hammamet', 93), ('Dar Chaabane Elfehri', 17), ('Beni Khiar', 11), ('Baraket El Sahel', 1), ('Bou Ficha', 1), ('Somaa', 1), ('Gafsa', 1), ('Bou Argoub', 1), ('Borj Cedria', 1), ('Grombalia', 4), ('Korba', 4), ('El Maamoura', 2), ('Cite El Mrezgua', 1), ('Sousse', 1), ('Yasmine Hammamet', 1), ('HAMMAMET SUD ', 1), ('Hammam Linf', 1), ('El Menzah 1', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T10:57:28.768601",
+    "question": "donne moi le nombre d'élèves par classe",
+    "sql": "SELECT `ep`.`classe`, COUNT(DISTINCT `ei`.`numeordr`) AS `nombre_eleves` FROM `eduinscription` AS `ei` JOIN `enseignants_presence` AS `ep` ON `ei`.`numeordr` = `ep`.`classe` GROUP BY `ep`.`classe`",
+    "response": "[('1S1', 1), ('1S2', 1), ('1S3', 1), ('2SC1', 1), ('2SC2', 1), ('2SC3', 1), ('3M1', 1), ('3M2', 1), ('3SC1', 1), ('3SC2', 1), ('4M1', 1), ('4M2', 1), ('4SC1', 1), ('4SC2', 1), ('7B1', 1), ('7B2', 1), ('7B3', 1), ('7B4', 1), ('8B1', 1), ('8B2', 1), ('8B3', 1), ('8B4', 1), ('8B5', 1), ('9B1', 1), ('9B2', 1), ('9B3', 1), ('9B4', 1), ('9B5', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T11:06:22.271637",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT eleve_alias.`NomFr`, eleve_alias.`PrenomFr`, paiement_alias.`TotalTTC`, paiement_alias.`MontantRestant` FROM `eleve` AS eleve_alias JOIN `inscriptioneleve` AS inscription_alias ON eleve_alias.`id` = inscription_alias.`Eleve` JOIN `paiement` AS paiement_alias ON inscription_alias.`id` = paiement_alias.`Inscription` WHERE paiement_alias.`MontantRestant` > 0 AND paiement_alias.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) Cette requête sélectionne les élèves qui ont un montant restant à payer pour l'année scolaire en cours. Cependant, sans informations supplémentaires sur les engagements de paiement trimestriel ou les tranches spécifiques, il est difficile de filtrer précisément sur la \"tranche n°1\".",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Cette requête sélectionne les élèves qui ont un montant restant à payer pou' at line 1\n[SQL: SELECT eleve_alias.`NomFr`, eleve_alias.`PrenomFr`, paiement_alias.`TotalTTC`, paiement_alias.`MontantRestant` FROM `eleve` AS eleve_alias JOIN `inscriptioneleve` AS inscription_alias ON eleve_alias.`id` = inscription_alias.`Eleve` JOIN `paiement` AS paiement_alias ON inscription_alias.`id` = paiement_alias.`Inscription` WHERE paiement_alias.`MontantRestant` > 0 AND paiement_alias.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) Cette requête sélectionne les élèves qui ont un montant restant à payer pour l'année scolaire en cours. Cependant, sans informations supplémentaires sur les engagements de paiement trimestriel ou les tranches spécifiques, il est difficile de filtrer précisément sur la \"tranche n°1\".]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T11:10:40.248682",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'trimestriel' AND pa.Tranche = 1 AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T11:17:07.597589",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.`NomFr`, p.`PrenomFr`, m.`NomModalite`, pa.`Tranche`, pa.`TotalTTC`, pa.`MontantRestant` FROM `inscriptioneleve` ie JOIN `personne` p ON ie.`Personne` = p.`id` JOIN `modalite` m ON ie.`Modalite` = m.`id` JOIN `paiement` pa ON pa.`Inscription` = ie.`id` WHERE m.`NomModalite` = 'trimestriel' AND pa.`Tranche` = 1 AND pa.`MontantRestant` > 0 AND pa.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'pa.AnneeScolaire' in 'IN/ALL/ANY subquery'\n[SQL: SELECT p.`NomFr`, p.`PrenomFr`, m.`NomModalite`, pa.`Tranche`, pa.`TotalTTC`, pa.`MontantRestant` FROM `inscriptioneleve` ie JOIN `personne` p ON ie.`Personne` = p.`id` JOIN `modalite` m ON ie.`Modalite` = m.`id` JOIN `paiement` pa ON pa.`Inscription` = ie.`id` WHERE m.`NomModalite` = 'trimestriel' AND pa.`Tranche` = 1 AND pa.`MontantRestant` > 0 AND pa.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T11:22:53.468253",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.`NomFr`, p.`PrenomFr`, pa.`TotalTTC`, pa.`MontantRestant` FROM `paiement` pa JOIN `inscriptioneleve` ie ON pa.`Inscription` = ie.`id` JOIN `eleve` e ON ie.`Eleve` = e.`id` JOIN `personne` p ON e.`IdPersonne` = p.`id` WHERE pa.`MontantRestant` > 0 AND pa.`Trimestre` = 1 AND ie.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'pa.Trimestre' in 'where clause'\n[SQL: SELECT p.`NomFr`, p.`PrenomFr`, pa.`TotalTTC`, pa.`MontantRestant` FROM `paiement` pa JOIN `inscriptioneleve` ie ON pa.`Inscription` = ie.`id` JOIN `eleve` e ON ie.`Eleve` = e.`id` JOIN `personne` p ON e.`IdPersonne` = p.`id` WHERE pa.`MontantRestant` > 0 AND pa.`Trimestre` = 1 AND ie.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T11:28:00.149104",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.`NomFr`, p.`PrenomFr`, m.`NomModalite`, pa.`Tranche`, pa.`TotalTTC`, pa.`MontantRestant` FROM `inscriptioneleve` ie JOIN `personne` p ON ie.`Personne` = p.`id` JOIN `modalite` m ON ie.`Modalite` = m.`id` JOIN `paiement` pa ON pa.`Inscription` = ie.`id` WHERE m.`NomModalite` LIKE '%trimestriel%' AND pa.`Tranche` = '1' AND pa.`MontantRestant` > 0 AND ie.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T11:31:34.906477",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'trimestriel' AND pa.Tranche = 1 AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T11:33:14.956793",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 1 AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "ℹ️ Aucune donnée trouvée."
+  },
+  {
+    "timestamp": "2025-08-20T11:46:00.434097",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` JOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` JOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` WHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T11:46:44.447048",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021 ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` JOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` JOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` JOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id` WHERE `anneescolaire`.`AnneeScolaire` = '2020/2021' GROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "[('Nabeul', 191), ('Hammamet', 93), ('Dar Chaabane Elfehri', 17), ('Beni Khiar', 11), ('Baraket El Sahel', 1), ('Bou Ficha', 1), ('Somaa', 1), ('Gafsa', 1), ('Bou Argoub', 1), ('Borj Cedria', 1), ('Grombalia', 4), ('Korba', 4), ('El Maamoura', 2), ('Cite El Mrezgua', 1), ('Sousse', 1), ('Yasmine Hammamet', 1), ('HAMMAMET SUD ', 1), ('Hammam Linf', 1), ('El Menzah 1', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T11:53:07.757118",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'tranche 1' AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "[('FARES', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('ABDELLAOUI', 'Mohamed aziz', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('MHIR', 'Dina', 'Trimestriel', 'Tranche 1', 2500.0, 1270.0), ('BACH', 'Youssef', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('BELGUITH', 'Adam', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BENKHMISS', 'Eya', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('IFAOUI', 'Ons', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('MOHAMEDYESSIN', 'Skandaji', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('KNIOUA', 'Cyrine ', 'Trimestriel', 'Tranche 1', 2375.0, 2375.0), ('KNIOUA', 'Melek', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('BERRED', 'farah', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('SAFFAR', 'Ferdaws', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('DAOUD', 'youssef', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BAATOUT', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('CHELLY', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2000.0)]"
+  },
+  {
+    "timestamp": "2025-08-20T11:54:56.975506",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1",
+    "response": "[('FARES', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('ABDELLAOUI', 'Mohamed aziz', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('MHIR', 'Dina', 'Trimestriel', 'Tranche 1', 2500.0, 1270.0), ('BACH', 'Youssef', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('BELGUITH', 'Adam', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BENKHMISS', 'Eya', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('IFAOUI', 'Ons', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('MOHAMEDYESSIN', 'Skandaji', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('KNIOUA', 'Cyrine ', 'Trimestriel', 'Tranche 1', 2375.0, 2375.0), ('KNIOUA', 'Melek', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('BERRED', 'farah', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('SAFFAR', 'Ferdaws', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('DAOUD', 'youssef', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BAATOUT', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('CHELLY', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2000.0)]"
+  },
+  {
+    "timestamp": "2025-08-20T11:59:51.571668",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.IdPersonne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1; Cette requête sélectionne les élèves avec un engagement de paiement trimestriel qui n'ont pas encore réglé la première tranche pour l'année scolaire en cours.",
+    "response": "❌ Erreur SQL : (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'ie.IdPersonne' in 'on clause'\n[SQL: SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.IdPersonne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1; Cette requête sélectionne les élèves avec un engagement de paiement trimestriel qui n'ont pas encore réglé la première tranche pour l'année scolaire en cours.]\n(Background on this error at: https://sqlalche.me/e/20/f405)"
+  },
+  {
+    "timestamp": "2025-08-20T12:00:33.848951",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` JOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` JOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` WHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "[('Hammamet', 47), ('Nabeul', 105), ('Baraket El Sahel', 2), ('Dar Chaabane Elfehri', 14), ('Zaghouan', 1), ('Beni Khiar', 18), ('Korba', 2), ('Grombalia', 8), ('Cite El Wafa', 1), ('Somaa', 2), ('Beni Khalled', 2), ('Bou Argoub', 2), ('Menzel Temime', 1), ('El Maamoura', 2), ('Yasmine Hammamet', 1), ('Bir Bouregba', 1)]"
+  },
+  {
+    "timestamp": "2025-08-20T12:01:28.138100",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1",
+    "response": "[('FARES', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('ABDELLAOUI', 'Mohamed aziz', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('MHIR', 'Dina', 'Trimestriel', 'Tranche 1', 2500.0, 1270.0), ('BACH', 'Youssef', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('BELGUITH', 'Adam', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BENKHMISS', 'Eya', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('IFAOUI', 'Ons', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('MOHAMEDYESSIN', 'Skandaji', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('KNIOUA', 'Cyrine ', 'Trimestriel', 'Tranche 1', 2375.0, 2375.0), ('KNIOUA', 'Melek', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('BERRED', 'farah', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('SAFFAR', 'Ferdaws', 'Trimestriel', 'Tranche 1', 2500.0, 1000.0), ('DAOUD', 'youssef', 'Trimestriel', 'Tranche 1', 2500.0, 1500.0), ('BAATOUT', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2500.0), ('CHELLY', 'Meriem', 'Trimestriel', 'Tranche 1', 2500.0, 2000.0)]"
+  },
+  {
+    "timestamp": "2025-08-20T12:01:37.994028",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°3  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 3' AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "[('MHADHBI', 'mohamed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BOUAICHA', 'Yahya', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('TRABELSI', 'SALMA', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BESGHAIER', 'Dhiaeddine', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('FARES', 'Meriem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BELGHITH', 'Youssef ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ABDELLAOUI', 'Mohamed aziz', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('SOUAISSI', 'Mouhamed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MAAMRI', 'Mehdi', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('YOUSEF ', 'Selman', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KHEMIR', 'NADINE', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KHAYATI', 'Youssefabdelkader', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('HAMROUNI', 'Ahmed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MHIR', 'Dina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KOUBAKJI', 'KHADIJA ', 'Trimestriel', 'Tranche 3', 1805.0, 1805.0), ('KOUBAKJI ', 'Aicha', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BABAY', 'Islem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KHALFALLAH', 'lina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('SBOUi', 'Eya', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('DJLASSI', 'Mohamed iyed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MHAMDI', 'Ghada', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('DEY', 'Malek', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MOUSSA', 'Lina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MARHOUL', 'meriem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KHALILI', 'Mey', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BOUJBEL', 'Bochra', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BOUJBEL', 'Mostfa', 'Trimestriel', 'Tranche 3', 1805.0, 1805.0), ('HAMMAMI', 'Jihed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('FAHEM', 'Salma', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('LADOUZ', 'Mohamedaziz', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('HARIZI', 'Farah', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('OUESLATI ', 'Iyed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ABDELKHALEK', 'Mohamedmalek', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('NEGZAOUI', 'Marouène', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('LASSOUED', 'Raed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('CHEHOUDI', 'Ranim', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('AMRI', 'Youssef', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BABAY', 'ZEINEB', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ALOUI', 'Yassmine ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BACH', 'Youssef', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MAALOUL ', 'Zeyneb', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ELGHALI ', 'Hiba ', 'Trimestriel', 'Tranche 3', 1805.0, 1805.0), ('BELGUITH', 'Adam', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BEN HAHA', 'Ahmed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BEN HOUIA ', 'Yahya ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ABDELGHANI ', 'Salah ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('CHEHIDA', 'may', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENKHMISS', 'Eya', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MAKHLOUF', 'Nadine', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENNANI', 'Ahmed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENNANI', 'Lina', 'Trimestriel', 'Tranche 3', 1805.0, 1805.0), ('IFAOUI', 'Ons', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BEL HADJ KACEM', 'Adam', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BECHER', 'Ahmed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('DEHMANI', 'nadine', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MOHAMEDYESSIN', 'Skandaji', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('SAADA', 'Ahmed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('DAOUD', 'Sarra', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('NACHEB', 'Dina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ZOUARI', 'Hedi', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('FERCHICHI', 'Meriem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENMEFTEH', 'Adem', 'Trimestriel', 'Tranche 3', 2000.0, 2000.0), ('DAKNOU', 'Mohamed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ABDERAZAK', 'Sarra', 'Trimestriel', 'Tranche 3', 1615.0, 1615.0), ('ABDERAZAK', 'Israa', 'Trimestriel', 'Tranche 3', 1615.0, 1615.0), ('MRAD', 'Kenza', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('JEBABLI', 'dina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENAMOR', 'emna', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('SAID', 'mayssa', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('CHEHIDA', 'Chaymaa', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('KNIOUA', 'Cyrine ', 'Trimestriel', 'Tranche 3', 1805.0, 1805.0), ('KNIOUA', 'Melek', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MOKADDEM ', 'Emna', 'Trimestriel', 'Tranche 3', 2000.0, 2000.0), ('HABOUBI ', 'Sarah', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BENROMDHANE', 'Idris', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('HMANDI', 'maram', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BERRED', 'farah', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('SAFFAR', 'Ferdaws', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BOUSSETTA', 'Sinda', 'Trimestriel', 'Tranche 3', 1800.0, 1800.0), ('DAOUD', 'youssef', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BELHAJHMIDA', 'Oumaima', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('AYED', 'Anas', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('TOUMI', 'Islem ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('RAIES ', 'Wajdi ', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('GORRAB', 'Rimes', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BEN SLEMA', 'Youssef', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('ROKBANI', 'aziz', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BAATOUT', 'Meriem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('CHELLY', 'Meriem', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BAATOUT', 'mohamed', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('BELHADJALAYA', 'yassmine', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('MEMMI', 'yassine', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('HASASIKLAR', 'lina', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0), ('LIMAM', 'Malek', 'Trimestriel', 'Tranche 3', 1900.0, 1900.0)]"
+  },
+  {
+    "timestamp": "2025-08-20T12:10:29.915369",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1 pour l’année scolaire en cours :\n\n- Meriem FARES : Montant restant 1 500.00\n- Mohamed aziz ABDELLAOUI : Montant restant 2 500.00\n- Dina MHIR : Montant restant 1 270.00\n- Youssef BACH : Montant restant 2 500.00\n- Adam BELGUITH : Montant restant 1 500.00\n- Eya BENKHMISS : Montant restant 2 500.00\n- Ons IFAOUI : Montant restant 1 000.00\n- Skandaji MOHAMEDYESSIN : Montant restant 1 500.00\n- Cyrine KNIOUA : Montant restant 2 375.00\n- Melek KNIOUA : Montant restant 1 000.00\n- Farah BERRED : Montant restant 2 500.00\n- Ferdaws SAFFAR : Montant restant 1 000.00\n- Youssef DAOUD : Montant restant 1 500.00\n- Meriem BAATOUT : Montant restant 2 500.00\n- Meriem CHELLY : Montant restant 2 000.00"
+  },
+  {
+    "timestamp": "2025-08-20T12:10:55.601586",
+    "question": "donne moi le nombre d'élèves par classe",
+    "sql": "SELECT `ep`.`classe` AS `Classe`, COUNT(DISTINCT `ei`.`numeordr`) AS `NombreEleves` FROM `enseignants_presence` AS `ep` JOIN `eduinscription` AS `ei` ON `ep`.`classe` = `ei`.`numeordr` GROUP BY `ep`.`classe`",
+    "response": "Il y a un total de 28 classes, chacune ayant 1 élève. Voici quelques exemples représentatifs :\n\n- Classe 1S1 : 1 élève\n- Classe 2SC1 : 1 élève\n- Classe 3M1 : 1 élève\n- Classe 4M1 : 1 élève\n- Classe 7B1 : 1 élève\n- Classe 8B1 : 1 élève\n- Classe 9B1 : 1 élève\n\nLa tendance montre que chaque classe a exactement 1 élève."
+  },
+  {
+    "timestamp": "2025-08-20T12:11:07.960407",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025 ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(`insc`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` `insc` JOIN `personne` `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` JOIN `anneescolaire` `annee` ON `insc`.`AnneeScolaire` = `annee`.`id` WHERE `annee`.`AnneeScolaire` = '2024/2025' GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "Il y a un total de 26 localités avec des inscriptions pour l'année scolaire 2024/2025. Voici un résumé des inscriptions par localité :\n\n- La localité avec le plus grand nombre d'inscriptions est Nabeul avec 332 inscriptions.\n- D'autres localités avec un nombre significatif d'inscriptions incluent Hammamet (159 inscriptions) et Dar Chaabane Elfehri (50 inscriptions).\n- La majorité des localités ont un nombre d'inscriptions relativement faible, souvent inférieur à 10.\n\nExemples représentatifs :\n- Nabeul : 332 inscriptions\n- Hammamet : 159 inscriptions\n- Dar Chaabane Elfehri : 50 inscriptions\n- Beni Khiar : 39 inscriptions\n- Grombalia : 25 inscriptions\n- Bou Argoub : 13 inscriptions\n- Bir Bouregba : 9 inscriptions\n- Beni Khalled : 8 inscriptions\n- Korba : 6 inscriptions\n- Menzel Bouzelfa : 6 inscriptions\n\nLes autres localités ont entre 1 et 5 inscriptions."
+  },
+  {
+    "timestamp": "2025-08-20T12:12:19.985475",
+    "question": "Comment contacter Walid Benabda ?",
+    "sql": "SELECT p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr` FROM `personne` p JOIN `parenteleve` pe ON pe.`Parent` = p.`id` JOIN `parent` pr ON pr.`id` = pe.`Parent` JOIN `personne` p_p ON p_p.`id` = pr.`Personne` WHERE p.`NomFr` = 'Benabda' AND p.`PrenomFr` = 'Walid'",
+    "response": "Il n'y a aucune information disponible pour contacter Walid Benabda."
+  },
+  {
+    "timestamp": "2025-08-20T12:12:51.650609",
+    "question": "donne moi le numéro de téléphone de Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3` FROM `personne` AS `p` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset'",
+    "response": "Voici les numéros de téléphone disponibles pour Abdelbasset Laataoui :\n\n- Tel1 : 98 534 528\n- Tel2 : 99 555 222\n\nLes autres numéros ne sont pas disponibles."
+  },
+  {
+    "timestamp": "2025-08-20T12:13:28.111310",
+    "question": "donne moi le contact des parents de Malak Benabda",
+    "sql": "SELECT p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` pe ON e.`IdPersonne` = pe.`id` JOIN `parenteleve` pelev ON pelev.`Eleve` = e.`id` JOIN `parent` p ON pelev.`Parent` = p.`id` JOIN `personne` p_p ON p.`Personne` = p_p.`id` WHERE pe.`NomFr` = 'Benabda' AND pe.`PrenomFr` = 'Malak'",
+    "response": "Voici les contacts des parents de Malak Benabda :\n\n- Téléphone : 25 220 415\n  - Email : walid.benabda@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen\n\n- Téléphone : 28 210 710\n  - Email : mouna.chabout@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T12:14:48.723409",
+    "question": "donne moi le contact des parents de Malak Benabda",
+    "sql": null,
+    "response": "❌ Je n’ai pas réussi à générer une requête SQL valide pour cette demande."
+  },
+  {
+    "timestamp": "2025-08-20T12:14:56.964758",
+    "question": "Comment contacter Walid Benabda ?",
+    "sql": null,
+    "response": "❌ Je n’ai pas réussi à générer une requête SQL valide pour cette demande."
+  },
+  {
+    "timestamp": "2025-08-20T12:15:00.344221",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025 ?",
+    "sql": null,
+    "response": "❌ Je n’ai pas réussi à générer une requête SQL valide pour cette demande."
+  },
+  {
+    "timestamp": "2025-08-20T12:15:38.273930",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": null,
+    "response": "❌ Je n’ai pas réussi à générer une requête SQL valide pour cette demande."
+  },
+  {
+    "timestamp": "2025-08-20T12:20:21.011395",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pa.Tranche, pa.TotalTTC, pa.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND a.Actif = 1",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1 pour l’année scolaire en cours :\n\n- Meriem FARES : Montant restant 1 500.00\n- Mohamed aziz ABDELLAOUI : Montant restant 2 500.00\n- Dina MHIR : Montant restant 1 270.00\n- Youssef BACH : Montant restant 2 500.00\n- Adam BELGUITH : Montant restant 1 500.00\n- Eya BENKHMISS : Montant restant 2 500.00\n- Ons IFAOUI : Montant restant 1 000.00\n- Skandaji MOHAMEDYESSIN : Montant restant 1 500.00\n- Cyrine KNIOUA : Montant restant 2 375.00\n- Melek KNIOUA : Montant restant 1 000.00\n- Farah BERRED : Montant restant 2 500.00\n- Ferdaws SAFFAR : Montant restant 1 000.00\n- Youssef DAOUD : Montant restant 1 500.00\n- Meriem BAATOUT : Montant restant 2 500.00\n- Meriem CHELLY : Montant restant 2 000.00"
+  },
+  {
+    "timestamp": "2025-08-20T12:20:47.101007",
+    "question": "Comment contacter Walid Benabda ?",
+    "sql": "SELECT `p`.`PrenomFr`, `p`.`NomFr`, `p`.`Tel1`, `p`.`Tel2`, `p`.`Email`, `p`.`AdresseFr` FROM `personne` `p` JOIN `parent` `pa` ON `pa`.`Personne` = `p`.`id` JOIN `parenteleve` `pe` ON `pe`.`Parent` = `pa`.`id` JOIN `eleve` `e` ON `pe`.`Eleve` = `e`.`id` WHERE `p`.`PrenomFr` = 'Walid' AND `p`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter Walid Benabda, vous pouvez utiliser les informations suivantes :\n\n- Téléphone : 25220415\n- Email : walid.benabda@gmail.com\n- Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T12:21:09.181897",
+    "question": "Comment joindre les parents de Malak Benabda ?",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` AS `e` JOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`id` JOIN `parenteleve` AS `pe` ON `pe`.`Eleve` = `e`.`id` JOIN `parent` AS `pr` ON `pe`.`Parent` = `pr`.`id` JOIN `personne` AS `parent_p` ON `pr`.`Personne` = `parent_p`.`id` WHERE `p`.`PrenomFr` = 'Malak' AND `p`.`NomFr` = 'Benabda'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'parenteleve.Type' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-20T12:21:37.783035",
+    "question": "donne moi le contact des parents de Malak Benabda ?",
+    "sql": "SELECT p_pere.`PrenomFr` AS PrenomPere, p_pere.`NomFr` AS NomPere, p_pere.`Tel1` AS TelPere, p_pere.`Email` AS EmailPere, p_mere.`PrenomFr` AS PrenomMere, p_mere.`NomFr` AS NomMere, p_mere.`Tel1` AS TelMere, p_mere.`Email` AS EmailMere FROM `eleve` e JOIN `personne` pe ON e.`IdPersonne` = pe.`id` JOIN `parenteleve` ple_pere ON ple_pere.`Eleve` = e.`id` AND ple_pere.`Type` = 'Père' JOIN `parent` pa_pere ON ple_pere.`Parent` = pa_pere.`id` JOIN `personne` p_pere ON pa_pere.`Personne` = p_pere.`id` JOIN `parenteleve` ple_mere ON ple_mere.`Eleve` = e.`id` AND ple_mere.`Type` = 'Mère' JOIN `parent` pa_mere ON ple_mere.`Parent` = pa_mere.`id` JOIN `personne` p_mere ON pa_mere.`Personne` = p_mere.`id` WHERE pe.`PrenomFr` = 'Malak' AND pe.`NomFr` = 'Benabda'",
+    "response": "Voici les contacts des parents de Malak Benabda :\n\n- Père : Walid Benabda\n  - Téléphone : 25220415\n  - Email : walid.benabda@gmail.com\n\n- Mère : Mouna Chabout\n  - Téléphone : 28210710\n  - Email : mouna.chabout@gmail.com"
+  },
+  {
+    "timestamp": "2025-08-20T12:23:44.410156",
+    "question": "Comment joindre les parents de Malak Benabda",
+    "sql": "SELECT p_p.`PrenomFr`, p_p.`NomFr`, p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` p ON pe.`Parent` = p.`id` JOIN `personne` p_p ON p.`Personne` = p_p.`id` WHERE p_p.`NomFr` = 'Benabda' AND p_p.`PrenomFr` = 'Malak'",
+    "response": "Il n'y a aucune information disponible pour joindre les parents de Malak Benabda."
+  },
+  {
+    "timestamp": "2025-08-20T12:24:56.393633",
+    "question": "Comment joindre les parents de Zeineb Bouharb",
+    "sql": "SELECT p_p.`PrenomFr`, p_p.`NomFr`, p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` pe ON e.`IdPersonne` = pe.`id` JOIN `parenteleve` pelev ON pelev.`Eleve` = e.`id` JOIN `parent` p ON pelev.`Parent` = p.`id` JOIN `personne` p_p ON p.`Personne` = p_p.`id` WHERE pe.`NomFr` = 'Bouharb' AND pe.`PrenomFr` = 'Zeineb'",
+    "response": "Pour joindre les parents de Zeineb Bouharb, vous pouvez contacter :\n\n- Sahl Bouharb : \n  - Téléphone 1 : 22209230\n  - Téléphone 2 : 71234540\n  - Adresse : 6 Rue Riode Jenero\n\n- Alia Kacem : \n  - Téléphone 2 : 71234540\n  - Adresse : 6 Rue Riodejenero\n\nAucun email n'est disponible pour ces contacts."
+  },
+  {
+    "timestamp": "2025-08-20T12:25:42.854492",
+    "question": "Comment joindre les parents de Nouha Laataoui",
+    "sql": "SELECT pp.`PrenomFr`, pp.`NomFr`, pp.`Tel1`, pp.`Tel2`, pp.`Email`, pp.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` pp ON pa.`Personne` = pp.`id` WHERE p.`PrenomFr` = 'Nouha' AND p.`NomFr` = 'Laataoui'",
+    "response": "Il n'y a aucune information de contact disponible pour les parents de Nouha Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T12:26:02.129594",
+    "question": "Comment contacter les parents de Malak Benabda",
+    "sql": "SELECT p1.`PrenomFr` AS PrenomParent, p1.`NomFr` AS NomParent, p1.`Tel1`, p1.`Tel2`, p1.`Email`, p1.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` p1 ON pa.`Personne` = p1.`id` WHERE p.`NomFr` = 'Benabda' AND p.`PrenomFr` = 'Malak'",
+    "response": "Pour contacter les parents de Malak Benabda, voici les informations disponibles :\n\n- Père : \n  - Nom : Walid BENABDA\n  - Téléphone : 25220415\n  - Email : walid.benabda@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen\n\n- Mère :\n  - Nom : Mouna CHABOUT\n  - Téléphone : 28210710\n  - Email : mouna.chabout@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T12:26:23.764682",
+    "question": "donne moi les notes de Malak Benabda",
+    "sql": "SELECT `edunoteelev`.`noteepre` FROM `edunoteelev` JOIN `edueleve` ON `edunoteelev`.`idenelev` = `edueleve`.`idenelev` JOIN `personne` ON `edueleve`.`idpersonne` = `personne`.`idpersonne` WHERE `personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'edueleve.idpersonne' in 'on clause'"
+  },
+  {
+    "timestamp": "2025-08-20T12:33:58.705775",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr AS Nom, p.PrenomFr AS Prenom, m.NomModalite AS Modalite, pa.Tranche AS Tranche, pa.TotalTTC AS Total, pa.MontantRestant AS MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pa ON pa.Inscription = ie.id WHERE m.NomModalite = 'Trimestriel' AND pa.Tranche = 'Tranche 1' AND pa.MontantRestant > 0 AND ie.AnneeScolaire IN (SELECT id FROM `anneescolaire` WHERE Actif = 1)",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n'ayant pas encore réglé la tranche n°1 pour l'année scolaire en cours :\n\n- Meriem FARES : Montant restant 1 500.00\n- Mohamed aziz ABDELLAOUI : Montant restant 2 500.00\n- Dina MHIR : Montant restant 1 270.00\n- Youssef BACH : Montant restant 2 500.00\n- Adam BELGUITH : Montant restant 1 500.00\n- Eya BENKHMISS : Montant restant 2 500.00\n- Ons IFAOUI : Montant restant 1 000.00\n- Skandaji MOHAMEDYESSIN : Montant restant 1 500.00\n- Cyrine KNIOUA : Montant restant 2 375.00\n- Melek KNIOUA : Montant restant 1 000.00\n- Farah BERRED : Montant restant 2 500.00\n- Ferdaws SAFFAR : Montant restant 1 000.00\n- Youssef DAOUD : Montant restant 1 500.00\n- Meriem BAATOUT : Montant restant 2 500.00\n- Meriem CHELLY : Montant restant 2 000.00"
+  },
+  {
+    "timestamp": "2025-08-20T12:34:29.273600",
+    "question": "Comment joindre les parents de Malak Benabda ?",
+    "sql": "SELECT p_p.`PrenomFr`, p_p.`NomFr`, p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` p_p ON pa.`Personne` = p_p.`id` WHERE p.`NomFr` = 'Benabda' AND p.`PrenomFr` = 'Malak'",
+    "response": "Pour joindre les parents de Malak Benabda, vous pouvez contacter :\n\n- **Walid Benabda (Père)**\n  - Téléphone : 25220415\n  - Email : walid.benabda@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen\n\n- **Mouna Chabout (Mère)**\n  - Téléphone : 28210710\n  - Email : mouna.chabout@gmail.com\n  - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T12:35:00.838256",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT p_p.`PrenomFr`, p_p.`NomFr`, p_p.`Tel1`, p_p.`Tel2`, p_p.`Email`, p_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` p_p ON pa.`Personne` = p_p.`id` WHERE p.`NomFr` = 'Laataoui' AND p.`PrenomFr` = 'Nouha'",
+    "response": "Pour contacter le parent de Nouha Laataoui, vous pouvez vous adresser à Mourad Laataoui à l'adresse suivante : 19 rue Maisson Blanche. Malheureusement, aucun numéro de téléphone ou adresse e-mail n'est disponible."
+  },
+  {
+    "timestamp": "2025-08-20T12:35:36.621166",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2024/2025 ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(`insc`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `insc` JOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` JOIN `anneescolaire` AS `annee` ON `insc`.`AnneeScolaire` = `annee`.`id` WHERE `annee`.`AnneeScolaire` = '2024/2025' GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "Pour l'année scolaire 2024/2025, voici un résumé des inscriptions par localité :\n\n- La localité de Nabeul a le plus grand nombre d'inscriptions avec 332 inscriptions.\n- Hammamet suit avec 159 inscriptions.\n- Dar Chaabane Elfehri compte 50 inscriptions.\n- Beni Khiar a 39 inscriptions.\n- Grombalia enregistre 25 inscriptions.\n- Les autres localités ont un nombre d'inscriptions inférieur à 20, avec plusieurs localités ayant seulement 1 ou 2 inscriptions.\n\nEn résumé, la majorité des inscriptions se concentrent dans quelques localités principales, tandis que d'autres ont un nombre très limité d'inscriptions."
+  },
+  {
+    "timestamp": "2025-08-20T13:17:55.265400",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(`insc`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `insc` JOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` WHERE `insc`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1) GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'inscriptions par localité pour l'année scolaire en cours :\n\n- Hammamet : 47 inscriptions\n- Nabeul : 105 inscriptions\n- Baraket El Sahel : 2 inscriptions\n- Dar Chaabane Elfehri : 14 inscriptions\n- Zaghouan : 1 inscription\n- Beni Khiar : 18 inscriptions\n- Korba : 2 inscriptions\n- Grombalia : 8 inscriptions\n- Cité El Wafa : 1 inscription\n- Somaa : 2 inscriptions\n- Beni Khalled : 2 inscriptions\n- Bou Argoub : 2 inscriptions\n- Menzel Temime : 1 inscription\n- El Maamoura : 2 inscriptions\n- Yasmine Hammamet : 1 inscription\n- Bir Bouregba : 1 inscription"
+  },
+  {
+    "timestamp": "2025-08-20T13:18:35.453942",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.NomFr, p.PrenomFr, m.NomModalite, pay.Tranche, pay.TotalTTC, pay.MontantRestant FROM `inscriptioneleve` ie JOIN `personne` p ON ie.Personne = p.id JOIN `modalite` m ON ie.Modalite = m.id JOIN `paiement` pay ON pay.Inscription = ie.id JOIN `anneescolaire` a ON ie.AnneeScolaire = a.id WHERE m.NomModalite = 'Trimestriel' AND pay.Tranche = 'Tranche 1' AND pay.MontantRestant > 0 AND a.Actif = 1",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1 pour l’année scolaire en cours :\n\n- Meriem FARES : Montant restant 1 500.00\n- Mohamed aziz ABDELLAOUI : Montant restant 2 500.00\n- Dina MHIR : Montant restant 1 270.00\n- Youssef BACH : Montant restant 2 500.00\n- Adam BELGUITH : Montant restant 1 500.00\n- Eya BENKHMISS : Montant restant 2 500.00\n- Ons IFAOUI : Montant restant 1 000.00\n- Skandaji MOHAMEDYESSIN : Montant restant 1 500.00\n- Cyrine KNIOUA : Montant restant 2 375.00\n- Melek KNIOUA : Montant restant 1 000.00\n- Farah BERRED : Montant restant 2 500.00\n- Ferdaws SAFFAR : Montant restant 1 000.00\n- Youssef DAOUD : Montant restant 1 500.00\n- Meriem BAATOUT : Montant restant 2 500.00\n- Meriem CHELLY : Montant restant 2 000.00"
+  },
+  {
+    "timestamp": "2025-08-20T13:19:09.160977",
+    "question": "donne moi l'année scolaire en cours",
+    "sql": "SELECT `a`.`AnneeScolaire` FROM `anneescolaire` AS `a` WHERE `a`.`Actif` = 1",
+    "response": "L'année scolaire en cours est 2025/2026."
+  },
+  {
+    "timestamp": "2025-08-20T13:20:11.196766",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT pp.`PrenomFr`, pp.`NomFr`, pp.`Tel1`, pp.`Tel2`, pp.`Email`, pp.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` pp ON pa.`Personne` = pp.`id` WHERE p.`PrenomFr` = 'Nouha' AND p.`NomFr` = 'Laataoui'",
+    "response": "Il n'y a pas de numéro de téléphone ni d'email disponible pour contacter les parents de Nouha Laataoui. Cependant, l'adresse du père, Mourad Laataoui, est le 19 rue Maisson Blanche."
+  },
+  {
+    "timestamp": "2025-08-20T13:20:53.778735",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`AdresseAr` FROM `personne` AS `p` WHERE `p`.`NomAr` = 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط'",
+    "response": "Il n'y a aucune information disponible pour joindre Abdelbasset Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T13:21:12.204290",
+    "question": "Comment contacter Abdelbasset Laataoui ?",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` AS `e` JOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`id` JOIN `parenteleve` AS `pe` ON `pe`.`Eleve` = `e`.`id` JOIN `parent` AS `pa` ON `pe`.`Parent` = `pa`.`id` JOIN `personne` AS `parent_p` ON `pa`.`Personne` = `parent_p`.`id` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'parenteleve.Type' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-20T13:21:32.363711",
+    "question": "donne moi le contact de Abdelbasset Laataoui",
+    "sql": "SELECT `p1`.`Tel1`, `p1`.`Tel2`, `p1`.`Tel3`, `p1`.`email` FROM `personne` AS `p1` WHERE `p1`.`NomFr` = 'Laataoui' AND `p1`.`PrenomFr` = 'Abdelbasset'",
+    "response": "Voici les coordonnées disponibles pour Abdelbasset Laataoui :\n\n- Téléphone 1 : 98534528\n- Téléphone 2 : 99555222\n\nLes autres informations de contact ne sont pas disponibles."
+  },
+  {
+    "timestamp": "2025-08-20T13:34:19.975923",
+    "question": "Comment contacter Walid Benabda ?",
+    "sql": "SELECT `p`.`PrenomFr`, `p`.`NomFr`, `p`.`Tel1`, `p`.`Tel2`, `p`.`Email`, `p`.`AdresseFr` FROM `personne` AS `p` JOIN `parent` AS `pa` ON `pa`.`Personne` = `p`.`id` JOIN `parenteleve` AS `pe` ON `pe`.`Parent` = `pa`.`id` JOIN `eleve` AS `e` ON `pe`.`Eleve` = `e`.`id` WHERE `p`.`PrenomFr` = 'Walid' AND `p`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter Walid Benabda, vous pouvez utiliser les informations suivantes : \n\n- Téléphone : 25220415\n- Email : walid.benabda@gmail.com\n- Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T13:34:33.520638",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT p.`NomFr`, p.`PrenomFr`, m.`NomModalite`, pa.`Tranche`, pa.`TotalTTC`, pa.`MontantRestant` FROM `inscriptioneleve` ie JOIN `personne` p ON ie.`Personne` = p.`id` JOIN `modalite` m ON ie.`Modalite` = m.`id` JOIN `paiement` pa ON pa.`Inscription` = ie.`id` JOIN `anneescolaire` a ON ie.`AnneeScolaire` = a.`id` WHERE m.`NomModalite` = 'Trimestriel' AND pa.`Tranche` = 'Tranche 1' AND pa.`MontantRestant` > 0 AND a.`Actif` = 1",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1 pour l’année scolaire en cours :\n\n- Meriem FARES : Montant restant 1 500.00\n- Mohamed aziz ABDELLAOUI : Montant restant 2 500.00\n- Dina MHIR : Montant restant 1 270.00\n- Youssef BACH : Montant restant 2 500.00\n- Adam BELGUITH : Montant restant 1 500.00\n- Eya BENKHMISS : Montant restant 2 500.00\n- Ons IFAOUI : Montant restant 1 000.00\n- Skandaji MOHAMEDYESSIN : Montant restant 1 500.00\n- Cyrine KNIOUA : Montant restant 2 375.00\n- Melek KNIOUA : Montant restant 1 000.00\n- Farah BERRED : Montant restant 2 500.00\n- Ferdaws SAFFAR : Montant restant 1 000.00\n- Youssef DAOUD : Montant restant 1 500.00\n- Meriem BAATOUT : Montant restant 2 500.00\n- Meriem CHELLY : Montant restant 2 000.00\n\nChaque élève a un montant restant à payer pour la première tranche."
+  },
+  {
+    "timestamp": "2025-08-20T13:35:04.224025",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021 ?",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`, COUNT(`insc`.`id`) AS `nombre_inscriptions` FROM `inscriptioneleve` AS `insc` JOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id` JOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE` JOIN `anneescolaire` AS `annee` ON `insc`.`AnneeScolaire` = `annee`.`id` WHERE `annee`.`AnneeScolaire` = '2020/2021' GROUP BY `loc`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'inscriptions par localité pour l'année scolaire 2020/2021 :\n\n- Nabeul : 191 inscriptions\n- Hammamet : 93 inscriptions\n- Dar Chaabane Elfehri : 17 inscriptions\n- Beni Khiar : 11 inscriptions\n- Grombalia : 4 inscriptions\n- Korba : 4 inscriptions\n- El Maamoura : 2 inscriptions\n- Baraket El Sahel : 1 inscription\n- Bou Ficha : 1 inscription\n- Somaa : 1 inscription\n- Gafsa : 1 inscription\n- Bou Argoub : 1 inscription\n- Borj Cedria : 1 inscription\n- Cite El Mrezgua : 1 inscription\n- Sousse : 1 inscription\n- Yasmine Hammamet : 1 inscription\n- HAMMAMET SUD : 1 inscription\n- Hammam Linf : 1 inscription\n- El Menzah 1 : 1 inscription"
+  },
+  {
+    "timestamp": "2025-08-20T13:35:27.352783",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`AdresseAr` FROM `personne` AS `p` WHERE (`p`.`NomAr` = 'عبدالباسط' AND `p`.`PrenomAr` = 'العطاوي') OR (`p`.`NomAr` = 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط')",
+    "response": "Il n'y a aucune information disponible pour joindre Abdelbasset Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T13:37:31.735010",
+    "question": "donne moi le numéro de téléphone de Abdelbasset Laataoui ?",
+    "sql": "SELECT `u`.`tel` AS `NumeroDeTelephone` FROM `utilisateur` AS `u` WHERE `u`.`NomFr` = 'Laataoui' AND `u`.`PrenomFr` = 'Abdelbasset' UNION SELECT `ua`.`numeroDeTelephone` AS `NumeroDeTelephone` FROM `useradmin` AS `ua` WHERE `ua`.`NomFr` = 'Laataoui' AND `ua`.`PrenomFr` = 'Abdelbasset' UNION SELECT `p`.`Tel1` AS `NumeroDeTelephone` FROM `personne` AS `p` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset' UNION SELECT `p`.`Tel2` AS `NumeroDeTelephone` FROM `personne` AS `p` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset' UNION SELECT `p`.`Tel3` AS `NumeroDeTelephone` FROM `personne` AS `p` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset' UNION SELECT `e`.`teletute` AS `NumeroDeTelephone` FROM `edueleve` AS `e` WHERE `e`.`NomFr` = 'Laataoui' AND `e`.`PrenomFr` = 'Abdelbasset'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'u.NomFr' in 'where clause'"
+  },
+  {
+    "timestamp": "2025-08-20T13:39:04.903087",
+    "question": "donne moi le contact de Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email` FROM `personne` AS `p` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Voici les coordonnées disponibles pour Abdelbasset Laataoui :\n\n- Téléphone 1 : 98 534 528\n- Téléphone 2 : 99 555 222\n\nAucun autre contact n'est disponible."
+  },
+  {
+    "timestamp": "2025-08-20T13:39:23.028620",
+    "question": "Comment contacter de Abdelbasset Laataoui",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `parenteleve` JOIN `eleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `personne` AS `parent_p` ON `parenteleve`.`Parent` = `parent`.`id` AND `parent`.`Personne` = `parent_p`.`id` WHERE (`parent_p`.`PrenomFr` = 'Abdelbasset' AND `parent_p`.`NomFr` = 'Laataoui') OR (`parent_p`.`PrenomFr` = 'Laataoui' AND `parent_p`.`NomFr` = 'Abdelbasset')",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'parent.id' in 'on clause'"
+  },
+  {
+    "timestamp": "2025-08-20T13:40:11.042702",
+    "question": "Comment contacter Abdelbasset Laataoui",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `parenteleve` JOIN `eleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` WHERE (`parent_p`.`PrenomFr` = 'Abdelbasset' AND `parent_p`.`NomFr` = 'Laataoui') OR (`parent_p`.`PrenomFr` = 'Laataoui' AND `parent_p`.`NomFr` = 'Abdelbasset')",
+    "response": "Pour contacter Abdelbasset Laataoui, vous pouvez utiliser les numéros de téléphone suivants : 98534528 ou 99555222. Son adresse est le 19 avenue Casa Blanca. Il n'y a pas d'adresse email disponible."
+  },
+  {
+    "timestamp": "2025-08-20T13:40:25.819343",
+    "question": "Comment joindre Abdelbasset Laataoui",
+    "sql": null,
+    "response": "❌ Je n’ai pas réussi à générer une requête SQL valide pour cette demande."
+  },
+  {
+    "timestamp": "2025-08-20T13:41:11.527341",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez vous rendre à l'adresse suivante : 19 شارع الدار البيضاء نابل, Nabeul."
+  },
+  {
+    "timestamp": "2025-08-20T13:44:23.466519",
+    "question": "donne moi le contact de Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Voici les informations de contact pour Abdelbasset Laataoui :\n\n- Téléphone 1 : 98 534 528\n- Téléphone 2 : 99 555 222\n- Adresse : 19 avenue Casa Blanca, Nabeul\n\nIl n'y a pas d'adresse email disponible."
+  },
+  {
+    "timestamp": "2025-08-20T13:44:38.549526",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE `p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset'",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez utiliser les numéros de téléphone suivants :  \n- 98534528  \n- 99555222  \n\nIl réside à l'adresse suivante :  \n- 19 avenue Casa Blanca, Nabeul  \n- 19 شارع الدار البيضاء نابل"
+  },
+  {
+    "timestamp": "2025-08-20T13:44:52.006389",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT pp.`PrenomFr`, pp.`NomFr`, pp.`Tel1`, pp.`Tel2`, pp.`Email`, pp.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` pp ON pa.`Personne` = pp.`id` WHERE p.`PrenomFr` = 'Nouha' AND p.`NomFr` = 'Laataoui'",
+    "response": "Il n'y a aucune information de contact disponible pour les parents de Nouha Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T14:12:43.792240",
+    "question": "Comment contacter les parents de Malak Benabda",
+    "sql": "SELECT DISTINCT parent_p.`PrenomFr`, parent_p.`NomFr`, personne.`Tel1`, personne.`Tel2`, personne.`Email`, personne.`AdresseFr`, parenteleve.`Type` FROM `eleve` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` ON `parent`.`Personne` = `personne`.`id` JOIN `personne` AS parent_p ON `parent`.`Personne` = parent_p.`id` WHERE `eleve`.`PrenomFr` = 'Malak' AND `eleve`.`NomFr` = 'Benabda'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'eleve.PrenomFr' in 'where clause'"
+  },
+  {
+    "timestamp": "2025-08-20T14:18:43.283330",
+    "question": "comment contacter les parents de Malak Benabda ?",
+    "sql": "SELECT DISTINCT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `personne`.`Tel1`, `personne`.`Tel2`, `personne`.`Tel3`, `personne`.`Email`, `personne`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` JOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` WHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter les parents de Malak Benabda, voici les informations disponibles :\n\n1. **Père : Walid Benabda**\n   - Téléphones : Non disponibles\n   - Email : Non disponible\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\n2. **Mère : Mouna Chabout**\n   - Téléphones : Non disponibles\n   - Email : Non disponible\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\nMalheureusement, les numéros de téléphone et les adresses email ne sont pas disponibles pour les deux parents."
+  },
+  {
+    "timestamp": "2025-08-20T14:19:07.767646",
+    "question": "comment joindre les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` JOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` JOIN `inscriptioneleve` ON `inscriptioneleve`.`Eleve` = `eleve`.`id` JOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id` WHERE `personne`.`PrenomFr` = 'Nouha' AND `personne`.`NomFr` = 'Laataoui' AND `anneescolaire`.`Actif` = 1",
+    "response": "Je suis désolé, mais il n'y a aucune information disponible pour joindre les parents de Nouha Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T14:19:46.424029",
+    "question": "comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` JOIN `personne` AS `eleve_p` ON `eleve`.`IdPersonne` = `eleve_p`.`id` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` JOIN `inscriptioneleve` ON `inscriptioneleve`.`Eleve` = `eleve`.`id` JOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id` WHERE `eleve_p`.`PrenomFr` = 'Nouha' AND `eleve_p`.`NomFr` = 'Laataoui' AND `anneescolaire`.`Actif` = 1",
+    "response": "Je suis désolé, mais il n'y a pas d'information disponible concernant les coordonnées des parents de Nouha Laataoui."
+  },
+  {
+    "timestamp": "2025-08-20T14:21:18.977470",
+    "question": "Comment contacter les parents de Malak Benabda",
+    "sql": "SELECT DISTINCT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `personne`.`Tel1`, `personne`.`Tel2`, `personne`.`Tel3`, `personne`.`Email`, `personne`.`AdresseFr` FROM `eleve` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` JOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id` WHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter les parents de Malak Benabda, voici les informations disponibles :\n\n1. **Walid Benabda** :\n   - Téléphone 1 : Non disponible\n   - Téléphone 2 : Non disponible\n   - Téléphone 3 : Non disponible\n   - Email : Non disponible\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\n2. **Mouna Chabout** :\n   - Téléphone 1 : Non disponible\n   - Téléphone 2 : Non disponible\n   - Téléphone 3 : Non disponible\n   - Email : Non disponible\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\nIl semble que les coordonnées téléphoniques et email ne soient pas disponibles pour le moment. Vous pouvez essayer de les contacter à l'adresse mentionnée."
+  },
+  {
+    "timestamp": "2025-08-20T14:21:42.767207",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui`) OR (`p`.`NomAr` = 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط') OR (`p`.`NomAr` = 'عبدالباسط' AND `p`.`PrenomAr` = 'العطاوي')",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط') OR (`p`.`NomAr` = 'ع' at line 1"
+  },
+  {
+    "timestamp": "2025-08-20T14:24:03.644026",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type` FROM `eleve` JOIN `personne` AS `eleve_p` ON `eleve`.`IdPersonne` = `eleve_p`.`id` JOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id` JOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id` JOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id` WHERE `eleve_p`.`PrenomFr` = 'Nouha' AND `eleve_p`.`NomFr` = 'Laataoui'",
+    "response": "Pour contacter le parent de Nouha Laataoui, voici les informations disponibles :\n\n- **Nom** : Mourad Laataoui\n- **Téléphone 1** : Non disponible\n- **Téléphone 2** : Non disponible\n- **Email** : Non disponible\n- **Adresse** : 19 rue maisson blanche\n\nIl semble que les coordonnées téléphoniques et l'email ne soient pas disponibles. Vous pouvez essayer de contacter Mourad Laataoui à l'adresse indiquée."
+  },
+  {
+    "timestamp": "2025-08-20T14:24:49.951995",
+    "question": "Comment joindre Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomAr` = 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط') OR (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset')",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez utiliser les coordonnées suivantes :\n\n- Téléphone 1 : 98 534 528\n- Téléphone 2 : 99 555 222\n- Téléphone 3 : Non disponible\n- Email : Non disponible\n\nAdresse en français : 19 avenue Casa Blanca, Nabeul  \nAdresse en arabe : 19 شارع الدار البيضاء نابل  \nLocalité : Nabeul"
+  },
+  {
+    "timestamp": "2025-08-20T14:25:17.127002",
+    "question": "Comment contacter Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui`)",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''Laataoui`)' at line 1"
+  },
+  {
+    "timestamp": "2025-08-20T14:32:54.857187",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT pp.`PrenomFr`, pp.`NomFr`, pp.`Tel1`, pp.`Tel2`, pp.`Email`, pp.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` p ON e.`IdPersonne` = p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` pp ON pa.`Personne` = pp.`id` WHERE p.`PrenomFr` = 'Nouha' AND p.`NomFr` = 'Laataoui'",
+    "response": "Pour contacter le parent de Nouha Laataoui, voici les informations disponibles :\n\n- **Nom** : Mourad LAATAOUI\n- **Téléphone 1** : Non disponible\n- **Téléphone 2** : Non disponible\n- **Email** : Non disponible\n- **Adresse** : 19 rue maisson blanche\n\nIl semble que les coordonnées téléphoniques et l'email ne soient pas disponibles. Vous pouvez essayer de le contacter à l'adresse indiquée."
+  },
+  {
+    "timestamp": "2025-08-20T14:33:09.593538",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR` FROM `personne` AS `p` JOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE` WHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui`)",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''Laataoui`)' at line 1"
+  },
+  {
+    "timestamp": "2025-08-20T14:48:48.240096",
+    "question": "Comment contacter Abdelbasset Laataoui",
+    "sql": "SELECT \n    `p`.`Tel1`, \n    `p`.`Tel2`, \n    `p`.`Tel3`, \n    `p`.`Email`, \n    `p`.`AdresseFr`, \n    `p`.`AdresseAr`, \n    `l`.`LIBELLELOCALITEFR`, \n    `l`.`LIBELLELOCALITEAR`\nFROM \n    `personne` AS `p`\nJOIN \n    `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE`\nWHERE \n    (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') \n    OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui)'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 16"
+  },
+  {
+    "timestamp": "2025-08-20T14:52:54.163958",
+    "question": "Comment contacter Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR`\nFROM `personne` AS `p`\nJOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE`\nWHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Pour contacter Abdelbasset Laataoui, vous pouvez utiliser les informations suivantes :\n\n1. Adresse : 19 avenue Casa Blanca, Nabeul.\n2. Téléphone : 98534528 ou 99555222.\n\nIl n'y a pas d'adresse email disponible."
+  },
+  {
+    "timestamp": "2025-08-20T14:53:10.992566",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `personne`.`Tel1`, `personne`.`Tel2`, `personne`.`Tel3`, `personne`.`Email`, `personne`.`AdresseFr`, `personne`.`AdresseAr`, `localite`.`LIBELLELOCALITEFR`, `localite`.`LIBELLELOCALITEAR`\nFROM `personne`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nWHERE (`personne`.`NomFr` = 'Laataoui' AND `personne`.`PrenomFr` = 'Abdelbasset')\n   OR (`personne`.`NomFr` = 'Abdelbasset' AND `personne`.`PrenomFr` = 'Laataoui')\n   OR (`personne`.`NomAr` = 'ءبديلباسيت' AND `personne`.`PrenomAr` = 'لاتاوي')\n   OR (`personne`.`NomAr` = 'لاتاوي' AND `personne`.`PrenomAr` = 'ءبديلباسيت')",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez utiliser les numéros de téléphone suivants : 98534528 ou 99555222. Il est également possible de se rendre à l'adresse suivante : 19 avenue Casa Blanca, Nabeul."
+  },
+  {
+    "timestamp": "2025-08-20T14:53:56.493871",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire 2020/2021 ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`id`) AS `nombre_inscriptions`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2020/2021'\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Pour l'année scolaire 2020/2021, voici le nombre d'inscriptions par localité :\n\n- Nabeul : 191 inscriptions\n- Hammamet : 93 inscriptions\n- Dar Chaabane Elfehri : 17 inscriptions\n- Beni Khiar : 11 inscriptions\n- Grombalia : 4 inscriptions\n- Korba : 4 inscriptions\n- El Maamoura : 2 inscriptions\n\nD'autres localités comme Baraket El Sahel, Bou Ficha, Somaa, Gafsa, Bou Argoub, Borj Cedria, Cite El Mrezgua, Sousse, Yasmine Hammamet, HAMMAMET SUD, Hammam Linf, et El Menzah 1 ont chacune 1 inscription."
+  },
+  {
+    "timestamp": "2025-08-20T14:54:19.887091",
+    "question": "Comment contacter Walid Benabda ?",
+    "sql": "SELECT `personne`.`Tel1`, `personne`.`Tel2`, `personne`.`Tel3`, `personne`.`Email`, `personne`.`AdresseFr`, `personne`.`AdresseAr`, `localite`.`LIBELLELOCALITEFR`, `localite`.`LIBELLELOCALITEAR`\nFROM `personne`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nWHERE (`personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Walid') OR (`personne`.`NomFr` = 'Walid' AND `personne`.`PrenomFr` = 'Benabda')",
+    "response": "Pour contacter Walid Benabda, vous pouvez utiliser les informations suivantes : \n\n- Téléphone : 25220415\n- Email : walid.benabda@gmail.com\n- Adresse : Avenue Om Kholthoum Rue Jeljlen, Nabeul."
+  },
+  {
+    "timestamp": "2025-08-20T14:54:32.250687",
+    "question": "Comment joindre les parents de Malak Benabda ?",
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN \n    `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN \n    `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN \n    `personne` AS parent_p ON `parent`.`Personne` = parent_p.`id`\nWHERE \n    `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour joindre les parents de Malak Benabda, vous pouvez contacter :\n\n1. Son père, Walid Benabda :\n   - Téléphone : 25220415\n   - Email : walid.benabda@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\n2. Sa mère, Mouna Chabout :\n   - Téléphone : 28210710\n   - Email : mouna.chabout@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-20T14:54:48.115145",
+    "question": "Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT DISTINCT p.`NomFr`, p.`PrenomFr`, m.`NomModalite`, pa.`Tranche`, pa.`TotalTTC`, pa.`MontantRestant`\nFROM `inscriptioneleve` ie\nJOIN `personne` p ON ie.`Personne` = p.`id`\nJOIN `modalite` m ON ie.`Modalite` = m.`id`\nJOIN `paiement` pa ON pa.`Inscription` = ie.`id`\nJOIN `anneescolaire` a ON ie.`AnneeScolaire` = a.`id`\nWHERE m.`NomModalite` = 'Trimestriel'\nAND pa.`Tranche` = 'Tranche 1'\nAND pa.`MontantRestant` > 0\nAND a.`Actif` = 1",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n'ayant pas encore réglé la tranche n°1 pour l'année scolaire en cours :\n\n1. Meriem FARES - Montant restant : 1500.0\n2. Mohamed Aziz ABDELLAOUI - Montant restant : 2500.0\n3. Dina MHIR - Montant restant : 1270.0\n4. Youssef BACH - Montant restant : 2500.0\n5. Adam BELGUITH - Montant restant : 1500.0\n6. Eya BENKHMISS - Montant restant : 2500.0\n7. Ons IFAOUI - Montant restant : 1000.0\n8. Skandaji MOHAMEDYESSIN - Montant restant : 1500.0\n9. Cyrine KNIOUA - Montant restant : 2375.0\n10. Melek KNIOUA - Montant restant : 1000.0\n11. Farah BERRED - Montant restant : 2500.0\n12. Ferdaws SAFFAR - Montant restant : 1000.0\n13. Youssef DAOUD - Montant restant : 1500.0\n14. Meriem BAATOUT - Montant restant : 2500.0\n15. Meriem CHELLY - Montant restant : 2000.0\n\nCes élèves n'ont pas encore réglé la totalité de la première tranche de leur engagement de paiement trimestriel."
+  },
+  {
+    "timestamp": "2025-08-20T14:55:19.573441",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` AS eleve_p ON eleve.`IdPersonne` = eleve_p.`id`\nJOIN \n    `parenteleve` ON parenteleve.`Eleve` = eleve.`id`\nJOIN \n    `parent` ON parenteleve.`Parent` = parent.`id`\nJOIN \n    `personne` AS parent_p ON parent.`Personne` = parent_p.`id`\nWHERE \n    (eleve_p.`PrenomFr` = 'Nouha' AND eleve_p.`NomFr` = 'Laataoui')\n    OR (eleve_p.`PrenomFr` = 'Laataoui' AND eleve_p.`NomFr` = 'Nouha')",
+    "response": "Pour contacter le parent de Nouha Laataoui, vous pouvez vous adresser à Mourad Laataoui, qui est le père. Son adresse est le 19 rue Maisson Blanche. Malheureusement, aucun numéro de téléphone ni adresse email n'est disponible."
+  },
+  {
+    "timestamp": "2025-08-20T14:57:06.209595",
+    "question": "donne moi le nombre d'élèves par classe en 2020/2021",
+    "sql": "SELECT `classe`.`NomClasse`, COUNT(`inscriptioneleve`.`Eleve`) AS `NombreEleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2020/2021'\nGROUP BY `classe`.`NomClasse`",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'classe.NomClasse' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-20T14:57:56.577780",
+    "question": "donne moi les notes de Malak Benabda",
+    "sql": "SELECT `edunoteelev`.`noteepre`\nFROM `edunoteelev`\nJOIN `edueleve` ON `edunoteelev`.`idenelev` = `edueleve`.`idenelev`\nWHERE `edueleve`.`NomFr` = 'Benabda' AND `edueleve`.`PrenomFr` = 'Malak'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'edueleve.NomFr' in 'where clause'"
+  },
+  {
+    "timestamp": "2025-08-21T09:43:18.119803",
+    "question": "Comment joindre Abdelbasset Laataoui",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR`\nFROM `personne` AS `p`\nJOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE`\nWHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez utiliser les informations suivantes :\n\n1. Adresse : 19 avenue Casa Blanca, Nabeul.\n2. Téléphones : 98534528, 99555222.\n\nIl n'y a pas d'adresse email disponible."
+  },
+  {
+    "timestamp": "2025-08-21T09:43:52.820890",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN \n    `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN \n    `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN \n    `personne` AS parent_p ON `parent`.`Personne` = parent_p.`id`\nWHERE \n    (`personne`.`NomFr` = 'Laataoui' AND `personne`.`PrenomFr` = 'Nouha')\n    OR (`personne`.`NomFr` = 'Nouha' AND `personne`.`PrenomFr` = 'Laataoui')",
+    "response": "Pour contacter le parent de Nouha Laataoui, vous pouvez vous adresser à Mourad Laataoui, son père, à l'adresse suivante : 19 rue Maisson Blanche. Malheureusement, il n'y a pas de numéro de téléphone ou d'adresse e-mail disponible."
+  },
+  {
+    "timestamp": "2025-08-21T09:44:21.854488",
+    "question": ":Donne-moi la liste des élèves ayant un engagement de paiement trimestriel et n’ayant pas encore réglé la tranche n°1  pour l’année scolaire en cours",
+    "sql": "SELECT DISTINCT `p`.`NomFr`, `p`.`PrenomFr`, `m`.`NomModalite`, `pa`.`Tranche`, `pa`.`TotalTTC`, `pa`.`MontantRestant`\nFROM `inscriptioneleve` AS `i`\nJOIN `personne` AS `p` ON `i`.`Personne` = `p`.`id`\nJOIN `modalite` AS `m` ON `i`.`Modalite` = `m`.`id`\nJOIN `paiement` AS `pa` ON `pa`.`Inscription` = `i`.`id`\nLEFT JOIN `reglementeleve` AS `r` ON `r`.`IdInscription` = `pa`.`id`\nWHERE `m`.`NomModalite` = 'Trimestriel'\nAND `pa`.`Tranche` = 'Tranche 1'\nAND `r`.`IdInscription` IS NULL\nAND `i`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "Voici la liste des élèves ayant un engagement de paiement trimestriel et n'ayant pas encore réglé la tranche n°1 pour l'année scolaire en cours :\n\n1. Mohamed Aziz ABDELLAOUI - Montant restant : 2500.0\n2. Youssef BACH - Montant restant : 2500.0\n3. Eya BENKHMISS - Montant restant : 2500.0\n4. Cyrine KNIOUA - Montant restant : 2375.0\n5. Farah BERRED - Montant restant : 2500.0\n6. Meriem BAATOUT - Montant restant : 2500.0\n\nTous ces élèves ont un montant total de la tranche de 2500.0, sauf Cyrine KNIOUA qui a un montant de 2375.0."
+  },
+  {
+    "timestamp": "2025-08-21T09:45:09.742844",
+    "question": "Quel est le nombre d’inscriptions par localité pour l’année scolaire en cours ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`id`) AS `nombre_inscriptions`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nWHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Pour l'année scolaire en cours, voici le nombre d'inscriptions par localité :\n\n- Nabeul : 105 inscriptions\n- Hammamet : 47 inscriptions\n- Beni Khiar : 18 inscriptions\n- Dar Chaabane Elfehri : 14 inscriptions\n- Grombalia : 8 inscriptions\n- Baraket El Sahel, Korba, Somaa, Beni Khalled, Bou Argoub, El Maamoura : 2 inscriptions chacun\n- Zaghouan, Cite El Wafa, Menzel Temime, Yasmine Hammamet, Bir Bouregba : 1 inscription chacun\n\nCela montre une répartition variée des inscriptions selon les localités."
+  },
+  {
+    "timestamp": "2025-08-21T10:01:17.604161",
+    "question": "donne moi le nombre d'élèves par classe",
+    "sql": "SELECT `classe`.`NOMCLASSEFR` AS `par_classe`, COUNT(`inscriptioneleve`.`id`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Voici le nombre d'élèves par classe :\n\n- Classe 4SC1 : 16 élèves\n- Classe 8B1 : 56 élèves\n- Classe 2SC1 : 30 élèves\n- Classe 3SC1 : 13 élèves\n- Classe 9B1 : 48 élèves\n- Classe 3M1 : 17 élèves\n- Classe 4M1 : 11 élèves\n- Classe 9B2 : 2 élèves\n- Classe 8B2 : 1 élève\n- Classe 1S1 : 16 élèves\n\nCela donne un aperçu du nombre d'élèves dans chaque classe."
+  },
+  {
+    "timestamp": "2025-08-21T10:02:06.998272",
+    "question": "donne moi le nombre d'élèves par classe pour l'année scolaire 2022/2023",
+    "sql": "SELECT `classe`.`NOMCLASSEFR` AS `par_classe`, COUNT(`inscriptioneleve`.`id`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2022/2023'\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Pour l'année scolaire 2022/2023, voici le nombre d'élèves par classe :\n\n- Classe 9B2 : 24 élèves\n- Classe 4SC1 : 27 élèves\n- Classe 8B2 : 23 élèves\n- Classe 8B1 : 25 élèves\n- Classe 2SC1 : 26 élèves\n- Classe 3M1 : 23 élèves\n- Classe 8B3 : 24 élèves\n- Classe 9B1 : 24 élèves\n- Classe 3M2 : 23 élèves\n- Classe 2SC2 : 27 élèves\n- Classe 9B3 : 24 élèves\n- Classe 4M1 : 24 élèves\n- Classe 3SC1 : 24 élèves\n- Classe 8B4 : 24 élèves\n- Classe 1S2 : 25 élèves\n- Classe 1S3 : 24 élèves\n- Classe 1S1 : 27 élèves\n- Classe 7B3 : 28 élèves\n- Classe 7B5 : 29 élèves\n- Classe 7B2 : 29 élèves\n- Classe 7B4 : 29 élèves\n- Classe 7B1 : 28 élèves\n\nCela représente un total de 22 classes avec des effectifs variés."
+  },
+  {
+    "timestamp": "2025-08-21T10:03:01.009673",
+    "question": "donne moi le nombre d'élèves par classe pour l'année en cours",
+    "sql": "SELECT `classe`.`NOMCLASSEFR` AS `par_classe`, COUNT(`inscriptioneleve`.`id`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nWHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Voici le nombre d'élèves par classe pour l'année en cours :\n\n- Classe 4SC1 : 16 élèves\n- Classe 8B1 : 56 élèves\n- Classe 2SC1 : 30 élèves\n- Classe 3SC1 : 13 élèves\n- Classe 9B1 : 48 élèves\n- Classe 3M1 : 17 élèves\n- Classe 4M1 : 11 élèves\n- Classe 9B2 : 2 élèves\n- Classe 8B2 : 1 élève\n- Classe 1S1 : 16 élèves\n\nCela donne un aperçu des effectifs par classe."
+  },
+  {
+    "timestamp": "2025-08-21T10:06:36.574123",
+    "question": "donne moi l'emploi du temps de Malak Benabda",
+    "sql": "SELECT `matiere`.`NomMatiereFr`, `classe`.`NOMCLASSEFR`, `salle`.`nomSalleFr`, `emploidutemps`.`SeanceDebut`\nFROM `emploidutemps`\nJOIN `classe` ON `emploidutemps`.`Classe` = `classe`.`id`\nJOIN `matiere` ON `emploidutemps`.`Matiere` = `matiere`.`id`\nJOIN `enseingant` ON `emploidutemps`.`Enseignant` = `enseingant`.`id`\nWHERE (`enseingant`.`NomFr` = 'Benabda' AND `enseingant`.`PrenomFr` = 'Malak')\n   OR (`enseingant`.`NomFr` = 'Malak' AND `enseingant`.`PrenomFr` = 'Benabda')",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'salle.nomSalleFr' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-21T10:09:15.255930",
+    "question": "donne moi les notes de Malak Benabda",
+    "sql": "SELECT `edunoteelev`.`noteepre`\nFROM `edunoteelev`\nJOIN `edueleve` ON `edunoteelev`.`idenelev` = `edueleve`.`idenelev`\nWHERE `edueleve`.`NomFr` = 'Benabda' AND `edueleve`.`PrenomFr` = 'Malak'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'edueleve.NomFr' in 'where clause'"
+  },
+  {
+    "timestamp": "2025-08-21T10:15:15.874281",
+    "question": "donne moi les notes de Malak Benabda par matière",
+    "sql": "SELECT \n    `edueleve`.`nomelevfr`, \n    `edueleve`.`prenelevfr`, \n    `edumatiere`.`libematifr`, \n    `eduperiexam`.`libeperiexamfr`, \n    `edumoymati`.`moyemati`, \n    `edumoymati`.`rangmati`\nFROM \n    `edumoymati`\nJOIN \n    `edueleve` ON `edumoymati`.`idenelev` = `edueleve`.`idenelev`\nJOIN \n    `edumatiere` ON `edumoymati`.`codemati` = `edumatiere`.`codemati`\nJOIN \n    `eduperiexam` ON `edumoymati`.`codeperiexam` = `eduperiexam`.`codeperiexam`\nWHERE \n    `edueleve`.`nomelevfr` = 'Benabda' \n    AND `edueleve`.`prenelevfr` = 'Malak'",
+    "response": "Il n'y a pas de données disponibles concernant les notes de Malak Benabda par matière."
+  },
+  {
+    "timestamp": "2025-08-21T10:15:35.073306",
+    "question": "donne moi les notes de Zeineb Bouharb par matière",
+    "sql": "SELECT \n    `edueleve`.`nomelevfr`, \n    `edueleve`.`prenelevfr`, \n    `edumatiere`.`libematifr`, \n    `eduperiexam`.`libeperiexamfr`, \n    `edumoymati`.`moyemati`, \n    `edumoymati`.`rangmati`\nFROM \n    `edumoymati`\nJOIN \n    `edueleve` ON `edumoymati`.`idenelev` = `edueleve`.`idenelev`\nJOIN \n    `edumatiere` ON `edumoymati`.`codemati` = `edumatiere`.`codemati`\nJOIN \n    `eduperiexam` ON `edumoymati`.`codeperiexam` = `eduperiexam`.`codeperiexam`\nWHERE \n    `edueleve`.`nomelevfr` = 'Bouharb' \n    AND `edueleve`.`prenelevfr` = 'Zeineb'",
+    "response": "Il n'y a pas de données disponibles concernant les notes de Zeineb Bouharb par matière."
+  },
+  {
+    "timestamp": "2025-08-21T10:19:39.028754",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR` AS `par_niveau`, COUNT(`inscriptioneleve`.`id`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 8ème : 57 élèves\n- 9ème : 50 élèves\n- 1ère : 16 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 4ème : 27 élèves"
+  },
+  {
+    "timestamp": "2025-08-21T10:21:44.354868",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(`inscriptioneleve`.`Classe`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nWHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 4ème : 27 élèves\n- 8ème : 57 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 9ème : 50 élèves\n- 1ère : 16 élèves"
+  },
+  {
+    "timestamp": "2025-08-21T10:26:27.541665",
+    "question": "donne moi la discipline de Malak Benabda",
+    "sql": "SELECT `d`.`nomDisciplineFr`, `d`.`nomDisciplineAr`\nFROM `discipline` AS `d`\nJOIN `edumatiere` AS `em` ON `d`.`codedisc` = `em`.`codedisc`\nJOIN `inscriptioneleve` AS `ie` ON `em`.`codedisc` = `ie`.`codedisc`\nJOIN `personne` AS `p` ON `ie`.`idPersonne` = `p`.`id`\nWHERE (`p`.`NomFr` = 'Benabda' AND `p`.`PrenomFr` = 'Malak') OR (`p`.`NomFr` = 'Malak' AND `p`.`PrenomFr` = 'Benabda')",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'ie.idPersonne' in 'on clause'"
+  },
+  {
+    "timestamp": "2025-08-21T10:28:14.919814",
+    "question": "donne moi les absences de Malak Benabda",
+    "sql": "SELECT `absence`.`Date`, `absence`.`Justifier`, `absence`.`Etat`\nFROM `absence`\nJOIN `inscriptioneleve` ON `absence`.`Inscription` = `inscriptioneleve`.`id`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nWHERE (`personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak')\n   OR (`personne`.`NomFr` = 'Malak' AND `personne`.`PrenomFr` = 'Benabda')",
+    "response": "Malak Benabda a un total de 183 absences enregistrées. Voici quelques exemples de ces absences :\n\n1. Le 27 septembre 2024, absence non justifiée.\n2. Le 3 octobre 2024, absence non justifiée.\n3. Le 4 octobre 2024, deux absences non justifiées.\n4. Le 18 octobre 2024, absence non justifiée.\n5. Le 23 octobre 2024, trois absences non justifiées.\n6. Le 25 octobre 2024, deux absences non justifiées.\n7. Le 26 octobre 2024, trois absences non justifiées.\n8. Le 5 novembre 2024, absence non justifiée.\n9. Le 6 novembre 2024, deux absences non justifiées.\n10. Le 7 novembre 2024, six absences non justifiées.\n\nToutes ces absences ne sont pas justifiées."
+  },
+  {
+    "timestamp": "2025-08-21T10:29:06.116111",
+    "question": "donne moi les absences de Nouha Laataoui",
+    "sql": "SELECT `absence`.`Date`, `absence`.`Justifier`\nFROM `absence`\nJOIN `inscriptioneleve` ON `absence`.`Inscription` = `inscriptioneleve`.`id`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nWHERE `personne`.`NomFr` = 'Laataoui' AND `personne`.`PrenomFr` = 'Nouha'",
+    "response": "Il n'y a pas de données concernant les absences de Nouha Laataoui."
+  },
+  {
+    "timestamp": "2025-08-21T10:29:23.432601",
+    "question": "donne moi les avertissements de Malak Benabda",
+    "sql": "SELECT `avertissement`.`Date`\nFROM `avertissement`\nJOIN `inscriptioneleve` ON `avertissement`.`Inscription` = `inscriptioneleve`.`id`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nWHERE `personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak'",
+    "response": "Il n'y a pas de données concernant les avertissements de Malak Benabda."
+  },
+  {
+    "timestamp": "2025-08-21T10:29:54.014842",
+    "question": "Comment est le comportement de Malak Benabda ?",
+    "sql": "SELECT `discipline`.`nomDisciplineAr`, `reglementeleve`.`Observation`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `discipline` ON `inscriptioneleve`.`Discipline` = `discipline`.`id`\nJOIN `reglementeleve` ON `inscriptioneleve`.`Reglement` = `reglementeleve`.`id`\nWHERE `personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak'\nAND `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'inscriptioneleve.Reglement' in 'on clause'"
+  },
+  {
+    "timestamp": "2025-08-21T10:30:25.073353",
+    "question": "donne moi le nombre d'élèves par localité",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`personne`.`id`) AS `nombre_eleves`\nFROM `personne`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `inscriptioneleve` ON `personne`.`id` = `inscriptioneleve`.`Personne`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'élèves par localité :\n\n- Hammamet : 47 élèves\n- Nabeul : 105 élèves\n- Baraket El Sahel : 2 élèves\n- Dar Chaabane Elfehri : 14 élèves\n- Zaghouan : 1 élève\n- Beni Khiar : 18 élèves\n- Korba : 2 élèves\n- Grombalia : 8 élèves\n- Cité El Wafa : 1 élève\n- Somaa : 2 élèves\n- Beni Khalled : 2 élèves\n- Bou Argoub : 2 élèves\n- Menzel Temime : 1 élève\n- El Maamoura : 2 élèves\n- Yasmine Hammamet : 1 élève\n- Bir Bouregba : 1 élève\n\nCela donne une vue d'ensemble du nombre d'élèves dans chaque localité mentionnée."
+  },
+  {
+    "timestamp": "2025-08-21T10:30:42.532020",
+    "question": "donne moi le nombre d'élèves par localité en 2020/2021",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(`inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2020/2021'\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'élèves par localité pour l'année 2020/2021 :\n\n- Nabeul : 191 élèves\n- Hammamet : 93 élèves\n- Dar Chaabane Elfehri : 17 élèves\n- Beni Khiar : 11 élèves\n- Baraket El Sahel, Bou Ficha, Somaa, Gafsa, Bou Argoub, Borj Cedria, Cite El Mrezgua, Sousse, Yasmine Hammamet, HAMMAMET SUD, Hammam Linf, El Menzah 1 : 1 élève chacun\n- Grombalia, Korba : 4 élèves chacun\n- El Maamoura : 2 élèves\n\nCela donne un aperçu des effectifs par localité."
+  },
+  {
+    "timestamp": "2025-08-22T10:14:05.629127",
+    "question": "donne moi le nombre d'élèves par classe",
+    "sql": "SELECT `classe`.`NOMCLASSEFR` AS `par_classe`, COUNT(`inscriptioneleve`.`numeordr`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'inscriptioneleve.numeordr' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-22T10:14:24.374144",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR` AS `par_niveau`, COUNT(*) AS `nombre_d_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nWHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 4ème : 27 élèves\n- 8ème : 57 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 9ème : 50 élèves\n- 1ère : 16 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T10:14:56.709867",
+    "question": "comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR`\nFROM `personne` AS `p`\nJOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE`\nWHERE (`p`.`NomAr` = 'عبدالباسط' AND `p`.`PrenomAr` = 'العطاوي') OR (`p`.`NomAr` = 'العطاوي' AND `p`.`PrenomAr` = 'عبدالباسط')",
+    "response": "Je suis désolé, mais il n'y a pas de données disponibles pour joindre Abdelbasset Laataoui."
+  },
+  {
+    "timestamp": "2025-08-22T10:16:56.606713",
+    "question": "Comment joindre Abdelbasset Laataoui ?",
+    "sql": "SELECT `p`.`Tel1`, `p`.`Tel2`, `p`.`Tel3`, `p`.`Email`, `p`.`AdresseFr`, `p`.`AdresseAr`, `l`.`LIBELLELOCALITEFR`, `l`.`LIBELLELOCALITEAR`\nFROM `personne` AS `p`\nJOIN `localite` AS `l` ON `p`.`Localite` = `l`.`IDLOCALITE`\nWHERE (`p`.`NomFr` = 'Laataoui' AND `p`.`PrenomFr` = 'Abdelbasset') OR (`p`.`NomFr` = 'Abdelbasset' AND `p`.`PrenomFr` = 'Laataoui')",
+    "response": "Pour joindre Abdelbasset Laataoui, vous pouvez utiliser les numéros de téléphone suivants : 98534528 ou 99555222. Il réside à l'adresse suivante : 19 avenue Casa Blanca, Nabeul. Malheureusement, aucune adresse email n'est disponible."
+  },
+  {
+    "timestamp": "2025-08-22T10:17:17.587117",
+    "question": "Comment contacter les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` AS eleve_p ON eleve.`IdPersonne` = eleve_p.`id`\nJOIN \n    `parenteleve` ON parenteleve.`Eleve` = eleve.`id`\nJOIN \n    `parent` ON parenteleve.`Parent` = parent.`id`\nJOIN \n    `personne` AS parent_p ON parent.`Personne` = parent_p.`id`\nWHERE \n    (eleve_p.`PrenomFr` = 'Nouha' AND eleve_p.`NomFr` = 'Laataoui')\n    OR (eleve_p.`PrenomFr` = 'Laataoui' AND eleve_p.`NomFr` = 'Nouha')",
+    "response": "Pour contacter le parent de Nouha Laataoui, vous pouvez vous adresser à Mourad Laataoui, qui est le père. Son adresse est le 19 rue Maison Blanche. Malheureusement, il n'y a pas de numéro de téléphone ni d'email disponibles pour le joindre directement."
+  },
+  {
+    "timestamp": "2025-08-22T10:17:37.491295",
+    "question": "Comment contacter les parents de Malak Benabda ?",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `personne`.`Tel1`, `personne`.`Tel2`, `personne`.`Tel3`, `personne`.`Email`, `personne`.`AdresseFr`, `parenteleve`.`Type`\nFROM `eleve`\nJOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id`\nWHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter les parents de Malak Benabda, vous pouvez vous rendre à l'adresse suivante : Avenue Om Kholthoum Rue Jeljlen. Malheureusement, il n'y a pas de numéro de téléphone ou d'adresse email disponible pour Walid Benabda (le père) et Mouna Chabout (la mère)."
+  },
+  {
+    "timestamp": "2025-08-22T10:18:21.526355",
+    "question": "donne moi le contact des parents de Malak Benabda",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type`\nFROM `eleve`\nJOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id`\nWHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Les parents de Malak Benabda sont :\n\n1. **Père** : Walid Benabda\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n   - Téléphone : 25220415\n   - Email : walid.benabda@gmail.com\n\n2. **Mère** : Mouna Chabout\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n   - Téléphone : 28210710\n   - Email : mouna.chabout@gmail.com"
+  },
+  {
+    "timestamp": "2025-08-22T10:18:40.704043",
+    "question": "Comment joindre les parents de Malak Benabda ?",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type`\nFROM `eleve`\nJOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id`\nWHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour joindre les parents de Malak Benabda, vous pouvez contacter :\n\n1. Son père, Walid Benabda, par téléphone au 25220415 ou par email à walid.benabda@gmail.com. Son adresse est Av Om Kholthoum Rue Jeljlen.\n\n2. Sa mère, Mouna Chabout, par téléphone au 28210710 ou par email à mouna.chabout@gmail.com. Elle réside également à Av Om Kholthoum Rue Jeljlen."
+  },
+  {
+    "timestamp": "2025-08-22T10:21:13.012021",
+    "question": "Comment contacter les parents de Malak Benabda ?",
+    "sql": "SELECT `parent_p`.`PrenomFr`, `parent_p`.`NomFr`, `parent_p`.`Tel1`, `parent_p`.`Tel2`, `parent_p`.`Email`, `parent_p`.`AdresseFr`, `parenteleve`.`Type`\nFROM `eleve`\nJOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN `personne` AS `parent_p` ON `parent`.`Personne` = `parent_p`.`id`\nWHERE `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour contacter les parents de Malak Benabda, vous pouvez joindre :\n\n1. Son père, Walid Benabda, par téléphone au 25220415 ou par email à walid.benabda@gmail.com. Son adresse est Av Om Kholthoum Rue Jeljlen.\n\n2. Sa mère, Mouna Chabout, par téléphone au 28210710 ou par email à mouna.chabout@gmail.com. Elle réside également à Av Om Kholthoum Rue Jeljlen."
+  },
+  {
+    "timestamp": "2025-08-22T10:21:32.800378",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(`inscriptioneleve`.`numeordr`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nWHERE `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'inscriptioneleve.numeordr' in 'field list'"
+  },
+  {
+    "timestamp": "2025-08-22T10:31:20.883416",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 1ère : 16 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 4ème : 27 élèves\n- 8ème : 57 élèves\n- 9ème : 49 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T10:32:20.412003",
+    "question": "donne moi le nombre d'élèves par classe",
+    "sql": "SELECT `classe`.`NOMCLASSEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Voici le nombre d'élèves par classe :\n\n- Classe 1S1 : 16 élèves\n- Classe 2SC1 : 30 élèves\n- Classe 3M1 : 17 élèves\n- Classe 3SC1 : 13 élèves\n- Classe 4M1 : 11 élèves\n- Classe 4SC1 : 16 élèves\n- Classe 8B1 : 56 élèves\n- Classe 8B2 : 1 élève\n- Classe 9B1 : 47 élèves\n- Classe 9B2 : 2 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T10:33:08.129984",
+    "question": "donne moi le nombre d'élèves par niveau pour l'année scolaire 2022/2023",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2022/2023'\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Pour l'année scolaire 2022/2023, voici le nombre d'élèves par niveau :\n\n- 1ère : 76 élèves\n- 2ème : 53 élèves\n- 3ème : 70 élèves\n- 4ème : 51 élèves\n- 7ème : 143 élèves\n- 8ème : 96 élèves\n- 9ème : 72 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T10:33:32.251301",
+    "question": "donne moi le nombre d'élèves par classe pour l'année scolaire 2022/2023",
+    "sql": "SELECT `classe`.`NOMCLASSEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2022/2023'\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Pour l'année scolaire 2022/2023, voici le nombre d'élèves par classe :\n\n- Classe 1S1 : 27 élèves\n- Classe 1S2 : 25 élèves\n- Classe 1S3 : 24 élèves\n- Classe 2SC1 : 26 élèves\n- Classe 2SC2 : 27 élèves\n- Classe 3M1 : 23 élèves\n- Classe 3M2 : 23 élèves\n- Classe 3SC1 : 24 élèves\n- Classe 4M1 : 24 élèves\n- Classe 4SC1 : 27 élèves\n- Classe 7B1 : 28 élèves\n- Classe 7B2 : 29 élèves\n- Classe 7B3 : 28 élèves\n- Classe 7B4 : 29 élèves\n- Classe 7B5 : 29 élèves\n- Classe 8B1 : 25 élèves\n- Classe 8B2 : 23 élèves\n- Classe 8B3 : 24 élèves\n- Classe 8B4 : 24 élèves\n- Classe 9B1 : 24 élèves\n- Classe 9B2 : 24 élèves\n- Classe 9B3 : 24 élèves\n\nIl y a un total de 22 classes avec des effectifs variés."
+  },
+  {
+    "timestamp": "2025-08-22T10:33:57.257695",
+    "question": "Comment joindre les parents de Malak Benabda ?",
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN \n    `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN \n    `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN \n    `personne` AS parent_p ON `parent`.`Personne` = parent_p.`id`\nWHERE \n    `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour joindre les parents de Malak Benabda, vous pouvez contacter :\n\n1. Son père, Walid Benabda :\n   - Téléphone : 25220415\n   - Email : walid.benabda@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\n2. Sa mère, Mouna Chabout :\n   - Téléphone : 28210710\n   - Email : mouna.chabout@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  {
+    "timestamp": "2025-08-22T10:34:14.567056",
+    "question": "donne moi les notes de Malak Benabda",
+    "sql": "SELECT `edunoteelev`.`noteepre`\nFROM `edunoteelev`\nJOIN `edueleve` ON `edunoteelev`.`idenelev` = `edueleve`.`idenelev`\nJOIN `personne` ON `edueleve`.`idpersonne` = `personne`.`idpersonne`\nWHERE `personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'edueleve.idpersonne' in 'on clause'"
+  },
+  {
+    "timestamp": "2025-08-22T10:34:38.043855",
+    "question": "donne moi le nombre d'élèves par localité",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'élèves par localité :\n\n- Baraket El Sahel : 2 élèves\n- Beni Khalled : 2 élèves\n- Beni Khiar : 18 élèves\n- Bir Bouregba : 1 élève\n- Bou Argoub : 2 élèves\n- Cité El Wafa : 1 élève\n- Dar Chaabane Elfehri : 14 élèves\n- El Maamoura : 2 élèves\n- Grombalia : 8 élèves\n- Hammamet : 47 élèves\n- Korba : 2 élèves\n- Menzel Temime : 1 élève\n- Nabeul : 104 élèves\n- Somaa : 2 élèves\n- Yasmine Hammamet : 1 élève\n- Zaghouan : 1 élève\n\nChaque localité a un nombre spécifique d'élèves, avec Nabeul et Hammamet ayant les effectifs les plus élevés."
   }
 ]

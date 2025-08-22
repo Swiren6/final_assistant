@@ -1,5 +1,33 @@
 [
   {
+    "pattern_id": "year_detection_universal",
+    "description": "Détection automatique de l'année dans toute requête",
+    "patterns": [
+      "année scolaire en cours", "cette année", "année courante", "année actuelle",
+      "2024-2025", "2025-2026", "2023-2024", "2020-2021", "2020/2021",
+      "l'année dernière", "toutes les années", "pour l'année"
+    ],
+    "key_tables": ["anneescolaire"],
+    "essential_joins": "table.AnneeScolaire = anneescolaire.id",
+    "common_filters": "anneescolaire.Actif = 1 (année courante), anneescolaire.AnneeScolaire = 'YYYY-YYYY' (année spécifique)",
+    "response_fields": "anneescolaire.AnneeScolaire, anneescolaire.Actif"
+  },
+  {
+    "pattern_id": "payment_modalities_tranches",
+    "description": "Modalités de paiement et gestion des tranches",
+    "patterns": [
+      "Trimestriel", "Mensuel", "Annuel", "engagement",
+      "Tranche", "Tranche 1", "Tranche n°1", "première tranche",
+      "Tranche 2", "deuxième tranche",
+      "Tranche 3", "troisième tranche",
+      "n'ayant pas réglé", "montant restant", "impayé", "solde"
+    ],
+    "key_tables": ["paiement", "inscriptioneleve", "modalite", "personne", "anneescolaire"],
+    "essential_joins": "paiement.Inscription = inscriptioneleve.id, inscriptioneleve.Modalite = modalite.id, inscriptioneleve.Personne = personne.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "common_filters": "modalite.NomModalite, paiement.Tranche, paiement.MontantRestant > 0",
+    "response_fields": "personne.NomFr, personne.PrenomFr, modalite.NomModalite, paiement.Tranche, paiement.TotalTTC, paiement.MontantRestant"
+  },
+  {
     "pattern_id": "student_identification",
     "description": "Recherche et identification d'élèves",
     "patterns": [
@@ -12,29 +40,40 @@
       "élève avec cin {numero}",
       "photo de l'élève {nom}"
     ],
-    "key_tables": ["eleve", "personne", "inscriptioneleve", "classe"],
-    "essential_joins": "eleve.IdPersonne = personne.id, inscriptioneleve.Eleve = eleve.id",
+    "key_tables": ["eleve", "personne", "inscriptioneleve", "classe", "anneescolaire"],
+    "essential_joins": "eleve.IdPersonne = personne.id, inscriptioneleve.Eleve = eleve.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
     "common_filters": "personne.NomFr, personne.PrenomFr, personne.NomAr, personne.PrenomAr",
     "response_fields": "personne.NomFr, personne.PrenomFr, eleve.DateNaissance, classe.NOMCLASSEFR"
+  },
+  {
+  "pattern_id": "contact_info_personne",
+  "description": "Récupérer les moyens de contact d'une personne (téléphones, email, adresse).",
+  "patterns": [
+    "comment joindre", "coordonnées", "téléphone", "email", "adresse", "parents de", "contacter"
+  ],
+  "key_tables": ["personne", "localite"],
+  "essential_joins": "personne.Localite = localite.IDLOCALITE",
+  "response_fields": "personne.Tel1, personne.Tel2, personne.Tel3, personne.Email, personne.AdresseFr, personne.AdresseAr, localite.LIBELLELOCALITEFR, localite.LIBELLELOCALITEAR"
   },
   {
     "pattern_id": "parent_contact_info",
     "description": "Informations de contact des parents",
     "patterns": [
-      "contact du père de {nom}",
-      "téléphone de la mère de {prenom}",
-      "email des parents de {nom}",
-      "numéro du tuteur de {prenom}",
-      "adresse de {nom}",
-      "joindre les parents de {nom}",
-      "coordonnées famille {nom}",
-      "appeler les parents de {prenom}"
+      "contact du père de",
+      "téléphone de la mère de",
+      "email des parents de",
+      "numéro du tuteur de",
+      "adresse de",
+      "joindre les parents de",
+      "coordonnées famille",
+      "appeler les parents de",
+      "Comment joindre les parents de",
+      "contacter les parents"
     ],
-    "key_tables": ["eleve", "personne", "parenteleve", "parent"],
-    "essential_joins": "eleve.IdPersonne = personne.id (élève), parenteleve.Eleve = eleve.id, parenteleve.Parent = parent.id, parent.Personne = personne.id (parent)",
+    "key_tables": ["eleve", "personne", "parenteleve", "parent", "inscriptioneleve", "anneescolaire"],
+    "essential_joins": "eleve.IdPersonne = personne.id, parenteleve.Eleve = eleve.id, parenteleve.Parent = parent.id, parent.Personne = parent_p.id, inscriptioneleve.Eleve = eleve.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
     "common_filters": "parenteleve.Type (Père/Mère/Tuteur)",
-    "response_fields":"parent_p.NomFr, parent_p.PrenomFr, parent_p.Tel1, parent_p.Tel2, parent_p.Tel3, parent_p.Email, parent_p.AdresseFr, parenteleve.Type"
-
+    "response_fields": "parent_p.PrenomFr,parent_p.NomFr,parent_p.Tel1, parent_p.Tel2, parent_p.Email, parent_p.AdresseFr, parenteleve.Type"
   },
   {
     "pattern_id": "student_payments",
@@ -49,9 +88,9 @@
       "situation financière de {nom}",
       "derniers paiements de {prenom}"
     ],
-    "key_tables": ["inscriptioneleve", "paiement", "reglementeleve", "eleve", "personne"],
-    "essential_joins": "inscriptioneleve.Eleve = eleve.id, paiement.Inscription = inscriptioneleve.id, reglementeleve.IdInscription = paiement.id",
-    "common_filters": "anneescolaire courante",
+    "key_tables": ["inscriptioneleve", "paiement", "reglementeleve", "eleve", "personne", "anneescolaire"],
+    "essential_joins": "inscriptioneleve.Eleve = eleve.id, paiement.Inscription = inscriptioneleve.id, reglementeleve.IdInscription = paiement.id, eleve.IdPersonne = personne.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "common_filters": "",
     "response_fields": "paiement.TotalTTC, paiement.MontantRestant, reglementeleve.Date, reglementeleve.Montant"
   },
   {
@@ -67,9 +106,9 @@
       "emploi du temps aujourd'hui",
       "cours de {matiere} en {classe}"
     ],
-    "key_tables": ["emploidutemps", "classe", "matiere", "salle", "enseingant", "personne"],
-    "essential_joins": "emploidutemps.Classe = classe.id, emploidutemps.Matiere = matiere.id, emploidutemps.Enseignant = enseingant.id",
-    "common_filters": "jour de la semaine, anneescolaire courante",
+    "key_tables": ["emploidutemps", "classe", "matiere", "salle", "enseingant", "personne", "anneescolaire"],
+    "essential_joins": "emploidutemps.Classe = classe.id, emploidutemps.Matiere = matiere.id, emploidutemps.Enseignant = enseingant.id, emploidutemps.AnneeScolaire = anneescolaire.id",
+    "common_filters": "jour de la semaine",
     "response_fields": "matiere.NomMatiereFr, classe.NOMCLASSEFR, salle.nomSalleFr, emploidutemps.SeanceDebut"
   },
   {
@@ -85,8 +124,8 @@
       "casier de {nom}",
       "services extras de {prenom}"
     ],
-    "key_tables": ["paiementextra", "paiementextradetails", "paiementmotif", "inscriptioneleve"],
-    "essential_joins": "paiementextra.Inscription = inscriptioneleve.id, paiementextradetails.PaiementExtras = paiementextra.id",
+    "key_tables": ["paiementextra", "paiementextradetails", "paiementmotif", "inscriptioneleve", "anneescolaire"],
+    "essential_joins": "paiementextra.Inscription = inscriptioneleve.id, paiementextradetails.PaiementExtras = paiementextra.id, paiementextra.AnneeScolaire = anneescolaire.id",
     "common_filters": "paiementmotif.Libelle (Cantine, Bus, Club, etc.)",
     "response_fields": "paiementmotif.Libelle, paiementextra.TotalTTC, paiementextra.MontantRestant"
   },
@@ -121,8 +160,8 @@
       "justifications de {nom}",
       "comportement de {prenom}"
     ],
-    "key_tables": ["absence", "avertissement", "blame", "inscriptioneleve"],
-    "essential_joins": "absence.Inscription = inscriptioneleve.id, avertissement.Inscription = inscriptioneleve.id",
+    "key_tables": ["absence", "avertissement", "blame", "inscriptioneleve", "anneescolaire"],
+    "essential_joins": "absence.Inscription = inscriptioneleve.id, avertissement.Inscription = inscriptioneleve.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
     "common_filters": "période scolaire, état de justification",
     "response_fields": "absence.Date, absence.Justifier, avertissement.Date, blame.Date"
   },
@@ -139,9 +178,9 @@
       "présence enseignant {nom}",
       "salaire de {professeur}"
     ],
-    "key_tables": ["enseingant", "personne", "enseignantmatiere", "matiere"],
-    "essential_joins": "enseingant.idPersonne = personne.id, enseignantmatiere.idPersonne = personne.id",
-    "common_filters": "anneescolaire courante, matière enseignée",
+    "key_tables": ["enseingant", "personne", "enseignantmatiere", "matiere", "anneescolaire"],
+    "essential_joins": "enseingant.idPersonne = personne.id, enseignantmatiere.idPersonne = personne.id, enseignantmatiere.anneeSco = anneescolaire.id",
+    "common_filters": "matière enseignée",
     "response_fields": "personne.NomFr, personne.PrenomFr, matiere.NomMatiereFr, personne.Tel1"
   },
   {
@@ -175,27 +214,50 @@
       "livraison uniforme {nom}",
       "catalogue uniformes"
     ],
-    "key_tables": ["uniformcommande", "uniformcommandedetails", "uniformmodel", "uniformtaille"],
-    "essential_joins": "uniformcommande.Inscription = inscriptioneleve.id, uniformcommandedetails.UniformCommande = uniformcommande.id",
+    "key_tables": ["uniformcommande", "uniformcommandedetails", "uniformmodel", "uniformtaille", "inscriptioneleve", "anneescolaire"],
+    "essential_joins": "uniformcommande.Inscription = inscriptioneleve.id, uniformcommandedetails.UniformCommande = uniformcommande.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
     "common_filters": "genre, taille, couleur",
     "response_fields": "uniformmodel.Model, uniformtaille.Taille, uniformcommande.TotalTTC"
   },
   {
-    "pattern_id": "exam_planning",
-    "description": "Planification des examens",
+    "pattern_id": "statistics_by_location",
+    "description": "Statistiques d'inscriptions par localité géographique",
     "patterns": [
-      "examens de {classe}",
-      "planning examens",
-      "surveillance examen",
-      "salles d'examen",
-      "calendrier examens",
-      "examen de {matiere}",
-      "surveillants du {date}",
-      "répartition examens"
+      "nombre d'inscriptions par localité",
+      "statistiques par ville",
+      "répartition géographique des élèves",
+      "inscriptions par gouvernorat",
+      "élèves par région",
+      "count inscriptions localité",
+      "distribution territoriale",
+      "analyse géographique inscriptions"
     ],
-    "key_tables": ["repartitionexamen", "classe", "matiere", "salle", "surveillant"],
-    "essential_joins": "repartitionexamen.idClasse = classe.id, repartitionexamen.idMatiere = matiere.id",
-    "common_filters": "date d'examen, trimestre, classe",
-    "response_fields": "repartitionexamen.date, matiere.NomMatiereFr, salle.nomSalleFr"
+    "key_tables": ["inscriptioneleve", "personne", "localite", "anneescolaire"],
+    "essential_joins": "inscriptioneleve.Personne = personne.id, personne.Localite = localite.IDLOCALITE, inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "common_filters": "GROUP BY localite.LIBELLELOCALITEFR",
+    "response_fields": "localite.LIBELLELOCALITEFR"
+  },
+  {
+    "pattern_id": "statistics_by_level_class",
+    "description": "Statistiques d'effectifs par niveau ou classe",
+    "patterns": [
+      "nombre d'élèves par niveau",
+      "nombre d'élèves par classe", 
+      "effectif par niveau",
+      "effectif par classe",
+      "statistiques par niveau",
+      "statistiques par classe",
+      "répartition par niveau",
+      "répartition par classe",
+      "count élèves niveau",
+      "count élèves classe"
+    ],
+    "key_tables": ["inscriptioneleve", "classe", "niveau", "anneescolaire"],
+    "essential_joins": "inscriptioneleve.Classe = classe.id, classe.IDNIV = niveau.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "common_filters": "GROUP BY selon demande (niveau.NOMNIVFR ou classe.NOMCLASSEFR)",
+    "response_fields": {
+      "par_niveau": "niveau.NOMNIVFR, COUNT(DISTINCT inscriptioneleve.Eleve) AS nombre_eleves",
+      "par_classe": "classe.NOMCLASSEFR, COUNT(DISTINCT inscriptioneleve.Eleve) AS nombre_eleves"
+    }
   }
 ]

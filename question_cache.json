@@ -1,14 +1,30 @@
 {
-  "donne moi le contact des parents de Zeineb Bouharb": {
-    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Bouharb' AND eleve_p.`PrenomFr` = 'Zeineb') OR (eleve_p.`NomFr` = 'Zeineb' AND eleve_p.`PrenomFr` = 'Bouharb')",
-    "response": "[('BOUHARB', 'Sahl', '22209230', '71234540', None, None, '6 Rue Riode Jenero', 'Pere'), ('KACEM', 'Alia', None, '71234540', None, None, '6 Rue Riodejenero', 'Mere')]"
+  "donne moi le nombre délèves par niveau": {
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 1ère : 16 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 4ème : 27 élèves\n- 8ème : 57 élèves\n- 9ème : 49 élèves"
   },
-  "donne moi le contact des parents de Malak Benabda": {
-    "sql": "SELECT parent_p.`NomFr`, parent_p.`PrenomFr`, parent_p.`Tel1`, parent_p.`Tel2`, parent_p.`Tel3`, parent_p.`Email`, parent_p.`AdresseFr`, pe.`Type` FROM `eleve` e JOIN `personne` eleve_p ON e.`IdPersonne` = eleve_p.`id` JOIN `parenteleve` pe ON pe.`Eleve` = e.`id` JOIN `parent` pa ON pe.`Parent` = pa.`id` JOIN `personne` parent_p ON pa.`Personne` = parent_p.`id` WHERE (eleve_p.`NomFr` = 'Benabda' AND eleve_p.`PrenomFr` = 'Malak') OR (eleve_p.`NomFr` = 'Malak' AND eleve_p.`PrenomFr` = 'Benabda')",
-    "response": "[('BENABDA', 'Walid', '25220415', None, None, 'walid.benabda@gmail.com', 'Av Om Kholthoum Rue Jeljlen', 'Pere'), ('CHABOUT', 'Mouna', '28210710', None, None, 'mouna.chabout@gmail.com', 'Av Om Kholthoum Rue Jeljlen', 'Mere')]"
+  "donne moi le nombre délèves par classe": {
+    "sql": "SELECT `classe`.`NOMCLASSEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Voici le nombre d'élèves par classe :\n\n- Classe 1S1 : 16 élèves\n- Classe 2SC1 : 30 élèves\n- Classe 3M1 : 17 élèves\n- Classe 3SC1 : 13 élèves\n- Classe 4M1 : 11 élèves\n- Classe 4SC1 : 16 élèves\n- Classe 8B1 : 56 élèves\n- Classe 8B2 : 1 élève\n- Classe 9B1 : 47 élèves\n- Classe 9B2 : 2 élèves"
   },
-  "donne moi le solde de Malak Benabda": {
-    "sql": "SELECT `e`.`Solde` FROM `eleve` AS `e` JOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`Id` WHERE (`p`.`NomFr` = 'Benabda' AND `p`.`PrenomFr` = 'Malak') OR (`p`.`NomFr` = 'Malak' AND `p`.`PrenomFr` = 'Benabda')",
-    "response": "[(None,)]"
+  "donne moi le nombre délèves par niveau pour lannée scolaire 20222023": {
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2022/2023'\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Pour l'année scolaire 2022/2023, voici le nombre d'élèves par niveau :\n\n- 1ère : 76 élèves\n- 2ème : 53 élèves\n- 3ème : 70 élèves\n- 4ème : 51 élèves\n- 7ème : 143 élèves\n- 8ème : 96 élèves\n- 9ème : 72 élèves"
+  },
+  "donne moi le nombre délèves par classe pour lannée scolaire 20222023": {
+    "sql": "SELECT `classe`.`NOMCLASSEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2022/2023'\nGROUP BY `classe`.`NOMCLASSEFR`",
+    "response": "Pour l'année scolaire 2022/2023, voici le nombre d'élèves par classe :\n\n- Classe 1S1 : 27 élèves\n- Classe 1S2 : 25 élèves\n- Classe 1S3 : 24 élèves\n- Classe 2SC1 : 26 élèves\n- Classe 2SC2 : 27 élèves\n- Classe 3M1 : 23 élèves\n- Classe 3M2 : 23 élèves\n- Classe 3SC1 : 24 élèves\n- Classe 4M1 : 24 élèves\n- Classe 4SC1 : 27 élèves\n- Classe 7B1 : 28 élèves\n- Classe 7B2 : 29 élèves\n- Classe 7B3 : 28 élèves\n- Classe 7B4 : 29 élèves\n- Classe 7B5 : 29 élèves\n- Classe 8B1 : 25 élèves\n- Classe 8B2 : 23 élèves\n- Classe 8B3 : 24 élèves\n- Classe 8B4 : 24 élèves\n- Classe 9B1 : 24 élèves\n- Classe 9B2 : 24 élèves\n- Classe 9B3 : 24 élèves\n\nIl y a un total de 22 classes avec des effectifs variés."
+  },
+  "Comment joindre les parents de Malak Benabda": {
+    "sql": "SELECT DISTINCT \n    parent_p.`PrenomFr`, \n    parent_p.`NomFr`, \n    parent_p.`Tel1`, \n    parent_p.`Tel2`, \n    parent_p.`Email`, \n    parent_p.`AdresseFr`, \n    parenteleve.`Type`\nFROM \n    `eleve`\nJOIN \n    `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN \n    `parenteleve` ON `parenteleve`.`Eleve` = `eleve`.`id`\nJOIN \n    `parent` ON `parenteleve`.`Parent` = `parent`.`id`\nJOIN \n    `personne` AS parent_p ON `parent`.`Personne` = parent_p.`id`\nWHERE \n    `personne`.`PrenomFr` = 'Malak' AND `personne`.`NomFr` = 'Benabda'",
+    "response": "Pour joindre les parents de Malak Benabda, vous pouvez contacter :\n\n1. Son père, Walid Benabda :\n   - Téléphone : 25220415\n   - Email : walid.benabda@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen\n\n2. Sa mère, Mouna Chabout :\n   - Téléphone : 28210710\n   - Email : mouna.chabout@gmail.com\n   - Adresse : Av Om Kholthoum Rue Jeljlen"
+  },
+  "donne moi les notes de Malak Benabda": {
+    "sql": "SELECT `edunoteelev`.`noteepre`\nFROM `edunoteelev`\nJOIN `edueleve` ON `edunoteelev`.`idenelev` = `edueleve`.`idenelev`\nJOIN `personne` ON `edueleve`.`idpersonne` = `personne`.`idpersonne`\nWHERE `personne`.`NomFr` = 'Benabda' AND `personne`.`PrenomFr` = 'Malak'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'edueleve.idpersonne' in 'on clause'"
+  },
+  "donne moi le nombre délèves par localité": {
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'élèves par localité :\n\n- Baraket El Sahel : 2 élèves\n- Beni Khalled : 2 élèves\n- Beni Khiar : 18 élèves\n- Bir Bouregba : 1 élève\n- Bou Argoub : 2 élèves\n- Cité El Wafa : 1 élève\n- Dar Chaabane Elfehri : 14 élèves\n- El Maamoura : 2 élèves\n- Grombalia : 8 élèves\n- Hammamet : 47 élèves\n- Korba : 2 élèves\n- Menzel Temime : 1 élève\n- Nabeul : 104 élèves\n- Somaa : 2 élèves\n- Yasmine Hammamet : 1 élève\n- Zaghouan : 1 élève\n\nChaque localité a un nombre spécifique d'élèves, avec Nabeul et Hammamet ayant les effectifs les plus élevés."
   }
 }

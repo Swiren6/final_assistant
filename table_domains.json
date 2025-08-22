@@ -8,17 +8,17 @@
   },
   {
     "id": "parent_contacts",
-    "content": "Contacts parentaux : relier `eleve` à `personne` (alias eleve_p) via `eleve.IdPersonne = eleve_p.id`. Ensuite relier `parenteleve` (Eleve = eleve.id) → `parent` → `personne` (alias parent_p). Toujours filtrer nom/prénom de l'élève sur `eleve_p` (NomFr/PrenomFr ou NomAr/PrenomAr). Les coordonnées (Tel1, Tel2, Tel3, Email, AdresseFr) sont uniquement dans `parent_p`.",
-    "keywords": ["parent", "père", "mère", "tuteur", "contact", "téléphone", "numéro de téléphone", "tel", "email", "mail", "appeler", "joindre", "contacter", "famille"],
+    "content": "Système de contacts parentaux : Table 'parent' liée à 'personne' pour les coordonnées. Les numéros de téléphone (Tel1, Tel2, Tel3) et email sont dans 'personne'. La table 'parenteleve' fait le lien entre parents et élèves avec le type de relation (Père, Mère, Tuteur). Pour contacter les parents d'un élève : élève → parenteleve → parent → personne.",
+    "keywords": ["parent", "père", "mère", "tuteur", "contact", "téléphone", "tel", "email", "mail", "appeler", "joindre", "contacter", "famille"],
     "tables": ["parent", "personne", "parenteleve", "eleve"],
-    "use_cases": ["Contacter les parents d'un élève", "Obtenir le numéro de téléphone du père", "Envoyer un email à la mère", "Liste des contacts familiaux","comment joindre les parents de"]
+    "use_cases": ["Contacter les parents d'un élève", "Obtenir le numéro de téléphone du père", "Envoyer un email à la mère", "Liste des contacts familiaux"]
   },
   {
     "id": "inscriptions_scolaires",
-    "content": "Table 'inscriptioneleve' : Gère les inscriptions annuelles des élèves. Contient l'élève (Eleve), la classe (Classe), l'année scolaire (AnneeScolaire), la modalité de paiement (Modalite), les montants TTC et restants, le type d'inscription (N=nouveau, R=réinscription). Liée à 'classe' pour le niveau et à 'modalite' pour les tranches de paiement.",
-    "keywords": ["inscription", "inscrire", "classe", "niveau", "année scolaire", "modalité", "paiement", "nouveau", "réinscription", "montant", "restant"],
-    "tables": ["inscriptioneleve", "classe", "eleve", "anneescolaire", "modalite"],
-    "use_cases": ["Vérifier l'inscription d'un élève", "Connaître la classe d'un élève", "Lister les nouveaux élèves", "Calculer les montants dus"]
+    "content": "Table 'inscriptioneleve' : Gère les inscriptions annuelles des élèves. Contient l'élève (Eleve), la classe (Classe), l'année scolaire (AnneeScolaire), la modalité de paiement (Modalite), les montants TTC et restants, le type d'inscription (N=nouveau, R=réinscription).",
+    "keywords": ["inscription", "inscrire", "classe", "niveau", "année scolaire", "modalité", "paiement", "nouveau", "réinscription", "montant", "restant", "localité", "statistiques", "nombre", "count"],
+    "tables": ["inscriptioneleve", "classe", "eleve", "anneescolaire", "modalite", "personne", "localite"],
+    "use_cases": ["Vérifier l'inscription d'un élève", "Connaître la classe d'un élève", "Lister les nouveaux élèves", "Calculer les montants dus", "Statistiques par localité", "Compter les inscriptions"]
   },
   {
     "id": "paiements_reglements",
@@ -105,10 +105,10 @@
     "use_cases": ["Organiser les cours d'été", "Inscrire aux formations", "Gérer les groupes", "Facturer les sessions"]
   },
   {
-    "id": "donnees_nationales",
-    "content": "Interface nationale : Tables 'edu*' (edueleve, educlasse, edumatiere, etc.) pour la synchronisation avec le système éducatif national. Données parallèles avec identifiants spécifiques pour reporting officiel et transferts administratifs.",
-    "keywords": ["national", "ministère", "officiel", "transfert", "reporting", "synchronisation", "administration", "éducation nationale"],
-    "tables": ["edueleve", "educlasse", "edumatiere", "eduinscription", "edumoymati"],
-    "use_cases": ["Synchroniser avec le ministère", "Générer les rapports officiels", "Transférer les données", "Respecter les standards"]
+    "id": "geographic_data",
+    "content": "Données géographiques : Table 'localite' avec IDLOCALITE (clé primaire), LIBELLELOCALITEFR (nom en français), LIBELLELOCALITEAR (nom en arabe). Liée via personne.Localite = localite.IDLOCALITE. Table 'gouvernorat' avec LIBELLEGOUVFR/LIBELLEGOUVAR. Table 'delegation' pour subdivision administrative. Pour statistiques géographiques, toujours joindre personne → localite pour obtenir LIBELLELOCALITEFR.",
+    "keywords": ["localité", "localite", "géographie", "adresse", "lieu", "ville", "gouvernorat", "délégation", "LIBELLELOCALITEFR", "région", "statistiques géographiques"],
+    "tables": ["localite", "personne", "gouvernorat", "delegation"],
+    "use_cases": ["Statistiques par localité", "Répartition géographique", "Adresses des personnes", "Analyses territoriales"]
   }
 ]
