@@ -18,7 +18,7 @@ def ask_llm(prompt: str) -> str:
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
             max_tokens=2048,
-            timeout=50  
+            timeout=100  
         )
         
         result = response.choices[0].message.content

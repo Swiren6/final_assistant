@@ -166,11 +166,70 @@ class SQLAssistant:
     # MÉTHODES PRINCIPALES D'INTERACTION
     # ================================
 
+    # def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
+    #                              roles: Optional[List[str]] = None, 
+    #                              conversation_id: Optional[int] = None) -> tuple[str, str, Optional[str], int]:
+    #     """
+    #     Sauvegarde automatiquement dans l'historique
+    #     Retourne (sql_query, formatted_response, graph_data, conversation_id)
+    #     """
+    #     if user_id is None:
+    #         user_id = 0
+    #     if roles is None:
+    #         roles = []
+
+    #     # Validation des rôles (identique à la version existante)
+    #     if not roles:
+    #         return "", "❌ Accès refusé : Aucun rôle fourni", None, 0
+        
+    #     valid_roles = ['ROLE_SUPER_ADMIN', 'ROLE_PARENT']
+    #     has_valid_role = any(role in valid_roles for role in roles)
+        
+    #     if not has_valid_role:
+    #         return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None, 0
+
+    #     try:
+    #         # 🆕 GESTION DE LA CONVERSATION
+    #         if conversation_id is None:
+    #             conversation_id = self.conversation_manager.create_conversation(user_id, question)
+            
+    #         # Sauvegarder la question utilisateur
+    #         self.conversation_manager.add_message(conversation_id, 'user', question)
+
+    #         # Traitement par rôle (utiliser les méthodes existantes)
+    #         if 'ROLE_SUPER_ADMIN' in roles:
+    #             sql_query, formatted_response, graph_data = self._process_super_admin_question(question)
+    #         elif 'ROLE_PARENT' in roles:
+    #             sql_query, formatted_response, graph_data = self._process_parent_question(question, user_id)
+            
+    #         # 🆕 SAUVEGARDER LA RÉPONSE ASSISTANT
+    #         self.conversation_manager.add_message(
+    #             conversation_id, 
+    #             'assistant', 
+    #             formatted_response, 
+    #             sql_query, 
+    #             graph_data
+    #         )
+            
+    #         logger.info(f"✅ Question traitée et sauvegardée - Conversation {conversation_id}")
+    #         return sql_query, formatted_response, graph_data, conversation_id
+            
+    #     except Exception as e:
+    #         logger.error(f"Erreur dans ask_question_with_history: {e}")
+    #         error_message = f"❌ Erreur : {str(e)}"
+            
+    #         # Sauvegarder l'erreur aussi
+    #         if conversation_id:
+    #             self.conversation_manager.add_message(conversation_id, 'system', error_message)
+            
+    #         return "", error_message, None, conversation_id or 0
+
     def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
-                                 roles: Optional[List[str]] = None, 
-                                 conversation_id: Optional[int] = None) -> tuple[str, str, Optional[str], int]:
+                             roles: Optional[List[str]] = None, 
+                             conversation_id: Optional[int] = None) -> tuple[str, str, Optional[str], int]:
         """
         Version améliorée qui sauvegarde automatiquement dans l'historique
+        AVEC RESTRICTION D'ATTESTATION pour les parents
         Retourne (sql_query, formatted_response, graph_data, conversation_id)
         """
         if user_id is None:
@@ -187,6 +246,36 @@ class SQLAssistant:
         
         if not has_valid_role:
             return "", f"❌ Accès refusé : Rôles fournis {roles}, requis {valid_roles}", None, 0
+
+        # 🚫 AJOUT: Vérification spéciale pour les parents qui demandent des attestations
+        if 'ROLE_PARENT' in roles and 'ROLE_SUPER_ADMIN' not in roles:
+            # Vérifier si c'est une demande d'attestation
+            pdf_request = self._check_for_pdf_request(question)
+            if pdf_request:
+                error_message = """❌ Accès refusé : Génération de documents officiels réservée aux administrateurs.
+
+    📋 Vous pouvez consulter :
+    • Les notes et résultats de vos enfants
+    • L'emploi du temps et les absences  
+    • Les informations de classe
+    • Les actualités de l'école
+
+    Pour obtenir une attestation officielle, veuillez contacter l'administration."""
+                
+                # Gérer la conversation
+                try:
+                    if conversation_id is None:
+                        conversation_id = self.conversation_manager.create_conversation(user_id, question)
+                    
+                    self.conversation_manager.add_message(conversation_id, 'user', question)
+                    self.conversation_manager.add_message(conversation_id, 'system', error_message)
+                    
+                    logger.warning(f"🚫 Tentative attestation bloquée - Utilisateur {user_id}")
+                    return "", error_message, None, conversation_id
+                    
+                except Exception as e:
+                    logger.error(f"Erreur gestion conversation refus: {e}")
+                    return "", error_message, None, 0
 
         try:
             # 🆕 GESTION DE LA CONVERSATION
@@ -223,8 +312,6 @@ class SQLAssistant:
                 self.conversation_manager.add_message(conversation_id, 'system', error_message)
             
             return "", error_message, None, conversation_id or 0
-
-    
     def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str]]:
         """Traite une question admin - VERSION CORRIGÉE"""
         
@@ -355,7 +442,12 @@ class SQLAssistant:
         return None
         
     def _process_parent_question(self, question: str, user_id: int) -> tuple[str, str, Optional[str]]:
-        """Traite une question avec restrictions parent - VERSION CORRIGÉE MULTI-ENFANTS"""
+        """Traite une question avec restrictions parent - VERSION CORRIGÉE MULTI-ENFANTS + BLOCAGE ATTESTATION"""
+        
+        # 🚫 AJOUT: Bloquer les demandes d'attestation pour les parents
+        pdf_request = self._check_for_pdf_request(question)
+        if pdf_request:
+            return "", "❌ Accès refusé : Seuls les administrateurs peuvent générer des attestations et documents officiels. Veuillez contacter l'administration de l'école.", None
         
         # Nettoyage du cache
         self.cache1.clean_double_braces_in_cache()

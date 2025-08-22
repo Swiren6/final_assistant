@@ -17,28 +17,22 @@ assistant_scolaire/
 │   │   ├── auth_service.py       # Service d'authentification
 |   ├──agent/
 │   │   ├──assistant.py
-│   │   ├──cache_manager.py
-│   │   ├──cache_manager1.py
+│   │   ├──cache_manager.py       #gestion de cache de l'admin
+│   │   ├──cache_manager1.py      #gestion de cache du parent
 │   │   ├──llm_utils.py
-│   │   ├──sql_query_cache.json
-│   │   ├──sql_query_cache1.json
-│   │   ├──templates_questions.json
+│   │   ├──sql_query_cache.json    #cache de l'admin
+│   │   ├──sql_query_cache1.json   #cache de parent
+│   │   ├──templates_questions.json #requetes sql compliquees 
 │   │   ├── pdf_utils/
-|   |   |   ├── attestation.py
-|   |   |   ├── bulletin.py
-|   |   |   ├── fonts/ #contient les fonts d'ecriture 
-│   │   ├── static/ #contient les pdfs 
+|   |   |   ├── attestation.py      #
+|   |   |   ├── fonts/              #contient les fonts d'ecriture 
+│   │   ├── static/                 #contient les pdfs 
 │   │   ├── security/
 |   |   |   ├── roles.py
 │   │   ├── prompts/
 |   |   |   ├── domain_description.json
 |   |   |   ├── domain_tables_mapping.json
-|   |   |   ├── prompt_eleve.txt
-|   |   |   ├── prompt_finance.txt
-|   |   |   ├── prompt_inscriptions.txt
-|   |   |   ├── prompt_pedagogie.txt
 |   |   |   ├── templates.py
-|   |   |   ├── relation.txt
 │   │   └── template_matcher
 |   |   |   ├── matcher.py
 │   └── utils/
@@ -48,12 +42,13 @@ assistant_scolaire/
 │   ├── lib/
 │   │   ├── main.dart
 │   │   ├── models/
+│   │   │   ├── conversation_model.dart
 │   │   │   ├── user_model.dart
 │   │   │   └── message_model.dart
 │   │   ├── screens/
 │   │   │   ├── login_screen.dart
 │   │   │   ├── chat_screen.dart
-│   │   │   └── home_screen.dart
+│   │   │   └── notification_checker.dart
 │   │   ├── services/
 │   │   │   ├── auth_service.dart
 │   │   │   ├── api_service.dart
@@ -62,14 +57,16 @@ assistant_scolaire/
 │   │   │   ├── custom_appbar.dart
 │   │   │   ├── message_bubble.dart
 │   │   │   └── sidebar_menu.dart
+│   │   │   └── history_sidebar.dart
+│   │   │   └── graph_widget.dart
 │   │   └── utils/
 │   │       ├── constants.dart
 │   │       └── theme.dart
 │   ├── pubspec.yaml
 │   ├── assets/
 │   │   └── logo.png
-│   └── android/
 └── docs/
     ├── API.md
     ├── INSTALL.md
     └── README.md
+    └── assistant.md

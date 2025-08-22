@@ -86,5 +86,25 @@
   "0f89096f64e804eba85bacd9dc3fa279": {
     "question_template": "donne moi les notes de {NomFr} {PrenomFr}",
     "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = '{NomFr}' \nAND p.PrenomFr = '{PrenomFr}' \nAND ed.moyemati NOT LIKE '0.00'"
+  },
+  "06bf9c4120ebc001715fc99761e7a9b5": {
+    "question_template": "qui est l'enfant de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr \nFROM eleve e \nJOIN parenteleve pe ON e.id = pe.eleve \nJOIN parent pa ON pe.parent = pa.id \nJOIN personne p ON e.IdPersonne = p.id \nJOIN personne pp ON pa.personne = pp.id \nWHERE (pp.NomFr = '{NomFr}' AND pp.PrenomFr = '{PrenomFr}') OR (pp.PrenomFr = '{NomFr}' AND pp.NomFr = '{PrenomFr}')"
+  },
+  "65bdf4951993d164327f00f5c98aee90": {
+    "question_template": "donne moi les numeros de teslphones de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.Tel1, p.Tel2 FROM personne p WHERE (p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}') OR (p.NomFr = '{PrenomFr}' AND p.PrenomFr = '{NomFr}')"
+  },
+  "079bdad6b7e86eb909365f8b886cbdad": {
+    "question_template": "donne moi les numeros de teslphones des parents de  {NomFr} {PrenomFr}",
+    "sql_template": "SELECT DISTINCT p.Tel1, p.Tel2 \nFROM parent pa \nJOIN personne p ON pa.personne = p.id \nJOIN parenteleve pe ON pa.id = pe.parent \nJOIN eleve e ON pe.eleve = e.id \nJOIN personne pe ON e.IdPersonne = pe.id \nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
+  },
+  "0292c3998d62d25217e4e747f570bf8e": {
+    "question_template": "donne moi les coordonnes des parents de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, p.Tel1, p.Tel2, p.AdresseFr \nFROM parent pa \nJOIN personne p ON pa.personne = p.id \nJOIN parenteleve pe ON pa.id = pe.parent \nJOIN eleve e ON pe.eleve = e.id \nJOIN personne pe ON e.IdPersonne = pe.id \nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
+  },
+  "b046cbe5072668cd850628bb5e73a681": {
+    "question_template": "donne moi les informations des parents de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.NomFr, p.PrenomFr, p.AdresseFr, p.Tel1, p.Tel2\nFROM parent pa\nJOIN personne p ON pa.personne = p.id\nJOIN parenteleve pe ON pa.id = pe.parent\nJOIN eleve e ON pe.eleve = e.id\nJOIN personne pe ON e.IdPersonne = pe.id\nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
   }
 }

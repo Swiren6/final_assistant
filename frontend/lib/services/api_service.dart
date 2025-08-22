@@ -83,7 +83,7 @@ class ApiResponse {
       sqlQuery: json['sql_query']?.toString(),
       graphBase64: extractedGraph,
       hasGraph: graphFound,
-      pdfUrl: json['pdf_url'] as String?,     
+      pdfUrl: json['pdf_url'] as String?,
       pdfType: json['pdf_type'] as String?,
       userData: json['user'] as Map<String, dynamic>?,
       status: json['status']?.toString() ?? 'success',
@@ -96,8 +96,8 @@ class ApiResponse {
 
 class ApiService {
   static const String baseUrl = AppConstants.apiBaseUrl;
-  static const Duration defaultTimeout = Duration(seconds: 30);
-  static const Duration longTimeout = Duration(seconds: 60);
+  static const Duration defaultTimeout = Duration(seconds: 50);
+  static const Duration longTimeout = Duration(seconds: 120);
   static const Duration loginTimeout = Duration(seconds: 15);
 
   Map<String, String> _getHeaders(String? token) {
@@ -295,9 +295,9 @@ class ApiService {
         '/ask',
         {
           'question': question.trim(),
-          // Paramètres optionnels pour le backend
           'include_graph': true,
           'response_format': 'enhanced',
+          'max_tokens': null,
         },
         token: token,
         timeout:

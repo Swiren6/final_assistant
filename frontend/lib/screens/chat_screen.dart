@@ -749,39 +749,39 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildTextField() {
-    return TextField(
-      controller: _messageController,
-      decoration: InputDecoration(
-        hintText: 'Tapez votre question... (ex: "Combien d\'élèves ?", "Classes de 1ère année")',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.radiusRound),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppConstants.paddingLarge,
-          vertical: AppConstants.paddingMedium,
-        ),
-        suffixIcon: _messageController.text.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  _messageController.clear();
-                  setState(() {});
-                },
-              )
-            : null,
+  return TextField(
+    controller: _messageController,
+    decoration: InputDecoration(
+      hintText: 'Tapez votre question... (ex: "Combien d\'élèves ?", "Classes de 1ère année")',
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppConstants.radiusRound),
+        borderSide: BorderSide.none,
       ),
-      textCapitalization: TextCapitalization.sentences,
-      maxLines: null,
-      minLines: 1,
-      maxLength: null, // ➕ Supprimé la limite de caractères
-      onSubmitted: (_) => _sendMessage(),
-      onChanged: (_) => setState(() {}),
-      enabled: !_isLoading,
-    );
-  }
+      filled: true,
+      fillColor: Colors.grey.shade100,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.paddingLarge,
+        vertical: AppConstants.paddingMedium,
+      ),
+      suffixIcon: _messageController.text.isNotEmpty
+          ? IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _messageController.clear();
+                setState(() {});
+              },
+            )
+          : null,
+    ),
+    textCapitalization: TextCapitalization.sentences,
+    maxLines: null,
+    minLines: 1,
+    maxLength: null,
+    onSubmitted: (_) => _sendMessage(),
+    onChanged: (_) => setState(() {}),
+    enabled: !_isLoading,
+  );
+}
 
   Widget _buildSendButton() {
     return Container(
