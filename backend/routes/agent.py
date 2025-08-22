@@ -9,7 +9,7 @@ import time
 from PIL import Image
 import io
 import base64
-
+import datetime
 from routes.auth import login
 from services.auth_service import AuthService
 from agent.assistant import SQLAssistant  
@@ -139,9 +139,26 @@ def ask_sql():
                     "details": "Impossible d'initialiser l'assistant IA"
                 }), 503
 
-        # 🧾 Cas spécial : Attestation de présence
         if "attestation" in question.lower():
-            return handle_attestation_request(question)
+            # Vérifier si l'utilisateur a les droits d'admin
+            if roles and 'ROLE_SUPER_ADMIN' in roles:
+                logger.info(f"✅ Demande d'attestation autorisée pour ADMIN {user_id}")
+                return handle_attestation_request(question)
+            else:
+                logger.warning(f"🚫 Demande d'attestation REFUSÉE pour utilisateur {user_id} avec rôles {roles}")
+                return jsonify({
+                    "success": True,
+                    "message": "❌ Accès refusé : Les parents ne peuvent pas générer d'attestations. Veuillez contacter l'administration.",
+                    "data": None,
+                    "graphBase64": None,
+                    "sqlQuery": None,
+                    "conversationId": None,
+                    "timestamp": datetime.now().isoformat(),
+                    "user_info": {
+                        "roles": roles,
+                        "access_level": "PARENT_RESTRICTED"
+                    }
+                }), 200
 
         
 

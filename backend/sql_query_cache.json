@@ -51,40 +51,24 @@
     "question_template": "donne moi les coordonné des parents de {NomFr} {PrenomFr}",
     "sql_template": "SELECT p.NomFr, p.PrenomFr, p.Tel1, p.Tel2, p.AdresseFr \nFROM parent pa \nJOIN personne p ON pa.personne = p.id \nJOIN parenteleve pe ON pa.id = pe.parent \nJOIN eleve e ON pe.eleve = e.id \nJOIN personne pe ON e.IdPersonne = pe.id \nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
   },
-  "f877e2ef909997b80edf803325259716": {
-    "question_template": "la classe de kouki bochra",
-    "sql_template": "SELECT c.CODECLASSEFR, c.NOMCLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'kouki' AND p.PrenomFr = 'bochra' AND ie.annuler = '0'"
-  },
-  "69d42433354c5f5003fd6c572885086c": {
-    "question_template": "kouki bochra",
-    "sql_template": "SELECT p.NomFr, p.PrenomFr FROM personne p WHERE (p.NomFr = 'kouki' AND p.PrenomFr = 'bochra') OR (p.NomFr = 'bochra' AND p.PrenomFr = 'kouki')"
-  },
-  "d7d9f12439bc2f8f7d16e9672d75543d": {
-    "question_template": "classe de BOUTITI Rimes",
-    "sql_template": "SELECT c.CODECLASSEFR, c.NOMCLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'BOUTITI' AND p.PrenomFr = 'Rimes' AND ie.annuler = '0'"
-  },
-  "a0b8081a0071657a41ab84b073c80a14": {
-    "question_template": "donne moi la classe de BOUTITI Rimes",
-    "sql_template": "SELECT c.CODECLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'BOUTITI' AND p.PrenomFr = 'Rimes'"
-  },
-  "1a39ea23f3b36813650917869238dee5": {
-    "question_template": "donne moi la classe de HMISSI Tasnim",
-    "sql_template": "SELECT c.CODECLASSEFR \nFROM eleve e \nJOIN personne p ON e.IdPersonne = p.id \nJOIN inscriptioneleve ie ON e.id = ie.Eleve \nJOIN classe c ON ie.Classe = c.id \nWHERE p.NomFr = 'HMISSI' AND p.PrenomFr = 'Tasnim' AND ie.annuler = '0'"
-  },
   "ddf88982d1e1e39dc79fd166648ca69f": {
     "question_template": "donne moi l'id de {NomFr} {PrenomFr}",
     "sql_template": "SELECT p.id FROM personne p WHERE (p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}') OR (p.NomFr = '{PrenomFr}' AND p.PrenomFr = '{NomFr}')"
   },
-  "45ac8473149dc8faa662001309a95f93": {
-    "question_template": "donne moi l'enfant de boutiti olfa",
-    "sql_template": "SELECT p.NomFr, p.PrenomFr \nFROM eleve e \nJOIN personne pe ON e.IdPersonne = pe.id \nJOIN parenteleve pelev ON e.id = pelev.eleve \nJOIN parent pa ON pelev.parent = pa.id \nJOIN personne p ON pa.personne = p.id \nWHERE p.NomFr = 'boutiti' AND p.PrenomFr = 'olfa'"
-  },
-  "fad487930476f7d362b218261d8e1fd9": {
-    "question_template": "les notes de benabda malak",
-    "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = 'benabda' \nAND p.PrenomFr = 'malak' \nAND ed.moyemati NOT LIKE '0.00'"
-  },
   "0f89096f64e804eba85bacd9dc3fa279": {
     "question_template": "donne moi les notes de {NomFr} {PrenomFr}",
     "sql_template": "SELECT em.libematifr AS matiere, ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre \nFROM Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e, personne p\nWHERE e.idedusrv = ed.idenelev \nAND ed.codemati = em.codemati \nAND ex.codeperiexam = ed.codeperiexam \nAND e.Idpersonne = p.id \nAND p.NomFr = '{NomFr}' \nAND p.PrenomFr = '{PrenomFr}' \nAND ed.moyemati NOT LIKE '0.00'"
+  },
+  "ddecb29edb7dcf161a7424df2a26590c": {
+    "question_template": "donne moi l'emploi du temps de la classe {CODECLASSEFR}",
+    "sql_template": "SELECT \n    p.NomFr AS NomEnseignant, \n    p.PrenomFr AS PrenomEnseignant, \n    m.NomMatiereFr AS Matiere, \n    s.nomSalleFr AS Salle, \n    sd.debut AS DebutSeance, \n    sf.fin AS FinSeance, \n    j.libelleJourFr AS Jour\nFROM \n    emploidutemps edt\nJOIN \n    personne p ON edt.Enseignant = p.id\nJOIN \n    matiere m ON edt.Matiere = m.id\nJOIN \n    salle s ON edt.Salle = s.id\nJOIN \n    seance sd ON edt.SeanceDebut = sd.id\nJOIN \n    seance sf ON edt.SeanceFin = sf.id\nJOIN \n    jour j ON edt.Jour = j.id\nJOIN \n    classe c ON edt.Classe = c.id\nWHERE \n    c.CODECLASSEFR = '{CODECLASSEFR}'\nORDER BY \n    j.id, sd.debut"
+  },
+  "a943028677118c22cb6af16620d3a61e": {
+    "question_template": "donne moi les numéros de téléphone de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT p.Tel1, p.Tel2 FROM personne p WHERE (p.NomFr = '{NomFr}' AND p.PrenomFr = '{PrenomFr}') OR (p.NomFr = '{PrenomFr}' AND p.PrenomFr = '{NomFr}')"
+  },
+  "12c166a4634e620ea828c7894cb8eb49": {
+    "question_template": "donne moi les numéro de téléohone des parents de {NomFr} {PrenomFr}",
+    "sql_template": "SELECT DISTINCT p.Tel1, p.Tel2 \nFROM parent pa \nJOIN personne p ON pa.personne = p.id \nJOIN parenteleve pe ON pa.id = pe.parent \nJOIN eleve e ON pe.eleve = e.id \nJOIN personne pe ON e.IdPersonne = pe.id \nWHERE pe.NomFr = '{NomFr}' AND pe.PrenomFr = '{PrenomFr}'"
   }
 }

@@ -69,14 +69,16 @@ GénéRALITE:
 **lorsqu'il y a un nom et prenom dans une question on fait le test si c'est ecrit NomFr PrenomFr ou PrenomFr NomFr .
 * la table qui relie l'eleve de son parent c'est parenteleve.
 **la colonnne de l'id de la personne dans la table parent s'apelle personne . 
+
 MOYENNE ET NOTE :
 **les moyennes des trimestres se trouve dans le table Eduresultatcopie a la colonne moyeperiexam.
+** la colone du code de trimestre est codeperiexam non pas idtrimestre dans la table Eduresultatcopie.
 **lorsqu'on demande les moyennes par matières pour une trimestre précise voici la requette qu on applique :
 SELECT em.libematifr AS matiere ,ed.moyemati AS moyenne, ex.codeperiexam AS codeTrimestre FROM
            Eduperiexam ex, Edumoymaticopie ed, Edumatiere em, Eleve e
            WHERE e.idedusrv=ed.idenelev and ed.codemati=em.codemati and
            ex.codeperiexam=ed.codeperiexam  and  e.Idpersonne=(id_de la personne) and ed.moyemati not like '0.00' and ed.codeperiexam = ( id de la trimestre ) ;
-**les résultats des trimestres se trouve dans le table Eduresultatcopie 
+
 
 EMPLOI DU TEMPS:
 ** l'emploi du temps est donnée par jour non pas matin et après midi .
@@ -219,26 +221,7 @@ EXEMPLES DE FILTRES CORRECTS:
    WHERE e.IdPersonne IN (7012) -- NE PAS utiliser IN avec un seul élément
 
 ATTENTION: 
-*POUR LES ABSENCES:
-**la table absence ne contient pas l'id de l'eleve mais plutot son nomprenom alors on fait ça a.nomprenom = (SELECT CONCAT(p.NomFr, ' ', p.prenomFr)
-                       FROM personne p
-                       JOIN eleve e ON p.id = e.IdPersonne
-                       WHERE e.IdPersonne = (id_child)).
-** la table absence  ne contient pas id_matiere mais matiere . on fait cette jointure  JOIN matiere m ON a.matiere = m.id.
-**lorsque on demande le nombre des absences par matière on donne le nom de matière n'on pas le code 
-** pour les absences il faut que la colone Etat de la table absence soit = 1.
-** lorsque on veut extraire les détails de l'absence on extrait a.date et matiere.NomMatiereFr.
-POUR L'EMPLOI DU TEMPS:
-** pour l'emploi du temps on l'extrait du table emploidutemps non pas de viewemploi. 
-**lorsque on demande l'emploi du temps d'un classe précie avec un jour précie on extrait le nom , le prénom de l'enseignant ,le nom de la matière , le nom de la salle , le debut et la fin de séance et le libelle de groupe (par classe...)
-**lorsque on veut savoir l id de la séance on fait la jointure suivante : seance.id=emploidutemps.SeanceDebut et pour la fin emploidutemps.SeanceFin = seance.id
-**Les coordonées de debut et de la fin de séance se trouve dans le table emploidutemps sous forme d'id ,les covertir en heures a l'aide de table seance . 
-** la table seance ne contient pas une colone heure mais une colone qui s'appele 'debut' et une autre qui s'appelle 'fin'.
-** on n'a pas ni idsalle ni idmatiere dans emploidutemps. on a salle et matiere.
-**la semaine A est d'id 2 , la semaine B est d'id 3 , Sans semaine d'id 1.
-
-** le table des enseignants s'appelle enseingant non pas enseignant. 
-**les moyennes des trimestres se trouve dans le table Eduresultatcopie.
+GENÉRALITÉ:
 **l'année scolaire se trouve dans anneescolaire.AnneeScolaire non pas dans Annee.
 ** si on dit l'annee XXXX/YYYY on parle de l'année scolaire XXXX/YYYY. 
 **les table eleve et parent et enseingant ne contienne pas les noms et les prenoms . ils se trouvent dans la table personne.
@@ -250,30 +233,44 @@ POUR L'EMPLOI DU TEMPS:
 ** le parametre du nom de la salle c'est nomSalleFr non NomSalle . 
 ** le nom de matière se trouve dans la table Matiere dans la colonne Nommatierefr.
 **pour les nom de jour en français on a une colone libelleJourFr avec mercredi c'est ecrite Mercredi . 
-**utiliser des JOINs explicites . exemple au lieu de :WHERE
-    e.Classe = (SELECT id FROM classe WHERE CODECLASSEFR = '7B2')
-    AND e.Jour = (SELECT id FROM jour WHERE libelleJourFr = 'Mercredi')
-    ecrire:
- JOIN
-     jour j ON e.Jour = j.id AND j.libelleJourFr = 'Mercredi'
-JOIN
-     classe c ON e.Classe = c.id AND c.CODECLASSEFR = '7B2'
 ** lorsque on veut savoir l id de l'eleve :  eleve.Idpersonne = {{children_ids}} [UN enfant] OU eleve.Idpersonne IN ({{children_ids}}) [PLUSIEURS]
 ** lorsque on veut chercher la classe de l'eleve on fait : 
    - UN enfant: idClasse = (SELECT id FROM classe WHERE id = (SELECT Classe FROM inscriptioneleve WHERE Eleve = (SELECT id FROM eleve WHERE IdPersonne = {{children_ids}})))
    - PLUSIEURS: idClasse IN (SELECT id FROM classe WHERE id IN (SELECT Classe FROM inscriptioneleve WHERE Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({{children_ids}}))))
 ** le nom de matière dans la table edumatiere est libematifr non pas NomMatiereFr .
-** la matière mathématique s'appelle Maths dans la table matiere. 
+** la matière mathématique s'appelle Maths dans la table matiere.
+** la table des enseignants s'appelle enseingant non pas enseignant. 
 
+*POUR LES ABSENCES:
+**la table absence ne contient pas l'id de l'eleve mais plutot son nomprenom alors on fait ça a.nomprenom = (SELECT CONCAT(p.NomFr, ' ', p.prenomFr)
+                       FROM personne p
+                       JOIN eleve e ON p.id = e.IdPersonne
+                       WHERE e.IdPersonne = (id_child)).
+** la table absence  ne contient pas id_matiere mais matiere . on fait cette jointure  JOIN matiere m ON a.matiere = m.id.
+**lorsque on demande le nombre des absences par matière on donne le nom de matière n'on pas le code 
+** pour les absences il faut que la colone Etat de la table absence soit = 1.
+** lorsque on veut extraire les détails de l'absence on extrait a.date et matiere.NomMatiereFr.
+
+POUR L'EMPLOI DU TEMPS:
+** l'emploi du temps est donnée par jour non pas matin et après midi .
+** pour l'emploi du temps on l'extrait du table emploidutemps non pas de viewemploi. 
+**lorsque on demande l'emploi du temps d'un classe précie avec un jour précie on extrait le nom , le prénom de l'enseignant ,le nom de la matière , le nom de la salle , le debut et la fin de séance .
+**lorsque on veut savoir l id de la séance on fait la jointure suivante : seance.id=emploidutemps.SeanceDebut et pour la fin emploidutemps.SeanceFin = seance.id
+**Les coordonées de debut et de la fin de séance se trouve dans le table emploidutemps sous forme d'id ,les covertir en heures a l'aide de table seance . 
+** on n'a pas ni idsalle ni idmatiere dans emploidutemps. on a salle et matiere.
+** la table seance ne contient pas une colone heure mais une colone qui s'appele 'debut' et une autre qui s'appelle 'fin'.
+**pour la salle la colonne du nom de salle s'appelle nomSalleFr .
+
+POUR LES MOYENNES ET NOTES:
+**les moyennes des trimestres se trouve dans le table Eduresultatcopie a la colonne moyeperiexam.
+** la colone du code de trimestre est codeperiexam non pas idtrimestre dans la table Eduresultatcopie.
+**le devoir de controle 1 a le nom de DC1 dans la table noteeleveparmatiere.
+****le devoir de synthese  a le nom de DS dans la table noteeleveparmatiere.
 🎯 EXEMPLE NOTES POUR UN SEUL ENFANT (children_ids = "7012"):
 SELECT 
     m.NomMatiereFr AS nom_matiere,
     n.orale,
-    n.TP,
-    n.ExamenEcrit,
-    n.DS,
-    n.DC1,
-    n.DC2
+    n.(code du devoir)
 FROM noteeleveparmatiere n
 JOIN matiere m ON n.id_matiere = m.id
 WHERE n.id_inscription = (

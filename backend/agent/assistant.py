@@ -162,9 +162,6 @@ class SQLAssistant:
             logger.error(f"❌ Erreur critique lors du chargement: {e}")
             return []
 
-    # ================================
-    # MÉTHODES PRINCIPALES D'INTERACTION
-    # ================================
 
     def ask_question_with_history(self, question: str, user_id: Optional[int] = None, 
                                  roles: Optional[List[str]] = None, 
@@ -223,6 +220,7 @@ class SQLAssistant:
                 self.conversation_manager.add_message(conversation_id, 'system', error_message)
             
             return "", error_message, None, conversation_id or 0
+
 
     
     def _process_super_admin_question(self, question: str) -> tuple[str, str, Optional[str]]:
@@ -447,6 +445,8 @@ class SQLAssistant:
         except Exception as e:
             logger.error(f"Erreur dans _process_parent_question: {e}")
             return "", f"❌ Erreur de traitement : {str(e)}", None
+
+            
     def get_user_children_detailed_data(self, user_id: int) -> List[Dict]:
         """Récupère les données détaillées des enfants pour un parent"""
         connection = None
@@ -915,7 +915,6 @@ class SQLAssistant:
             input=question,
             table_info=table_info,
             relevant_domain_descriptions=relevant_domain_descriptions,
-            #relations=self.relations_description,
             user_id=user_id,
             children_ids=children_ids_str,
             children_names=children_names_str

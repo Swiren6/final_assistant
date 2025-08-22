@@ -45,7 +45,6 @@ class SemanticTemplateMatcher:
         template_text = template["template_question"]
         variables = {}
 
-        # Extraction des années scolaires (format 2023-2024 ou 2023/2024)
         annee_pattern = r"(20\d{2}[-\/]20\d{2})"
         annee_match = re.search(annee_pattern, question)
         if annee_match:

@@ -26,5 +26,9 @@
   "4c5bc30cadabd73ef7b720a82a418d43": {
     "question_template": "donne moi la classe de {family_relation}",
     "sql_template": "SELECT c.CODECLASSEFR \nFROM classe c \nJOIN inscriptioneleve ie ON c.id = ie.Classe \nWHERE ie.Eleve IN (SELECT id FROM eleve WHERE IdPersonne IN ({id_personne}))"
+  },
+  "3cbeff4283263647a15bfb7f2561f5e2": {
+    "question_template": "donne moi l'emploi du temps de {family_relation}",
+    "sql_template": "SELECT \n    e.PrenomFr AS prenom_enseignant,\n    e.NomFr AS nom_enseignant,\n    m.NomMatiereFr AS nom_matiere,\n    s.nomSalleFr AS nom_salle,\n    seance_debut.debut AS debut_seance,\n    seance_fin.fin AS fin_seance,\n    j.libelleJourFr AS jour\nFROM emploidutemps edt\nJOIN enseingant ens ON edt.enseignant = ens.id\nJOIN personne e ON ens.IdPersonne = e.id\nJOIN matiere m ON edt.matiere = m.id\nJOIN salle s ON edt.salle = s.id\nJOIN seance seance_debut ON edt.SeanceDebut = seance_debut.id\nJOIN seance seance_fin ON edt.SeanceFin = seance_fin.id\nJOIN jour j ON edt.jour = j.id\nWHERE edt.classe = (\n    SELECT Classe \n    FROM inscriptioneleve \n    WHERE Eleve = (\n        SELECT id \n        FROM eleve \n        WHERE IdPersonne = 7818\n    )\n)\nORDER BY j.id, seance_debut.debut"
   }
 }
