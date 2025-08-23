@@ -3052,5 +3052,95 @@
     "question": "donne moi le nombre d'élèves par localité",
     "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
     "response": "Voici le nombre d'élèves par localité :\n\n- Baraket El Sahel : 2 élèves\n- Beni Khalled : 2 élèves\n- Beni Khiar : 18 élèves\n- Bir Bouregba : 1 élève\n- Bou Argoub : 2 élèves\n- Cité El Wafa : 1 élève\n- Dar Chaabane Elfehri : 14 élèves\n- El Maamoura : 2 élèves\n- Grombalia : 8 élèves\n- Hammamet : 47 élèves\n- Korba : 2 élèves\n- Menzel Temime : 1 élève\n- Nabeul : 104 élèves\n- Somaa : 2 élèves\n- Yasmine Hammamet : 1 élève\n- Zaghouan : 1 élève\n\nChaque localité a un nombre spécifique d'élèves, avec Nabeul et Hammamet ayant les effectifs les plus élevés."
+  },
+  {
+    "timestamp": "2025-08-22T13:30:43.769546",
+    "question": "Comment joindre les parents de Nouha Laataoui ?",
+    "sql": "SELECT DISTINCT \n    pp.`PrenomFr`, \n    pp.`NomFr`, \n    pp.`Tel1`, \n    pp.`Tel2`, \n    pp.`Email`, \n    pp.`AdresseFr`, \n    pe.`Type`\nFROM \n    `eleve` e\nJOIN \n    `personne` p ON e.`IdPersonne` = p.`id`\nJOIN \n    `parenteleve` pe ON pe.`Eleve` = e.`id`\nJOIN \n    `parent` pa ON pe.`Parent` = pa.`id`\nJOIN \n    `personne` pp ON pa.`Personne` = pp.`id`\nWHERE \n    (p.`PrenomFr` = 'Nouha' AND p.`NomFr` = 'Laataoui')\n    OR (p.`PrenomFr` = 'Laataoui' AND p.`NomFr` = 'Nouha')",
+    "response": "Pour joindre le parent de Nouha Laataoui, vous pouvez contacter son père, Mourad Laataoui, à l'adresse suivante : 19 rue Maisson Blanche. Malheureusement, il n'y a pas de numéro de téléphone ou d'email disponible pour le joindre directement."
+  },
+  {
+    "timestamp": "2025-08-22T13:31:05.843679",
+    "question": "donne moi le nombre d'élèves par niveau",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Voici le nombre d'élèves par niveau :\n\n- 1ère : 16 élèves\n- 2ème : 30 élèves\n- 3ème : 30 élèves\n- 4ème : 27 élèves\n- 8ème : 57 élèves\n- 9ème : 49 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T13:31:28.157437",
+    "question": "donne moi le nombre d'élèves par niveau en 2021/2022",
+    "sql": "SELECT `niveau`.`NOMNIVFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `classe` ON `inscriptioneleve`.`Classe` = `classe`.`id`\nJOIN `niveau` ON `classe`.`IDNIV` = `niveau`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`AnneeScolaire` = '2021/2022'\nGROUP BY `niveau`.`NOMNIVFR`",
+    "response": "Pour l'année scolaire 2021/2022, voici le nombre d'élèves par niveau :\n\n- 1ère : 48 élèves\n- 2ème : 52 élèves\n- 3ème : 43 élèves\n- 4ème : 48 élèves\n- 7ème : 79 élèves\n- 8ème : 52 élèves\n- 9ème : 70 élèves"
+  },
+  {
+    "timestamp": "2025-08-22T14:06:54.743450",
+    "question": "quel est le nombre d'élèves par localité ?",
+    "sql": "SELECT `localite`.`LIBELLELOCALITEFR`, COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `anneescolaire`.`Actif` = 1\nGROUP BY `localite`.`LIBELLELOCALITEFR`",
+    "response": "Voici le nombre d'élèves par localité :\n\n- Baraket El Sahel : 2 élèves\n- Beni Khalled : 2 élèves\n- Beni Khiar : 18 élèves\n- Bir Bouregba : 1 élève\n- Bou Argoub : 2 élèves\n- Cité El Wafa : 1 élève\n- Dar Chaabane Elfehri : 14 élèves\n- El Maamoura : 2 élèves\n- Grombalia : 8 élèves\n- Hammamet : 47 élèves\n- Korba : 2 élèves\n- Menzel Temime : 1 élève\n- Nabeul : 104 élèves\n- Somaa : 2 élèves\n- Yasmine Hammamet : 1 élève\n- Zaghouan : 1 élève"
+  },
+  {
+    "timestamp": "2025-08-22T14:09:03.966471",
+    "question": "donne moi le nombre d'élèves inscrits de Nabeul",
+    "sql": "SELECT COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE`\nWHERE `localite`.`LIBELLELOCALITEFR` = 'Nabeul'",
+    "response": "Le nombre d'élèves inscrits à Nabeul est de 610."
+  },
+  {
+    "timestamp": "2025-08-22T14:09:31.484201",
+    "question": "donne moi le nombre d'élèves inscrits de Nabeul pour l'année scolaire en cours",
+    "sql": "SELECT COUNT(DISTINCT `inscriptioneleve`.`Eleve`) AS `nombre_eleves`\nFROM `inscriptioneleve`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nJOIN `eleve` ON `inscriptioneleve`.`Eleve` = `eleve`.`id`\nJOIN `personne` ON `eleve`.`id` = `personne`.`id`\nJOIN `localite` ON `personne`.`Localite` = `localite`.`id`\nWHERE `anneescolaire`.`Actif` = 1 AND `localite`.`NomFr` = 'Nabeul'",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'localite.NomFr' in 'where clause'"
+  },
+  {
+    "timestamp": "2025-08-22T14:10:39.222137",
+    "question": "donne moi le nombre d'élèves inscrits de la localité de Nabeul pour l'année scolaire en cours",
+    "sql": "SELECT COUNT(*) \nFROM `inscriptioneleve` \nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id` \nJOIN `localite` ON `personne`.`Localite` = `localite`.`IDLOCALITE` \nWHERE `localite`.`LIBELLELOCALITEFR` = 'Nabeul' \nAND `inscriptioneleve`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "Il y a 105 élèves inscrits de la localité de Nabeul pour l'année scolaire en cours."
+  },
+  {
+    "timestamp": "2025-08-22T14:14:55.095659",
+    "question": "donne moi la localité avec le plus grand nombre d'inscriptions",
+    "sql": "SELECT `loc`.`LIBELLELOCALITEFR`\nFROM `inscriptioneleve` AS `insc`\nJOIN `personne` AS `pers` ON `insc`.`Personne` = `pers`.`id`\nJOIN `localite` AS `loc` ON `pers`.`Localite` = `loc`.`IDLOCALITE`\nWHERE `insc`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\nGROUP BY `loc`.`LIBELLELOCALITEFR`\nORDER BY COUNT(`insc`.`id`) DESC\nLIMIT 1",
+    "response": "La localité avec le plus grand nombre d'inscriptions est Nabeul."
+  },
+  {
+    "timestamp": "2025-08-22T14:20:08.746931",
+    "question": "donne moi la liste des élèves qui n'ont pas encore payé la tanche 1 pour l'année en cours ?",
+    "sql": "SELECT DISTINCT p.`NomFr`, p.`PrenomFr`\nFROM `eleve` e\nJOIN `personne` p ON e.`IdPersonne` = p.`id`\nJOIN `inscriptioneleve` ie ON e.`id` = ie.`Eleve`\nJOIN `paiement` pa ON ie.`id` = pa.`Inscription`\nWHERE pa.`MontantRestant` > 0\nAND pa.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'pa.AnneeScolaire' in 'IN/ALL/ANY subquery'"
+  },
+  {
+    "timestamp": "2025-08-22T14:20:50.600247",
+    "question": "donne moi la liste des élèves qui n'ont pas encore payé la tranche 1 pour l'année en cours ?",
+    "sql": "SELECT DISTINCT `personne`.`NomFr`, `personne`.`PrenomFr`, `paiement`.`Tranche`, `paiement`.`MontantRestant`\nFROM `inscriptioneleve`\nJOIN `personne` ON `inscriptioneleve`.`Personne` = `personne`.`id`\nJOIN `paiement` ON `paiement`.`Inscription` = `inscriptioneleve`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `paiement`.`Tranche` = 'Tranche 1'\nAND `paiement`.`MontantRestant` > 0\nAND `anneescolaire`.`Actif` = 1",
+    "response": "Il y a 47 élèves qui n'ont pas encore payé la tranche 1 pour l'année en cours. Voici quelques exemples :\n\n1. Maryem TEIB doit encore 1920.0.\n2. Tasnime TEIB doit encore 2235.0.\n3. Sarra KERKENI doit encore 5071.5.\n4. Abdelaziz KERKENI doit encore 5985.0.\n5. Ritej MATHLOUTHI doit encore 3485.0.\n6. Rayhan FARHAT doit encore 5700.0.\n7. Kenza AKROUT doit encore 5670.0.\n8. Donia AKROUT doit encore 5985.0.\n9. Meriem FARES doit encore 1500.0.\n10. Mohamed Aziz ABDELLAOUI doit encore 2500.0.\n\nLa liste complète comprend d'autres élèves avec des montants restants variés."
+  },
+  {
+    "timestamp": "2025-08-22T14:22:26.543233",
+    "question": "donne moi la liste des élèves avec un engagement de paiement annuel",
+    "sql": "SELECT DISTINCT `p`.`NomFr`, `p`.`PrenomFr`\nFROM `eleve` AS `e`\nJOIN `personne` AS `p` ON `e`.`IdPersonne` = `p`.`id`\nJOIN `inscriptioneleve` AS `i` ON `i`.`Eleve` = `e`.`id`\nJOIN `paiement` AS `pa` ON `pa`.`Inscription` = `i`.`id`\nWHERE `pa`.`AnneeScolaire` IN (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)",
+    "response": "❌ Erreur lors de l’exécution de la demande.\nDétail : 1054 (42S22): Unknown column 'pa.AnneeScolaire' in 'IN/ALL/ANY subquery'"
+  },
+  {
+    "timestamp": "2025-08-22T14:28:32.042145",
+    "question": "donne moi la liste des élèves qui n'ont pas payé la tranche 3 de l'année scolaire précédente",
+    "sql": "SELECT DISTINCT p.`NomFr`, p.`PrenomFr`\nFROM `eleve` e\nJOIN `personne` p ON e.`IdPersonne` = p.`id`\nJOIN `inscriptioneleve` i ON e.`id` = i.`Eleve`\nJOIN `anneescolaire` a ON i.`AnneeScolaire` = a.`id`\nJOIN `paiement` pa ON i.`id` = pa.`Inscription`\nWHERE pa.`MontantRestant` > 0\nAND pa.`Tranche` = 3\nAND a.`id` = (\n    SELECT `id`\n    FROM `anneescolaire`\n    WHERE `id` < (SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1)\n    ORDER BY `id` DESC\n    LIMIT 1\n)",
+    "response": "Il n'y a pas de données disponibles concernant les élèves qui n'ont pas payé la tranche 3 de l'année scolaire précédente."
+  },
+  {
+    "timestamp": "2025-08-22T14:32:47.121891",
+    "question": "donne moi la liste des élèves qui n'ont pas payé la tranche numéro 3 de l'année scolaire précédente",
+    "sql": "SELECT DISTINCT p.`NomFr`, p.`PrenomFr`\nFROM `eleve` e\nJOIN `personne` p ON e.`IdPersonne` = p.`id`\nJOIN `inscriptioneleve` i ON e.`id` = i.`Eleve`\nJOIN `paiement` pay ON i.`id` = pay.`Inscription`\nJOIN `anneescolaire` a ON i.`AnneeScolaire` = a.`id`\nWHERE pay.`MontantRestant` > 0\nAND pay.`Tranche` = 3\nAND a.`id` = (SELECT MAX(id) FROM `anneescolaire` WHERE `id` < (SELECT id FROM `anneescolaire` WHERE `Actif` = 1))",
+    "response": "Il n'y a pas de données disponibles concernant les élèves qui n'ont pas payé la tranche numéro 3 de l'année scolaire précédente."
+  },
+  {
+    "timestamp": "2025-08-22T14:33:04.008742",
+    "question": "donne moi la liste des élèves qui n'ont pas payé la tranche 1 de l'année scolaire précédente",
+    "sql": "SELECT DISTINCT `personne`.`NomFr`, `personne`.`PrenomFr`\nFROM `eleve`\nJOIN `inscriptioneleve` ON `eleve`.`id` = `inscriptioneleve`.`Eleve`\nJOIN `paiement` ON `inscriptioneleve`.`id` = `paiement`.`Inscription`\nJOIN `personne` ON `eleve`.`IdPersonne` = `personne`.`id`\nJOIN `anneescolaire` ON `inscriptioneleve`.`AnneeScolaire` = `anneescolaire`.`id`\nWHERE `paiement`.`MontantRestant` > 0\nAND `paiement`.`TotalTTC` > 0\nAND `anneescolaire`.`id` = (\n    SELECT MAX(`id`) FROM `anneescolaire` WHERE `id` < (\n        SELECT `id` FROM `anneescolaire` WHERE `Actif` = 1\n    )\n)\nAND `paiement`.`Tranche` = 1",
+    "response": "Il n'y a pas de données disponibles concernant les élèves qui n'ont pas payé la tranche 1 de l'année scolaire précédente."
+  },
+  {
+    "timestamp": "2025-08-22T14:34:49.788059",
+    "question": "donne moi la liste des élèves qui n'ont pas encore réglé la tranche 1 de l'année scolaire précédente",
+    "sql": "SELECT DISTINCT p.`NomFr`, p.`PrenomFr`\nFROM `inscriptioneleve` ie\nJOIN `eleve` e ON ie.`Eleve` = e.`id`\nJOIN `personne` p ON e.`IdPersonne` = p.`id`\nJOIN `anneescolaire` a ON ie.`AnneeScolaire` = a.`id`\nLEFT JOIN `reglementeleve` re ON re.`IdInscription` = ie.`id`\nWHERE a.`id` = (SELECT MAX(id) FROM `anneescolaire` WHERE `id` < (SELECT id FROM `anneescolaire` WHERE `Actif` = 1))\nAND ie.`Restant_Scolaire` > 0\nAND re.`IdInscription` IS NULL",
+    "response": "Voici la liste des élèves qui n'ont pas encore réglé la tranche 1 de l'année scolaire précédente :\n\n1. Youssef Saanouni\n2. Rim Benhajchaabane\n3. Elea Jaafer\n4. Yahia Hammami\n5. Ahmedyakin Khemiri\n6. Kenza Ayed"
   }
 ]

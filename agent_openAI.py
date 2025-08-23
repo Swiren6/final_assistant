@@ -400,6 +400,7 @@ class SQLAssistant:
         except Exception:
             pass
 
+
         # Fallback déterministe (toujours générique)
         if count == 0:
             return "Aucune donnée trouvée pour cette demande."

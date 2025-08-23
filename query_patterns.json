@@ -28,6 +28,24 @@
     "response_fields": "personne.NomFr, personne.PrenomFr, modalite.NomModalite, paiement.Tranche, paiement.TotalTTC, paiement.MontantRestant"
   },
   {
+    "pattern_id": "student_payments",
+    "description": "Paiements et règlements des élèves",
+    "patterns": [
+      "paiements de {nom}",
+      "montant restant pour {prenom}",
+      "facture de {nom}",
+      "règlements de {prenom}",
+      "solde de {nom}",
+      "dette de {prenom}",
+      "situation financière de {nom}",
+      "derniers paiements de {prenom}"
+    ],
+    "key_tables": ["inscriptioneleve", "paiement", "reglementeleve", "eleve", "personne", "anneescolaire"],
+    "essential_joins": "inscriptioneleve.Eleve = eleve.id, paiement.Inscription = inscriptioneleve.id, reglementeleve.IdInscription = paiement.id, eleve.IdPersonne = personne.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
+    "common_filters": "",
+    "response_fields": "paiement.TotalTTC, paiement.MontantRestant, reglementeleve.Date, reglementeleve.Montant, inscriptioneleve.AnneeScolaire"
+  },
+  {
     "pattern_id": "student_identification",
     "description": "Recherche et identification d'élèves",
     "patterns": [
@@ -74,24 +92,6 @@
     "essential_joins": "eleve.IdPersonne = personne.id, parenteleve.Eleve = eleve.id, parenteleve.Parent = parent.id, parent.Personne = parent_p.id, inscriptioneleve.Eleve = eleve.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
     "common_filters": "parenteleve.Type (Père/Mère/Tuteur)",
     "response_fields": "parent_p.PrenomFr,parent_p.NomFr,parent_p.Tel1, parent_p.Tel2, parent_p.Email, parent_p.AdresseFr, parenteleve.Type"
-  },
-  {
-    "pattern_id": "student_payments",
-    "description": "Paiements et règlements des élèves",
-    "patterns": [
-      "paiements de {nom}",
-      "montant restant pour {prenom}",
-      "facture de {nom}",
-      "règlements de {prenom}",
-      "solde de {nom}",
-      "dette de {prenom}",
-      "situation financière de {nom}",
-      "derniers paiements de {prenom}"
-    ],
-    "key_tables": ["inscriptioneleve", "paiement", "reglementeleve", "eleve", "personne", "anneescolaire"],
-    "essential_joins": "inscriptioneleve.Eleve = eleve.id, paiement.Inscription = inscriptioneleve.id, reglementeleve.IdInscription = paiement.id, eleve.IdPersonne = personne.id, inscriptioneleve.AnneeScolaire = anneescolaire.id",
-    "common_filters": "",
-    "response_fields": "paiement.TotalTTC, paiement.MontantRestant, reglementeleve.Date, reglementeleve.Montant"
   },
   {
     "pattern_id": "class_schedule",
